@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -33,7 +34,7 @@ const bankData = [
   {
     id: 1,
     name: 'Ngân hàng Vietcombank',
-    logo: 'https://upload.wikimedia.org/wikipedia/vi/7/7c/Vietcombank_logo.svg',
+    logo: '/lovable-uploads/2bff7777-92fa-4bf7-83d8-ec84491ec641.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.5,
@@ -68,7 +69,7 @@ const bankData = [
   {
     id: 2,
     name: 'Ngân hàng BIDV',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/BIDV_logo.svg',
+    logo: '/lovable-uploads/2bff7777-92fa-4bf7-83d8-ec84491ec641.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.7,
@@ -103,7 +104,7 @@ const bankData = [
   {
     id: 3,
     name: 'Ngân hàng Techcombank',
-    logo: 'https://upload.wikimedia.org/wikipedia/vi/7/7e/Techcombank_logo.png',
+    logo: '/lovable-uploads/2bff7777-92fa-4bf7-83d8-ec84491ec641.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.3,
@@ -138,7 +139,7 @@ const bankData = [
   {
     id: 4,
     name: 'Ngân hàng MB Bank',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_MB_new.png',
+    logo: '/lovable-uploads/2bff7777-92fa-4bf7-83d8-ec84491ec641.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.6,
@@ -173,7 +174,7 @@ const bankData = [
   {
     id: 5,
     name: 'Ngân hàng VPBank',
-    logo: 'https://upload.wikimedia.org/wikipedia/vi/8/8c/VPBank_logo.png',
+    logo: '/lovable-uploads/2bff7777-92fa-4bf7-83d8-ec84491ec641.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.9,
