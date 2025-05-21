@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,11 +9,11 @@ const Header = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   
-  const navigationLinks = [
+  const navLinks = [
     { name: "Trang chủ", path: "/" },
     { name: "Khảo sát", path: "/khao-sat" },
-    { name: "So sánh khoản vay", path: "/so-sanh" },
-    { name: "Về chúng tôi", path: "/gioi-thieu" },
+    { name: "So sánh", path: "/so-sanh" },
+    { name: "Khu vực khách hàng", path: "/dashboard" },
   ];
 
   const closeSheet = () => {
@@ -32,7 +31,7 @@ const Header = () => {
         </Link>
         
         <nav className="hidden md:flex items-center space-x-6">
-          {navigationLinks.map((link) => (
+          {navLinks.map((link) => (
             <Link 
               key={link.path}
               to={link.path} 
@@ -77,7 +76,7 @@ const Header = () => {
               </SheetTrigger>
               <SheetContent side="right" className="w-[80%] pt-10">
                 <div className="flex flex-col gap-6 py-6">
-                  {navigationLinks.map((link) => (
+                  {navLinks.map((link) => (
                     <Link 
                       key={link.path}
                       to={link.path} 

@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import KhaoSat from "./pages/KhaoSat";
 import SoSanh from "./pages/SoSanh";
 import KetQua from "./pages/KetQua";
+import UserDashboard from "./pages/UserDashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,11 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/khao-sat" element={<KhaoSat />} />
             <Route path="/so-sanh" element={<SoSanh />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <UserDashboard />
+              </ProtectedRoute>
+            } />
             <Route path="/ket-qua" element={
               <ProtectedRoute>
                 <KetQua />
