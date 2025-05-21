@@ -10,6 +10,8 @@ import KhaoSat from "./pages/KhaoSat";
 import SoSanh from "./pages/SoSanh";
 import KetQua from "./pages/KetQua";
 import UserDashboard from "./pages/UserDashboard";
+import LoanComparison from "./pages/LoanComparison";
+import FAQ from "./pages/FAQ";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -35,6 +37,8 @@ function App() {
                 <KetQua />
               </ProtectedRoute>
             } />
+            <Route path="/loan-comparison" element={<LoanComparison />} />
+            <Route path="/faq" element={<FAQ />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

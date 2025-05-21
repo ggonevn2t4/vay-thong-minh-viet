@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,8 @@ const Header = () => {
     { name: "Trang chủ", path: "/" },
     { name: "Khảo sát", path: "/khao-sat" },
     { name: "So sánh", path: "/so-sanh" },
+    { name: "So sánh khoản vay", path: "/loan-comparison" },
+    { name: "FAQ", path: "/faq" },
     { name: "Khu vực khách hàng", path: "/dashboard" },
   ];
 
