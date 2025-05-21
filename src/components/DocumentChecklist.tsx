@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -8,7 +7,7 @@ import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, Dr
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Define document types for each loan category
 type DocumentItem = {
@@ -25,7 +24,7 @@ type DocumentCategory = {
 
 const DocumentChecklist = () => {
   const { toast } = useToast();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null);
   
   // Personal loan documents

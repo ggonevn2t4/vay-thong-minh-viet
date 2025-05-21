@@ -1,369 +1,363 @@
+
 import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Check, FileText } from 'lucide-react';
+import { ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
 
-const eligibilitySchema = z.object({
-  monthlyIncome: z.string().min(1, {
-    message: "Vui lòng nhập thu nhập hàng tháng",
-  }).transform(val => Number(val)),
-  employmentType: z.enum(["full-time", "part-time", "self-employed", "retired", "unemployed"], {
-    required_error: "Vui lòng chọn loại hình công việc",
-  }),
-  hasExistingLoan: z.boolean().default(false),
-  creditScore: z.string().transform(val => Number(val)),
-  age: z.string().min(1, {
-    message: "Vui lòng nhập tuổi của bạn",
-  }).transform(val => Number(val)),
-  hasSavings: z.boolean().default(false),
-});
-
-type EligibilityFormValues = z.infer<typeof eligibilitySchema>;
+interface EligibilityFormData {
+  monthlyIncome: number;
+  age: number;
+  creditHistory: string;
+  employmentType: string;
+  existingDebts: number;
+  loanAmount: number;
+  loanTerm: number;
+}
 
 const LoanEligibilityChecker = () => {
   const { toast } = useToast();
-  const [result, setResult] = useState<{
-    eligible: boolean;
-    message: string;
-    score: number;
-    recommendations: string[];
-  } | null>(null);
+  const [eligibilityScore, setEligibilityScore] = useState<number | null>(null);
+  const [showResults, setShowResults] = useState(false);
   
-  const form = useForm<EligibilityFormValues>({
-    resolver: zodResolver(eligibilitySchema),
-    defaultValues: {
-      monthlyIncome: "",
-      employmentType: "full-time",
-      hasExistingLoan: false,
-      creditScore: "650",
-      age: "",
-      hasSavings: false,
-    },
+  const [formData, setFormData] = useState<EligibilityFormData>({
+    monthlyIncome: 0,
+    age: 30,
+    creditHistory: 'good',
+    employmentType: 'full-time',
+    existingDebts: 0,
+    loanAmount: 100000000,
+    loanTerm: 10
   });
   
-  const onSubmit = (values: EligibilityFormValues) => {
-    // Calculate eligibility score
-    let score = 0;
-    const recommendations: string[] = [];
-    
-    // Income factor (0-40 points)
-    if (values.monthlyIncome >= 20000000) score += 40;
-    else if (values.monthlyIncome >= 15000000) score += 30;
-    else if (values.monthlyIncome >= 10000000) score += 20;
-    else if (values.monthlyIncome >= 7000000) score += 10;
-    else recommendations.push("Tăng thu nhập hoặc tìm việc làm thêm để cải thiện khả năng vay");
-    
-    // Employment type (0-20 points)
-    switch (values.employmentType) {
-      case "full-time": score += 20; break;
-      case "part-time": score += 10; break;
-      case "self-employed": score += 15; break;
-      case "retired": score += 10; break;
-      case "unemployed": 
-        score += 0; 
-        recommendations.push("Tìm việc làm ổn định để tăng khả năng được vay");
-        break;
-    }
-    
-    // Existing loans (-10 or 0 points)
-    if (values.hasExistingLoan) {
-      score -= 10;
-      recommendations.push("Giảm các khoản nợ hiện tại trước khi vay thêm");
-    }
-    
-    // Credit score (0-20 points)
-    if (values.creditScore >= 800) score += 20;
-    else if (values.creditScore >= 700) score += 15;
-    else if (values.creditScore >= 650) score += 10;
-    else if (values.creditScore >= 600) score += 5;
-    else recommendations.push("Cải thiện điểm tín dụng bằng cách thanh toán đúng hạn các khoản vay và hóa đơn");
-    
-    // Age factor (0-10 points)
-    if (values.age >= 25 && values.age <= 55) score += 10;
-    else if (values.age >= 22 && values.age < 25) score += 5;
-    else if (values.age > 55 && values.age <= 65) score += 5;
-    else recommendations.push("Tuổi nằm ngoài khoảng tối ưu cho khoản vay");
-    
-    // Savings (0 or 10 points)
-    if (values.hasSavings) score += 10;
-    else recommendations.push("Tạo một khoản tiết kiệm để tăng khả năng được duyệt vay");
-    
-    // Determine eligibility
-    const eligible = score >= 50;
-    let message = "";
-    
-    if (score >= 80) {
-      message = "Bạn có khả năng cao được phê duyệt khoản vay với lãi suất tốt.";
-    } else if (score >= 50) {
-      message = "Bạn có khả năng được phê duyệt khoản vay nhưng lãi suất có thể cao hơn.";
+  const handleInputChange = (field: keyof EligibilityFormData, value: string | number) => {
+    // For numeric fields, ensure we're setting numbers not strings
+    if (field === 'monthlyIncome' || field === 'age' || field === 'existingDebts' || 
+        field === 'loanAmount' || field === 'loanTerm') {
+      const numValue = typeof value === 'string' ? parseFloat(value) || 0 : value;
+      setFormData(prev => ({ ...prev, [field]: numValue }));
     } else {
-      message = "Bạn có thể gặp khó khăn trong việc được phê duyệt khoản vay tại thời điểm này.";
+      setFormData(prev => ({ ...prev, [field]: value }));
+    }
+  };
+  
+  const calculateEligibility = () => {
+    // Base score starts at 50
+    let score = 50;
+    
+    // Income factor (higher income = higher score)
+    score += Math.min(30, formData.monthlyIncome / 10000000);
+    
+    // Age factor (25-40 is ideal range)
+    if (formData.age >= 25 && formData.age <= 40) {
+      score += 10;
+    } else if (formData.age > 40 && formData.age <= 55) {
+      score += 5;
+    } else if (formData.age > 55) {
+      score -= 10;
     }
     
-    setResult({
-      eligible,
-      message,
-      score,
-      recommendations: recommendations.length ? recommendations : ["Hồ sơ của bạn đã rất tốt!"],
-    });
+    // Credit history
+    if (formData.creditHistory === 'excellent') {
+      score += 15;
+    } else if (formData.creditHistory === 'good') {
+      score += 10;
+    } else if (formData.creditHistory === 'fair') {
+      score += 0;
+    } else if (formData.creditHistory === 'poor') {
+      score -= 15;
+    }
     
+    // Employment type
+    if (formData.employmentType === 'full-time') {
+      score += 10;
+    } else if (formData.employmentType === 'part-time') {
+      score += 5;
+    } else if (formData.employmentType === 'self-employed') {
+      score += 7;
+    } else if (formData.employmentType === 'unemployed') {
+      score -= 20;
+    }
+    
+    // Debt to income ratio
+    const debtToIncomeRatio = formData.existingDebts / (formData.monthlyIncome + 0.01);
+    if (debtToIncomeRatio <= 0.2) {
+      score += 15;
+    } else if (debtToIncomeRatio <= 0.4) {
+      score += 7;
+    } else if (debtToIncomeRatio <= 0.6) {
+      score += 0;
+    } else {
+      score -= 15;
+    }
+    
+    // Loan amount to income ratio
+    const loanToIncomeRatio = formData.loanAmount / (formData.monthlyIncome * 12 + 0.01);
+    if (loanToIncomeRatio <= 3) {
+      score += 10;
+    } else if (loanToIncomeRatio <= 5) {
+      score += 5;
+    } else if (loanToIncomeRatio <= 7) {
+      score += 0;
+    } else {
+      score -= 10;
+    }
+    
+    // Ensure score is between 0-100
+    score = Math.max(0, Math.min(100, score));
+    
+    setEligibilityScore(score);
+    setShowResults(true);
+    
+    // Show toast notification
     toast({
-      title: "Đã hoàn tất đánh giá",
-      description: "Kết quả đánh giá đã được hiển thị bên dưới.",
+      title: `Điểm đánh giá: ${score.toFixed(0)}/100`,
+      description: getScoreMessage(score),
     });
+  };
+  
+  const getScoreMessage = (score: number) => {
+    if (score >= 80) {
+      return "Khả năng vay vốn rất cao. Bạn có thể đủ điều kiện cho nhiều gói vay ưu đãi.";
+    } else if (score >= 65) {
+      return "Khả năng vay vốn khá tốt. Bạn có thể đủ điều kiện cho các gói vay thông thường.";
+    } else if (score >= 50) {
+      return "Khả năng vay vốn trung bình. Bạn có thể cần cải thiện một số yếu tố.";
+    } else {
+      return "Khả năng vay vốn thấp. Bạn nên cải thiện tình hình tài chính trước khi vay.";
+    }
+  };
+  
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "bg-green-500";
+    if (score >= 65) return "bg-lime-500";
+    if (score >= 50) return "bg-yellow-500";
+    return "bg-red-500";
   };
   
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <Card className="mb-8 border-brand-200">
+      <Card>
         <CardHeader className="bg-brand-50">
           <CardTitle className="text-2xl text-brand-700">Kiểm tra khả năng vay vốn</CardTitle>
           <CardDescription>
-            Nhập thông tin của bạn dưới đây để nhận đánh giá nhanh về khả năng vay vốn
+            Hoàn thành thông tin bên dưới để đánh giá nhanh khả năng vay vốn của bạn
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {!showResults ? (
+            <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="monthlyIncome"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Thu nhập hàng tháng (VND)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Ví dụ: 10000000"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Nhập tổng thu nhập hàng tháng của bạn
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="age"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tuổi</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Ví dụ: 30"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Nhập tuổi hiện tại của bạn
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-3">
+                  <Label htmlFor="monthlyIncome">Thu nhập hàng tháng (VND)</Label>
+                  <Input
+                    id="monthlyIncome"
+                    type="number"
+                    placeholder="Nhập thu nhập hàng tháng"
+                    value={formData.monthlyIncome}
+                    onChange={(e) => handleInputChange('monthlyIncome', e.target.value)}
+                  />
+                </div>
                 
-                <FormField
-                  control={form.control}
-                  name="employmentType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Loại hình công việc</FormLabel>
-                      <div className="relative">
-                        <select
-                          className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          value={field.value}
-                          onChange={field.onChange}
-                        >
-                          <option value="full-time">Toàn thời gian</option>
-                          <option value="part-time">Bán thời gian</option>
-                          <option value="self-employed">Tự kinh doanh</option>
-                          <option value="retired">Đã nghỉ hưu</option>
-                          <option value="unemployed">Thất nghiệp</option>
-                        </select>
-                      </div>
-                      <FormDescription>
-                        Chọn loại hình công việc hiện tại của bạn
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-3">
+                  <Label htmlFor="age">Tuổi</Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    placeholder="Nhập tuổi của bạn"
+                    value={formData.age}
+                    onChange={(e) => handleInputChange('age', e.target.value)}
+                    min={18}
+                    max={70}
+                  />
+                </div>
                 
-                <FormField
-                  control={form.control}
-                  name="creditScore"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Điểm tín dụng (ước tính)</FormLabel>
-                      <div className="relative">
-                        <select
-                          className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          value={field.value}
-                          onChange={field.onChange}
-                        >
-                          <option value="850">Rất tốt (800-850)</option>
-                          <option value="750">Tốt (700-799)</option>
-                          <option value="650">Khá (650-699)</option>
-                          <option value="600">Trung bình (600-649)</option>
-                          <option value="550">Dưới trung bình (&lt;600)</option>
-                        </select>
-                      </div>
-                      <FormDescription>
-                        Chọn mức đánh giá tín dụng gần nhất với tình hình của bạn
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-3">
+                  <Label htmlFor="creditHistory">Lịch sử tín dụng</Label>
+                  <Select 
+                    value={formData.creditHistory} 
+                    onValueChange={(value) => handleInputChange('creditHistory', value)}
+                  >
+                    <SelectTrigger id="creditHistory">
+                      <SelectValue placeholder="Chọn lịch sử tín dụng" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="excellent">Xuất sắc - Luôn trả nợ đúng hạn</SelectItem>
+                      <SelectItem value="good">Tốt - Hiếm khi trễ hạn</SelectItem>
+                      <SelectItem value="fair">Trung bình - Đôi khi trễ hạn</SelectItem>
+                      <SelectItem value="poor">Kém - Thường xuyên trễ hạn</SelectItem>
+                      <SelectItem value="none">Chưa có lịch sử tín dụng</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 
-                <FormField
-                  control={form.control}
-                  name="hasExistingLoan"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>
-                          Bạn hiện có khoản vay đang trả góp
-                        </FormLabel>
-                        <FormDescription>
-                          Chọn nếu bạn đang có khoản vay cần trả góp hàng tháng
-                        </FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-3">
+                  <Label htmlFor="employmentType">Loại hình công việc</Label>
+                  <Select 
+                    value={formData.employmentType} 
+                    onValueChange={(value) => handleInputChange('employmentType', value)}
+                  >
+                    <SelectTrigger id="employmentType">
+                      <SelectValue placeholder="Chọn loại hình công việc" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full-time">Toàn thời gian</SelectItem>
+                      <SelectItem value="part-time">Bán thời gian</SelectItem>
+                      <SelectItem value="self-employed">Tự kinh doanh</SelectItem>
+                      <SelectItem value="contract">Hợp đồng ngắn hạn</SelectItem>
+                      <SelectItem value="unemployed">Đang không có việc làm</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 
-                <FormField
-                  control={form.control}
-                  name="hasSavings"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>
-                          Bạn có khoản tiết kiệm
-                        </FormLabel>
-                        <FormDescription>
-                          Chọn nếu bạn có tài khoản tiết kiệm với số dư đáng kể
-                        </FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-3">
+                  <Label htmlFor="existingDebts">Nợ hiện tại (VND)</Label>
+                  <Input
+                    id="existingDebts"
+                    type="number"
+                    placeholder="Nhập số nợ hiện tại"
+                    value={formData.existingDebts}
+                    onChange={(e) => handleInputChange('existingDebts', e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-3">
+                  <Label htmlFor="loanAmount">Số tiền muốn vay (VND)</Label>
+                  <Input
+                    id="loanAmount"
+                    type="number"
+                    placeholder="Nhập số tiền muốn vay"
+                    value={formData.loanAmount}
+                    onChange={(e) => handleInputChange('loanAmount', e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-3">
+                  <Label htmlFor="loanTerm">Thời hạn vay (năm)</Label>
+                  <Input
+                    id="loanTerm"
+                    type="number"
+                    placeholder="Nhập thời hạn vay"
+                    value={formData.loanTerm}
+                    onChange={(e) => handleInputChange('loanTerm', e.target.value)}
+                    min={1}
+                    max={30}
+                  />
+                </div>
               </div>
               
-              <div className="pt-4">
-                <Button type="submit" className="w-full md:w-auto">
-                  Kiểm tra khả năng vay
+              <div className="flex justify-end pt-4">
+                <Button onClick={calculateEligibility} className="w-full md:w-auto">
+                  Đánh giá khả năng vay <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
-            </form>
-          </Form>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="text-center p-6">
+                <h3 className="text-xl font-medium mb-2">Kết quả đánh giá khả năng vay vốn</h3>
+                <div className="relative mx-auto w-48 h-48 mb-4">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-4xl font-bold">{eligibilityScore?.toFixed(0)}</span>
+                  </div>
+                  <svg className="w-full h-full" viewBox="0 0 100 100">
+                    <circle
+                      className="text-gray-200"
+                      strokeWidth="10"
+                      stroke="currentColor"
+                      fill="transparent"
+                      r="40"
+                      cx="50"
+                      cy="50"
+                    />
+                    <circle
+                      className="text-brand-600"
+                      strokeWidth="10"
+                      strokeDasharray={251.2}
+                      strokeDashoffset={251.2 - (251.2 * (eligibilityScore || 0)) / 100}
+                      strokeLinecap="round"
+                      stroke="currentColor"
+                      fill="transparent"
+                      r="40"
+                      cx="50"
+                      cy="50"
+                    />
+                  </svg>
+                </div>
+                
+                <div className="mb-6">
+                  <p className="text-xl font-medium">
+                    {eligibilityScore && eligibilityScore >= 65 ? (
+                      <span className="flex items-center justify-center text-green-600">
+                        <CheckCircle className="mr-2 h-5 w-5" /> 
+                        {eligibilityScore >= 80 ? "Rất cao" : "Khá tốt"}
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center text-amber-600">
+                        <AlertCircle className="mr-2 h-5 w-5" />
+                        {eligibilityScore && eligibilityScore >= 50 ? "Trung bình" : "Thấp"}
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-gray-600 mt-2">{getScoreMessage(eligibilityScore || 0)}</p>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <p className="mb-2 font-medium">Mức thu nhập hàng tháng</p>
+                    <p className="text-gray-600">
+                      {formData.monthlyIncome.toLocaleString('vi-VN')} VND
+                      {formData.monthlyIncome < 5000000 && (
+                        <span className="text-red-500 block mt-1">
+                          ⚠️ Thu nhập thấp có thể ảnh hưởng tới khả năng vay vốn
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <p className="mb-2 font-medium">Tỷ lệ nợ/thu nhập</p>
+                    <p className="text-gray-600">
+                      {((formData.existingDebts / (formData.monthlyIncome + 0.01)) * 100).toFixed(1)}%
+                      {(formData.existingDebts / (formData.monthlyIncome + 0.01)) > 0.4 && (
+                        <span className="text-red-500 block mt-1">
+                          ⚠️ Tỷ lệ nợ/thu nhập cao có thể ảnh hưởng tới khả năng vay vốn
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <p className="mb-2 font-medium">Khả năng chi trả hàng tháng</p>
+                    <p className="text-gray-600">
+                      Ước tính: {((formData.loanAmount / (formData.loanTerm * 12)) * 1.1).toLocaleString('vi-VN')} VND
+                      {((formData.loanAmount / (formData.loanTerm * 12)) * 1.1) > (formData.monthlyIncome * 0.5) && (
+                        <span className="text-red-500 block mt-1">
+                          ⚠️ Khoản vay vượt quá 50% thu nhập hàng tháng
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-t pt-6 flex flex-col md:flex-row gap-4 justify-between">
+                <Button variant="outline" onClick={() => setShowResults(false)}>
+                  Đánh giá lại
+                </Button>
+                <Button>
+                  Xem gợi ý khoản vay phù hợp
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
-      
-      {result && (
-        <Card className={`border-2 ${result.eligible ? 'border-green-500' : 'border-amber-500'} shadow-lg`}>
-          <CardHeader className={`${result.eligible ? 'bg-green-50' : 'bg-amber-50'}`}>
-            <div className="flex items-center space-x-2">
-              {result.eligible ? (
-                <Check className="h-6 w-6 text-green-600" />
-              ) : (
-                <FileText className="h-6 w-6 text-amber-600" />
-              )}
-              <CardTitle className={`${result.eligible ? 'text-green-700' : 'text-amber-700'}`}>
-                {result.eligible ? 'Bạn có khả năng được vay!' : 'Khả năng vay hạn chế'}
-              </CardTitle>
-            </div>
-            <CardDescription className="text-lg">
-              Điểm đánh giá: <span className="font-semibold">{result.score}/100</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-lg">{result.message}</p>
-            
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">Khuyến nghị:</h3>
-              <ul className="list-disc pl-5 space-y-1">
-                {result.recommendations.map((recommendation, index) => (
-                  <li key={index}>{recommendation}</li>
-                ))}
-              </ul>
-            </div>
-            
-            {result.eligible && (
-              <div className="bg-green-50 p-4 rounded-md mt-4">
-                <h3 className="font-medium text-green-800 mb-2">Các bước tiếp theo:</h3>
-                <ol className="list-decimal pl-5 space-y-1 text-green-700">
-                  <li>Hoàn thành khảo sát chi tiết để nhận đề xuất khoản vay phù hợp nhất</li>
-                  <li>Chuẩn bị hồ sơ vay vốn theo yêu cầu của ngân hàng</li>
-                  <li>Liên hệ với chuyên viên tư vấn để được hướng dẫn chi tiết</li>
-                </ol>
-              </div>
-            )}
-            
-            {!result.eligible && (
-              <div className="bg-blue-50 p-4 rounded-md mt-4">
-                <h3 className="font-medium text-blue-800 mb-2">Chúng tôi vẫn có thể giúp bạn:</h3>
-                <ul className="list-disc pl-5 space-y-1 text-blue-700">
-                  <li>Tham khảo danh sách các ngân hàng có điều kiện vay dễ dàng hơn</li>
-                  <li>Tư vấn miễn phí về cách cải thiện hồ sơ vay vốn</li>
-                  <li>Đăng ký nhận thông báo khi có chương trình vay ưu đãi</li>
-                </ul>
-              </div>
-            )}
-          </CardContent>
-          <CardFooter className="flex justify-between flex-wrap gap-2">
-            <Button variant="outline" onClick={() => setResult(null)}>
-              Kiểm tra lại
-            </Button>
-            <Button
-              className={result.eligible ? "bg-green-600 hover:bg-green-700" : ""}
-              onClick={() => {
-                toast({
-                  title: "Đã đăng ký tư vấn",
-                  description: "Chuyên viên tư vấn sẽ liên hệ với bạn trong thời gian sớm nhất.",
-                });
-              }}
-            >
-              Đăng ký tư vấn miễn phí
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
     </div>
   );
 };
