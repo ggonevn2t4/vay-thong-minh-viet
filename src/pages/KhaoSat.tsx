@@ -3,880 +3,730 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
-import { Check, Info } from 'lucide-react';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { toast } from 'sonner';
+import { ArrowRight, HelpCircle } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { 
   Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
   CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+  CardTitle, 
+  CardDescription, 
+  CardContent,
+  CardFooter 
+} from "@/components/ui/card";
+import Chatbot from '@/components/Chatbot';
+import { 
+  Collapsible, 
+  CollapsibleContent, 
+  CollapsibleTrigger 
+} from "@/components/ui/collapsible";
+
+// Define form schema using Zod
+const formSchema = z.object({
+  // Thông tin cá nhân
+  hoTen: z.string().min(2, { message: 'Họ tên phải có ít nhất 2 ký tự' }),
+  tuoi: z.string().refine((val) => !isNaN(parseInt(val)) && parseInt(val) >= 18, {
+    message: 'Tuổi phải từ 18 trở lên',
+  }),
+  soDienThoai: z.string().min(10, { message: 'Số điện thoại phải có ít nhất 10 số' }),
+  email: z.string().email({ message: 'Email không hợp lệ' }),
+  diaChi: z.string().min(5, { message: 'Địa chỉ phải có ít nhất 5 ký tự' }),
+  
+  // Thông tin nghề nghiệp
+  ngheNghiep: z.string().min(1, { message: 'Vui lòng chọn nghề nghiệp' }),
+  noiLamViec: z.string().min(2, { message: 'Vui lòng nhập nơi làm việc' }),
+  thoiGianLamViec: z.string().min(1, { message: 'Vui lòng chọn thời gian làm việc' }),
+  
+  // Thông tin tài chính
+  thuNhap: z.string().min(1, { message: 'Vui lòng chọn mức thu nhập' }),
+  coTaiSanDamBao: z.string().min(1, { message: 'Vui lòng chọn có hoặc không' }),
+  loaiTaiSanDamBao: z.string().optional(),
+  giaTriTaiSanDamBao: z.string().optional(),
+  
+  // Thông tin khoản vay
+  soTienVay: z.string().min(1, { message: 'Vui lòng nhập số tiền muốn vay' }),
+  mucDichVay: z.string().min(1, { message: 'Vui lòng chọn mục đích vay' }),
+  thoiHanVay: z.string().min(1, { message: 'Vui lòng chọn thời hạn vay' }),
+  
+  // Lịch sử tín dụng
+  coVayNganHang: z.string().min(1, { message: 'Vui lòng chọn có hoặc không' }),
+  coNoXau: z.string().min(1, { message: 'Vui lòng chọn có hoặc không' }),
+  
+  // Đồng ý điều khoản
+  dongYDieuKhoan: z.literal(true, {
+    errorMap: () => ({ message: 'Bạn phải đồng ý với điều khoản để tiếp tục' }),
+  }),
+});
 
 const KhaoSat = () => {
   const navigate = useNavigate();
+  const [isOpenHelp, setIsOpenHelp] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
   
-  // State để theo dõi các bước khảo sát
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
-    // Thông tin cá nhân
-    fullName: '',
-    age: '',
-    gender: '',
-    city: '',
-    district: '',
-    phoneNumber: '',
-    email: '',
-    job: '',
-    workplace: '',
-    workDuration: '',
-    
-    // Thông tin tài chính
-    monthlyIncome: '',
-    additionalIncome: '',
-    currentDebt: '',
-    monthlyExpenses: '',
-    
-    // Lịch sử tín dụng
-    creditHistory: 'none', // none, good, bad, unknown
-    badDebtHistory: 'none', // none, group1, group2, group3, group4, group5
-    existingLoans: '',
-    
-    // Mục đích vay
-    loanPurpose: '',
-    loanAmount: '',
-    loanDuration: '',
-    
-    // Tài sản đảm bảo
-    collateralType: '',
-    collateralValue: '',
-    
-    // Thông tin bổ sung
-    familySize: '',
-    maritalStatus: '',
-    dependents: '',
-    homeOwnership: '',
-    
-    // Thông tin thuế
-    taxId: '',
-    taxReturnStatus: '',
-    
-    // Đồng ý với điều khoản
-    agreeTerms: false,
-    allowContact: false,
+  // Initialize form
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      hoTen: '',
+      tuoi: '',
+      soDienThoai: '',
+      email: '',
+      diaChi: '',
+      ngheNghiep: '',
+      noiLamViec: '',
+      thoiGianLamViec: '',
+      thuNhap: '',
+      coTaiSanDamBao: '',
+      loaiTaiSanDamBao: '',
+      giaTriTaiSanDamBao: '',
+      soTienVay: '',
+      mucDichVay: '',
+      thoiHanVay: '',
+      coVayNganHang: '',
+      coNoXau: '',
+      dongYDieuKhoan: false,
+    },
   });
   
-  // Danh sách các bước khảo sát
-  const steps = [
-    {
-      id: 'personal',
-      title: 'Thông tin cá nhân',
-      description: 'Thông tin cơ bản về bạn',
-      fields: ['fullName', 'age', 'gender', 'city', 'district', 'phoneNumber', 'email']
-    },
-    {
-      id: 'employment',
-      title: 'Thông tin việc làm',
-      description: 'Thông tin về công việc hiện tại của bạn',
-      fields: ['job', 'workplace', 'workDuration']
-    },
-    {
-      id: 'financial',
-      title: 'Thông tin tài chính',
-      description: 'Thông tin về thu nhập và chi tiêu của bạn',
-      fields: ['monthlyIncome', 'additionalIncome', 'currentDebt', 'monthlyExpenses']
-    },
-    {
-      id: 'credit',
-      title: 'Lịch sử tín dụng',
-      description: 'Thông tin về lịch sử tín dụng của bạn',
-      fields: ['creditHistory', 'badDebtHistory', 'existingLoans']
-    },
-    {
-      id: 'loan',
-      title: 'Khoản vay mong muốn',
-      description: 'Thông tin về khoản vay bạn muốn tìm kiếm',
-      fields: ['loanPurpose', 'loanAmount', 'loanDuration']
-    },
-    {
-      id: 'collateral',
-      title: 'Tài sản đảm bảo',
-      description: 'Thông tin về tài sản đảm bảo (nếu có)',
-      fields: ['collateralType', 'collateralValue']
-    },
-    {
-      id: 'additional',
-      title: 'Thông tin bổ sung',
-      description: 'Thông tin bổ sung để đánh giá chính xác hơn',
-      fields: ['familySize', 'maritalStatus', 'dependents', 'homeOwnership', 'taxId']
-    },
-    {
-      id: 'confirm',
-      title: 'Xác nhận thông tin',
-      description: 'Xác nhận thông tin và đồng ý với điều khoản',
-      fields: ['agreeTerms', 'allowContact']
-    }
-  ];
+  // Watch form values for conditional fields
+  const coTaiSanDamBao = form.watch('coTaiSanDamBao');
+  const coNoXau = form.watch('coNoXau');
   
-  // Hàm xử lý thay đổi giá trị form
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement;
-    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
-    
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
-    
-    // Logic điều kiện: nếu có nợ xấu nhóm 2 trở lên, tự động chuyển đến bước cuối cùng
-    if (name === 'badDebtHistory' && ['group2', 'group3', 'group4', 'group5'].includes(value)) {
-      // Đánh dấu là không đủ điều kiện và chuyển đến trang kết quả
-      setTimeout(() => {
-        navigate('/ket-qua', { 
-          state: { 
-            eligibility: false,
-            reason: 'Lịch sử nợ xấu nhóm 2 trở lên',
-            score: 0
-          } 
-        });
-      }, 500);
-    }
-  };
+  // Calculate form progress
+  const totalSteps = 4;
+  const progress = (currentStep / totalSteps) * 100;
   
-  // Hàm xử lý nút Next
-  const handleNext = () => {
-    // Logic kiểm tra trường dữ liệu bắt buộc
-    const currentFields = steps[currentStep].fields;
-    const isValid = currentFields.every(field => {
-      // Bỏ qua các trường không bắt buộc
-      if (['additionalIncome', 'collateralType', 'collateralValue', 'taxId', 'allowContact'].includes(field)) {
-        return true;
-      }
-      return formData[field as keyof typeof formData];
-    });
-    
-    if (!isValid) {
-      alert('Vui lòng điền đầy đủ thông tin bắt buộc trước khi tiếp tục.');
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    // Check if user has bad credit history
+    if (values.coNoXau === 'co') {
+      toast.error('Rất tiếc, bạn không đủ điều kiện vay do lịch sử tín dụng xấu.');
       return;
     }
     
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-      window.scrollTo(0, 0);
-    } else {
-      // Nếu đây là bước cuối cùng, chuyển đến trang kết quả
-      calculateScore();
-    }
-  };
-  
-  // Hàm xử lý nút Back
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-      window.scrollTo(0, 0);
-    }
-  };
-  
-  // Hàm tính điểm khách hàng
-  const calculateScore = () => {
+    // Calculate credit score
     let score = 0;
-    let maxScore = 100;
     
-    // Tính điểm dựa trên thu nhập (20%)
-    const income = parseInt(formData.monthlyIncome) || 0;
-    if (income > 20000000) score += 20;
-    else if (income > 15000000) score += 16;
-    else if (income > 10000000) score += 12;
-    else if (income > 5000000) score += 8;
-    else score += 4;
-    
-    // Tính điểm dựa trên lịch sử tín dụng (25%)
-    if (formData.creditHistory === 'good') score += 25;
-    else if (formData.creditHistory === 'none') score += 15;
-    else if (formData.creditHistory === 'bad') score += 5;
-    
-    // Trừ điểm nếu có nợ xấu
-    if (formData.badDebtHistory === 'group1') score -= 10;
-    
-    // Tính điểm dựa trên tài sản đảm bảo (20%)
-    if (formData.collateralType && formData.collateralValue) {
-      const collateralValue = parseInt(formData.collateralValue) || 0;
-      const loanAmount = parseInt(formData.loanAmount) || 1;
-      if (collateralValue > loanAmount * 2) score += 20;
-      else if (collateralValue > loanAmount * 1.5) score += 15;
-      else if (collateralValue > loanAmount) score += 10;
-      else score += 5;
-    }
-    
-    // Tính điểm khả năng trả nợ (25%)
-    const monthlyExpenses = parseInt(formData.monthlyExpenses) || 0;
-    const currentDebt = parseInt(formData.currentDebt) || 0;
-    const debtToIncomeRatio = (monthlyExpenses + currentDebt) / income;
-    
-    if (debtToIncomeRatio < 0.3) score += 25;
-    else if (debtToIncomeRatio < 0.5) score += 20;
-    else if (debtToIncomeRatio < 0.7) score += 10;
+    // Nghề nghiệp ổn định
+    if (values.thoiGianLamViec === 'tren3nam') score += 20;
+    else if (values.thoiGianLamViec === '1-3nam') score += 15;
     else score += 5;
     
-    // Điểm các yếu tố khác (10%)
-    if (formData.workDuration === '5+') score += 10;
-    else if (formData.workDuration === '3-5') score += 8;
-    else if (formData.workDuration === '1-3') score += 5;
-    else score += 2;
+    // Thu nhập
+    if (values.thuNhap === 'tren20tr') score += 25;
+    else if (values.thuNhap === '10-20tr') score += 20;
+    else if (values.thuNhap === '5-10tr') score += 15;
+    else score += 5;
     
-    // Giới hạn điểm tối đa và tối thiểu
-    score = Math.min(Math.max(score, 0), maxScore);
+    // Tài sản đảm bảo
+    if (values.coTaiSanDamBao === 'co') score += 20;
     
-    // Phân loại khách hàng
-    let category = '';
-    if (score >= 80) category = 'A';
-    else if (score >= 60) category = 'B';
-    else if (score >= 40) category = 'C';
-    else category = 'D';
+    // Lịch sử tín dụng
+    if (values.coVayNganHang === 'khong') score += 15;
+    else score += 10;
     
-    // Kiểm tra đủ điều kiện vay
-    const eligible = score >= 40;
+    // Tiếp tục với phân khúc người dùng
+    let phanKhuc = '';
+    if (score >= 80) phanKhuc = 'A';
+    else if (score >= 60) phanKhuc = 'B';
+    else if (score >= 40) phanKhuc = 'C';
+    else phanKhuc = 'D';
     
-    // Chuyển đến trang kết quả với thông tin đánh giá
-    navigate('/ket-qua', { 
-      state: { 
-        eligibility: eligible,
-        score: score,
-        category: category,
-        formData: formData
-      } 
-    });
+    // Lưu thông tin vào localStorage
+    const ketQua = {
+      thongTinCaNhan: {
+        hoTen: values.hoTen,
+        tuoi: values.tuoi,
+        soDienThoai: values.soDienThoai,
+        email: values.email,
+        diaChi: values.diaChi,
+      },
+      thongTinNgheNghiep: {
+        ngheNghiep: values.ngheNghiep,
+        noiLamViec: values.noiLamViec,
+        thoiGianLamViec: values.thoiGianLamViec,
+      },
+      thongTinTaiChinh: {
+        thuNhap: values.thuNhap,
+        coTaiSanDamBao: values.coTaiSanDamBao,
+        loaiTaiSanDamBao: values.loaiTaiSanDamBao,
+        giaTriTaiSanDamBao: values.giaTriTaiSanDamBao,
+      },
+      thongTinKhoanVay: {
+        soTienVay: values.soTienVay,
+        mucDichVay: values.mucDichVay,
+        thoiHanVay: values.thoiHanVay,
+      },
+      lichSuTinDung: {
+        coVayNganHang: values.coVayNganHang,
+        coNoXau: values.coNoXau,
+      },
+      ketQua: {
+        diemTinDung: score,
+        phanKhuc: phanKhuc,
+      },
+    };
+    
+    localStorage.setItem('ketQuaKhaoSat', JSON.stringify(ketQua));
+    
+    // Chuyển hướng đến trang kết quả
+    navigate('/ket-qua');
+    toast.success('Khảo sát đã hoàn thành! Đang phân tích kết quả...');
   };
   
-  // Render các trường dữ liệu dựa trên bước hiện tại
-  const renderFields = () => {
-    const currentFields = steps[currentStep].fields;
-    
-    return (
-      <div className="space-y-4">
-        {currentFields.includes('fullName') && (
-          <div className="form-group">
-            <label htmlFor="fullName" className="form-label">Họ và tên <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('age') && (
-          <div className="form-group">
-            <label htmlFor="age" className="form-label">Tuổi <span className="text-red-500">*</span></label>
-            <input
-              type="number"
-              id="age"
-              name="age"
-              min="18"
-              max="100"
-              value={formData.age}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('gender') && (
-          <div className="form-group">
-            <label htmlFor="gender" className="form-label">Giới tính <span className="text-red-500">*</span></label>
-            <select
-              id="gender"
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="male">Nam</option>
-              <option value="female">Nữ</option>
-              <option value="other">Khác</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('city') && (
-          <div className="form-group">
-            <label htmlFor="city" className="form-label">Tỉnh/Thành phố <span className="text-red-500">*</span></label>
-            <select
-              id="city"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="hanoi">Hà Nội</option>
-              <option value="hochiminh">TP. Hồ Chí Minh</option>
-              <option value="danang">Đà Nẵng</option>
-              <option value="other">Khác</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('district') && (
-          <div className="form-group">
-            <label htmlFor="district" className="form-label">Quận/Huyện <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              id="district"
-              name="district"
-              value={formData.district}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('phoneNumber') && (
-          <div className="form-group">
-            <label htmlFor="phoneNumber" className="form-label">Số điện thoại <span className="text-red-500">*</span></label>
-            <input
-              type="tel"
-              id="phoneNumber"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('email') && (
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">Email <span className="text-red-500">*</span></label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('job') && (
-          <div className="form-group">
-            <label htmlFor="job" className="form-label">Nghề nghiệp <span className="text-red-500">*</span></label>
-            <select
-              id="job"
-              name="job"
-              value={formData.job}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="private">Nhân viên công ty tư nhân</option>
-              <option value="state">Nhân viên công ty nhà nước</option>
-              <option value="business">Chủ doanh nghiệp</option>
-              <option value="freelance">Tự do</option>
-              <option value="retired">Nghỉ hưu</option>
-              <option value="other">Khác</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('workplace') && (
-          <div className="form-group">
-            <label htmlFor="workplace" className="form-label">Nơi làm việc <span className="text-red-500">*</span></label>
-            <input
-              type="text"
-              id="workplace"
-              name="workplace"
-              value={formData.workplace}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('workDuration') && (
-          <div className="form-group">
-            <label htmlFor="workDuration" className="form-label">Thời gian làm việc <span className="text-red-500">*</span></label>
-            <select
-              id="workDuration"
-              name="workDuration"
-              value={formData.workDuration}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="<1">Dưới 1 năm</option>
-              <option value="1-3">1 - 3 năm</option>
-              <option value="3-5">3 - 5 năm</option>
-              <option value="5+">Trên 5 năm</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('monthlyIncome') && (
-          <div className="form-group">
-            <label htmlFor="monthlyIncome" className="form-label">Thu nhập hàng tháng (VNĐ) <span className="text-red-500">*</span></label>
-            <select
-              id="monthlyIncome"
-              name="monthlyIncome"
-              value={formData.monthlyIncome}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="<5000000">Dưới 5 triệu</option>
-              <option value="5000000-10000000">5 - 10 triệu</option>
-              <option value="10000000-15000000">10 - 15 triệu</option>
-              <option value="15000000-20000000">15 - 20 triệu</option>
-              <option value="20000000-30000000">20 - 30 triệu</option>
-              <option value="30000000+">Trên 30 triệu</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('additionalIncome') && (
-          <div className="form-group">
-            <label htmlFor="additionalIncome" className="form-label">Thu nhập phụ (VNĐ)</label>
-            <input
-              type="number"
-              id="additionalIncome"
-              name="additionalIncome"
-              value={formData.additionalIncome}
-              onChange={handleChange}
-              className="form-input"
-              placeholder="Nếu có"
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('currentDebt') && (
-          <div className="form-group">
-            <label htmlFor="currentDebt" className="form-label">Nợ hiện tại mỗi tháng (VNĐ) <span className="text-red-500">*</span></label>
-            <input
-              type="number"
-              id="currentDebt"
-              name="currentDebt"
-              value={formData.currentDebt}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('monthlyExpenses') && (
-          <div className="form-group">
-            <label htmlFor="monthlyExpenses" className="form-label">Chi tiêu hàng tháng (VNĐ) <span className="text-red-500">*</span></label>
-            <input
-              type="number"
-              id="monthlyExpenses"
-              name="monthlyExpenses"
-              value={formData.monthlyExpenses}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('creditHistory') && (
-          <div className="form-group">
-            <label htmlFor="creditHistory" className="form-label">Lịch sử tín dụng <span className="text-red-500">*</span></label>
-            <select
-              id="creditHistory"
-              name="creditHistory"
-              value={formData.creditHistory}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="good">Tốt (luôn trả nợ đúng hạn)</option>
-              <option value="bad">Có vấn đề (đã trễ hạn một số lần)</option>
-              <option value="none">Chưa có lịch sử tín dụng</option>
-              <option value="unknown">Không biết</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('badDebtHistory') && (
-          <div className="form-group">
-            <label htmlFor="badDebtHistory" className="form-label">Lịch sử nợ xấu <span className="text-red-500">*</span></label>
-            <select
-              id="badDebtHistory"
-              name="badDebtHistory"
-              value={formData.badDebtHistory}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="none">Không có nợ xấu</option>
-              <option value="group1">Nợ nhóm 1 (Nợ đủ tiêu chuẩn)</option>
-              <option value="group2">Nợ nhóm 2 (Nợ cần chú ý)</option>
-              <option value="group3">Nợ nhóm 3 (Nợ dưới tiêu chuẩn)</option>
-              <option value="group4">Nợ nhóm 4 (Nợ nghi ngờ)</option>
-              <option value="group5">Nợ nhóm 5 (Nợ có khả năng mất vốn)</option>
-            </select>
-            {formData.badDebtHistory && formData.badDebtHistory !== 'none' && formData.badDebtHistory !== 'group1' && (
-              <div className="mt-2 p-3 bg-red-50 text-red-700 rounded-md text-sm">
-                <p className="font-semibold">Chú ý:</p>
-                <p>Nợ xấu từ nhóm 2 trở lên có thể ảnh hưởng đến khả năng được phê duyệt khoản vay.</p>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {currentFields.includes('existingLoans') && (
-          <div className="form-group">
-            <label htmlFor="existingLoans" className="form-label">Số khoản vay hiện tại <span className="text-red-500">*</span></label>
-            <select
-              id="existingLoans"
-              name="existingLoans"
-              value={formData.existingLoans}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="0">Không có</option>
-              <option value="1">1 khoản vay</option>
-              <option value="2">2 khoản vay</option>
-              <option value="3+">3 khoản vay trở lên</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('loanPurpose') && (
-          <div className="form-group">
-            <label htmlFor="loanPurpose" className="form-label">Mục đích vay <span className="text-red-500">*</span></label>
-            <select
-              id="loanPurpose"
-              name="loanPurpose"
-              value={formData.loanPurpose}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="home">Mua nhà</option>
-              <option value="car">Mua xe</option>
-              <option value="business">Kinh doanh</option>
-              <option value="education">Học tập</option>
-              <option value="travel">Du lịch</option>
-              <option value="medical">Y tế</option>
-              <option value="personal">Tiêu dùng cá nhân</option>
-              <option value="other">Khác</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('loanAmount') && (
-          <div className="form-group">
-            <label htmlFor="loanAmount" className="form-label">Số tiền muốn vay (VNĐ) <span className="text-red-500">*</span></label>
-            <input
-              type="number"
-              id="loanAmount"
-              name="loanAmount"
-              value={formData.loanAmount}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('loanDuration') && (
-          <div className="form-group">
-            <label htmlFor="loanDuration" className="form-label">Thời gian vay <span className="text-red-500">*</span></label>
-            <select
-              id="loanDuration"
-              name="loanDuration"
-              value={formData.loanDuration}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="6">6 tháng</option>
-              <option value="12">12 tháng</option>
-              <option value="24">24 tháng</option>
-              <option value="36">36 tháng</option>
-              <option value="48">48 tháng</option>
-              <option value="60">60 tháng</option>
-              <option value="120">120 tháng</option>
-              <option value="180">180 tháng</option>
-              <option value="240">240 tháng</option>
-              <option value="300">300 tháng</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('collateralType') && (
-          <div className="form-group">
-            <label htmlFor="collateralType" className="form-label">Loại tài sản đảm bảo</label>
-            <select
-              id="collateralType"
-              name="collateralType"
-              value={formData.collateralType}
-              onChange={handleChange}
-              className="form-input"
-            >
-              <option value="">-- Không có --</option>
-              <option value="property">Bất động sản</option>
-              <option value="vehicle">Xe ô tô</option>
-              <option value="savings">Sổ tiết kiệm</option>
-              <option value="other">Khác</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('collateralValue') && formData.collateralType && (
-          <div className="form-group">
-            <label htmlFor="collateralValue" className="form-label">Giá trị tài sản đảm bảo (VNĐ)</label>
-            <input
-              type="number"
-              id="collateralValue"
-              name="collateralValue"
-              value={formData.collateralValue}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('familySize') && (
-          <div className="form-group">
-            <label htmlFor="familySize" className="form-label">Số người trong gia đình <span className="text-red-500">*</span></label>
-            <input
-              type="number"
-              id="familySize"
-              name="familySize"
-              min="1"
-              value={formData.familySize}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('maritalStatus') && (
-          <div className="form-group">
-            <label htmlFor="maritalStatus" className="form-label">Tình trạng hôn nhân <span className="text-red-500">*</span></label>
-            <select
-              id="maritalStatus"
-              name="maritalStatus"
-              value={formData.maritalStatus}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="single">Độc thân</option>
-              <option value="married">Đã kết hôn</option>
-              <option value="divorced">Ly hôn</option>
-              <option value="other">Khác</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('dependents') && (
-          <div className="form-group">
-            <label htmlFor="dependents" className="form-label">Số người phụ thuộc <span className="text-red-500">*</span></label>
-            <input
-              type="number"
-              id="dependents"
-              name="dependents"
-              min="0"
-              value={formData.dependents}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('homeOwnership') && (
-          <div className="form-group">
-            <label htmlFor="homeOwnership" className="form-label">Tình trạng nhà ở <span className="text-red-500">*</span></label>
-            <select
-              id="homeOwnership"
-              name="homeOwnership"
-              value={formData.homeOwnership}
-              onChange={handleChange}
-              className="form-input"
-              required
-            >
-              <option value="">-- Chọn --</option>
-              <option value="own">Sở hữu</option>
-              <option value="mortgage">Đang vay mua</option>
-              <option value="rent">Đang thuê</option>
-              <option value="family">Sống cùng gia đình</option>
-              <option value="other">Khác</option>
-            </select>
-          </div>
-        )}
-        
-        {currentFields.includes('taxId') && (
-          <div className="form-group">
-            <label htmlFor="taxId" className="form-label">Mã số thuế cá nhân</label>
-            <input
-              type="text"
-              id="taxId"
-              name="taxId"
-              value={formData.taxId}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-        )}
-        
-        {currentFields.includes('agreeTerms') && (
-          <div className="form-group mt-6">
-            <div className="flex items-start">
-              <input
-                type="checkbox"
-                id="agreeTerms"
-                name="agreeTerms"
-                checked={formData.agreeTerms as boolean}
-                onChange={handleChange}
-                className="mt-1 mr-2"
-                required
+  // Handle next step
+  const handleNextStep = async () => {
+    if (currentStep === 1) {
+      const result = await form.trigger(['hoTen', 'tuoi', 'soDienThoai', 'email', 'diaChi']);
+      if (result) setCurrentStep(2);
+    } else if (currentStep === 2) {
+      const result = await form.trigger(['ngheNghiep', 'noiLamViec', 'thoiGianLamViec', 'thuNhap', 'coTaiSanDamBao']);
+      if (result) {
+        if (form.getValues('coTaiSanDamBao') === 'co') {
+          const assetResult = await form.trigger(['loaiTaiSanDamBao', 'giaTriTaiSanDamBao']);
+          if (assetResult) setCurrentStep(3);
+        } else {
+          setCurrentStep(3);
+        }
+      }
+    } else if (currentStep === 3) {
+      const result = await form.trigger(['soTienVay', 'mucDichVay', 'thoiHanVay']);
+      if (result) setCurrentStep(4);
+    } else if (currentStep === 4) {
+      const result = await form.trigger(['coVayNganHang', 'coNoXau', 'dongYDieuKhoan']);
+      if (result) form.handleSubmit(onSubmit)();
+    }
+  };
+  
+  // Handle previous step
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+  
+  // Render form steps
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Thông tin cá nhân</CardTitle>
+              <CardDescription>Vui lòng cung cấp thông tin cá nhân của bạn</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="hoTen"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Họ và tên</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nguyễn Văn A" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <label htmlFor="agreeTerms" className="text-sm">
-                Tôi xác nhận rằng thông tin đã cung cấp là chính xác và đồng ý với <a href="/dieu-khoan-su-dung" className="text-brand-600 hover:underline">Điều khoản sử dụng</a> và <a href="/chinh-sach-bao-mat" className="text-brand-600 hover:underline">Chính sách bảo mật</a> của VayThôngMinh. <span className="text-red-500">*</span>
-              </label>
-            </div>
-          </div>
-        )}
-        
-        {currentFields.includes('allowContact') && (
-          <div className="form-group">
-            <div className="flex items-start">
-              <input
-                type="checkbox"
-                id="allowContact"
-                name="allowContact"
-                checked={formData.allowContact as boolean}
-                onChange={handleChange}
-                className="mt-1 mr-2"
+              
+              <FormField
+                control={form.control}
+                name="tuoi"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tuổi</FormLabel>
+                    <FormControl>
+                      <Input placeholder="30" type="number" min="18" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              <label htmlFor="allowContact" className="text-sm">
-                Tôi đồng ý nhận thông tin cập nhật và ưu đãi từ VayThôngMinh qua email hoặc SMS.
-              </label>
-            </div>
-          </div>
-        )}
-      </div>
-    );
+              
+              <FormField
+                control={form.control}
+                name="soDienThoai"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Số điện thoại</FormLabel>
+                    <FormControl>
+                      <Input placeholder="098xxxxxxx" type="tel" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="example@email.com" type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="diaChi"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Địa chỉ</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="123 Đường ABC, Quận XYZ, TP. HCM" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+        );
+        
+      case 2:
+        return (
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Thông tin nghề nghiệp và tài chính</CardTitle>
+              <CardDescription>Vui lòng cung cấp thông tin về nghề nghiệp và tình hình tài chính của bạn</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="ngheNghiep"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nghề nghiệp</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn nghề nghiệp" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="nhanVienVanPhong">Nhân viên văn phòng</SelectItem>
+                        <SelectItem value="congNhanVienChuc">Công nhân viên chức</SelectItem>
+                        <SelectItem value="kiDoanhTuDo">Kinh doanh tự do</SelectItem>
+                        <SelectItem value="giaoVien">Giáo viên</SelectItem>
+                        <SelectItem value="bacSi">Bác sĩ</SelectItem>
+                        <SelectItem value="kysu">Kỹ sư</SelectItem>
+                        <SelectItem value="khac">Khác</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="noiLamViec"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nơi làm việc</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Tên công ty/tổ chức" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="thoiGianLamViec"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Thời gian làm việc tại nơi hiện tại</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn thời gian làm việc" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="duoi1nam">Dưới 1 năm</SelectItem>
+                        <SelectItem value="1-3nam">1 - 3 năm</SelectItem>
+                        <SelectItem value="tren3nam">Trên 3 năm</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="thuNhap"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Thu nhập hàng tháng</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn mức thu nhập" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="duoi5tr">Dưới 5 triệu</SelectItem>
+                        <SelectItem value="5-10tr">5 - 10 triệu</SelectItem>
+                        <SelectItem value="10-20tr">10 - 20 triệu</SelectItem>
+                        <SelectItem value="tren20tr">Trên 20 triệu</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="coTaiSanDamBao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bạn có tài sản đảm bảo không?</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn có hoặc không" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="co">Có</SelectItem>
+                        <SelectItem value="khong">Không</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {coTaiSanDamBao === 'co' && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="loaiTaiSanDamBao"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Loại tài sản đảm bảo</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn loại tài sản" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="nha">Nhà/Căn hộ</SelectItem>
+                            <SelectItem value="dat">Đất</SelectItem>
+                            <SelectItem value="oto">Ô tô</SelectItem>
+                            <SelectItem value="soTietKiem">Sổ tiết kiệm</SelectItem>
+                            <SelectItem value="khac">Khác</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="giaTriTaiSanDamBao"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Giá trị tài sản đảm bảo (VND)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="500,000,000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+            </CardContent>
+          </Card>
+        );
+        
+      case 3:
+        return (
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Thông tin khoản vay</CardTitle>
+              <CardDescription>Vui lòng cung cấp thông tin về khoản vay mà bạn mong muốn</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="soTienVay"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Số tiền muốn vay (VND)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="200,000,000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="mucDichVay"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mục đích vay</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn mục đích vay" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="muaNha">Mua nhà/căn hộ</SelectItem>
+                        <SelectItem value="muaXe">Mua xe</SelectItem>
+                        <SelectItem value="duHoc">Du học</SelectItem>
+                        <SelectItem value="kinhDoanh">Kinh doanh</SelectItem>
+                        <SelectItem value="tieuDung">Tiêu dùng</SelectItem>
+                        <SelectItem value="khac">Khác</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="thoiHanVay"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Thời hạn vay mong muốn</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn thời hạn vay" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="duoi12thang">Dưới 12 tháng</SelectItem>
+                        <SelectItem value="1-3nam">1 - 3 năm</SelectItem>
+                        <SelectItem value="3-5nam">3 - 5 năm</SelectItem>
+                        <SelectItem value="5-10nam">5 - 10 năm</SelectItem>
+                        <SelectItem value="tren10nam">Trên 10 năm</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+        );
+        
+      case 4:
+        return (
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Lịch sử tín dụng và xác nhận</CardTitle>
+              <CardDescription>Vui lòng cung cấp thông tin về lịch sử tín dụng và xác nhận điều khoản</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="coVayNganHang"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bạn có đang vay tại ngân hàng/tổ chức tín dụng nào không?</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn có hoặc không" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="co">Có</SelectItem>
+                        <SelectItem value="khong">Không</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="coNoXau"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center">
+                      Bạn có nợ xấu từ nhóm 2 trở lên không?
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="ml-1 cursor-help">
+                              <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="w-80">
+                            <p>Nợ nhóm 2 là nợ quá hạn từ 10 đến 90 ngày. Nhóm 3 trở lên là nợ xấu.</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn có hoặc không" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="co">Có</SelectItem>
+                        <SelectItem value="khong">Không</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              {coNoXau === 'co' && (
+                <div className="rounded-md bg-yellow-50 p-4 border border-yellow-200">
+                  <div className="flex">
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-yellow-800">Lưu ý quan trọng</h3>
+                      <div className="mt-2 text-sm text-yellow-700">
+                        <p>
+                          Việc có nợ xấu từ nhóm 2 trở lên có thể ảnh hưởng đến khả năng được phê duyệt khoản vay. 
+                          Vui lòng liên hệ trực tiếp với nhân viên tư vấn để được hỗ trợ tốt nhất.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <FormField
+                control={form.control}
+                name="dongYDieuKhoan"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        Tôi đồng ý với các điều khoản sử dụng và chính sách bảo mật
+                      </FormLabel>
+                      <FormDescription>
+                        Bằng việc đồng ý, bạn cho phép chúng tôi sử dụng thông tin để tìm kiếm các sản phẩm vay phù hợp.
+                      </FormDescription>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+        );
+        
+      default:
+        return null;
+    }
   };
   
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Khảo sát đánh giá khả năng vay vốn</h1>
-            <p className="text-gray-600">
-              Hoàn thành mẫu khảo sát dưới đây để nhận đánh giá và đề xuất khoản vay phù hợp với bạn.
-            </p>
-          </div>
-          
-          {/* Progress steps */}
-          <div className="mb-8">
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div 
-                className="bg-brand-600 h-2.5 rounded-full" 
-                style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-              ></div>
-            </div>
-            <div className="flex justify-between mt-2">
-              <span className="text-sm text-brand-600 font-medium">Bước {currentStep + 1}/{steps.length}</span>
-              <span className="text-sm text-gray-500">{steps[currentStep].title}</span>
-            </div>
-          </div>
-          
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>{steps[currentStep].title}</CardTitle>
-              <CardDescription>{steps[currentStep].description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {renderFields()}
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button 
-                variant="outline" 
-                onClick={handleBack}
-                disabled={currentStep === 0}
-              >
-                Quay lại
-              </Button>
-              <Button 
-                onClick={handleNext}
-                disabled={!formData.agreeTerms && currentStep === steps.length - 1}
-              >
-                {currentStep === steps.length - 1 ? 'Hoàn thành' : 'Tiếp theo'}
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <Info className="h-5 w-5 text-blue-500" />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">Thông tin quan trọng</h3>
-                <div className="mt-2 text-sm text-blue-700">
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="item-1">
-                      <AccordionTrigger className="text-sm text-blue-800">Thông tin của tôi có được bảo mật không?</AccordionTrigger>
-                      <AccordionContent className="text-sm">
-                        Thông tin của bạn được bảo mật tuyệt đối và chỉ được sử dụng cho mục đích đánh giá khả năng vay vốn. Chúng tôi không chia sẻ thông tin của bạn với bên thứ ba khi chưa có sự đồng ý.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-2">
-                      <AccordionTrigger className="text-sm text-blue-800">Khảo sát này có ràng buộc tôi phải vay không?</AccordionTrigger>
-                      <AccordionContent className="text-sm">
-                        Không. Khảo sát này chỉ giúp bạn đánh giá khả năng vay vốn và nhận đề xuất các khoản vay phù hợp. Bạn hoàn toàn có quyền quyết định có nộp hồ sơ vay hay không.
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-3">
-                      <AccordionTrigger className="text-sm text-blue-800">Kết quả có chính xác 100% không?</AccordionTrigger>
-                      <AccordionContent className="text-sm">
-                        Kết quả đánh giá dựa trên thông tin bạn cung cấp và các tiêu chí chung của ngân hàng. Tuy nhiên, quyết định cuối cùng phụ thuộc vào chính sách của từng ngân hàng tại thời điểm bạn nộp hồ sơ.
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div className="container mx-auto py-8 px-4">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">Khảo sát nhu cầu vay vốn</h1>
+        
+        {/* Progress bar */}
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+          <div className="bg-brand-600 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
         </div>
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {renderStep()}
+            
+            <div className="flex justify-between mt-6">
+              {currentStep > 1 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handlePrevStep}
+                >
+                  Quay lại
+                </Button>
+              )}
+              
+              <Button
+                type="button"
+                className={`${currentStep === 1 ? 'ml-auto' : ''}`}
+                onClick={handleNextStep}
+              >
+                {currentStep < totalSteps ? 'Tiếp theo' : 'Hoàn thành'}
+                {currentStep < totalSteps && <ArrowRight className="ml-1 h-4 w-4" />}
+              </Button>
+            </div>
+          </form>
+        </Form>
+        
+        <Collapsible
+          open={isOpenHelp}
+          onOpenChange={setIsOpenHelp}
+          className="mt-8 border rounded-lg p-4"
+        >
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-medium">Bạn cần hỗ trợ?</h3>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm">
+                {isOpenHelp ? "Ẩn bớt" : "Xem thêm"}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+          <CollapsibleContent className="mt-4 space-y-4">
+            <p>Nếu bạn cần hỗ trợ thêm về khảo sát này, vui lòng liên hệ với chúng tôi qua:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Hotline: <strong>1900 1234</strong></li>
+              <li>Email: <strong>hotro@vaythongminh.vn</strong></li>
+              <li>Hoặc chat với trợ lý ảo của chúng tôi</li>
+            </ul>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
+      
+      {/* Chatbot */}
+      <Chatbot initialMessage="Xin chào! Tôi là trợ lý ảo của VayThôngMinh. Bạn cần hỗ trợ gì về khảo sát vay vốn không?" />
     </Layout>
   );
 };
