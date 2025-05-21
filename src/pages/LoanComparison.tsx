@@ -1,6 +1,8 @@
 
 import React from 'react';
 import Layout from '@/components/layout/Layout';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import { 
   Table, 
   TableBody, 
@@ -249,7 +251,7 @@ const LoanComparison = () => {
                       <TableCell>Tối đa 80% xe mới</TableCell>
                       <TableCell>Đến 8 năm</TableCell>
                       <TableCell>24-48 giờ</TableCell>
-                      <TableCell>Thu nhập > 10 triệu/tháng</TableCell>
+                      <TableCell>Thu nhập {'>'} 10 triệu/tháng</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-medium">TPBank</TableCell>
@@ -257,7 +259,7 @@ const LoanComparison = () => {
                       <TableCell>Tối đa 85% xe mới</TableCell>
                       <TableCell>Đến 8 năm</TableCell>
                       <TableCell>8-24 giờ</TableCell>
-                      <TableCell>Thu nhập > 8 triệu/tháng</TableCell>
+                      <TableCell>Thu nhập {'>'} 8 triệu/tháng</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-medium">VPBank</TableCell>
@@ -265,7 +267,7 @@ const LoanComparison = () => {
                       <TableCell>Tối đa 80% xe mới</TableCell>
                       <TableCell>Đến 7 năm</TableCell>
                       <TableCell>24-72 giờ</TableCell>
-                      <TableCell>Thu nhập > 10 triệu/tháng</TableCell>
+                      <TableCell>Thu nhập {'>'} 10 triệu/tháng</TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-medium">OCB</TableCell>
@@ -273,7 +275,7 @@ const LoanComparison = () => {
                       <TableCell>Tối đa 90% xe mới</TableCell>
                       <TableCell>Đến 8 năm</TableCell>
                       <TableCell>24-48 giờ</TableCell>
-                      <TableCell>Thu nhập > 12 triệu/tháng</TableCell>
+                      <TableCell>Thu nhập {'>'} 12 triệu/tháng</TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
