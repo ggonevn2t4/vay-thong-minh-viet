@@ -3,17 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { sendChatRequest, getOpenAIKey, setOpenAIKey } from '@/services/openaiService';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { sendChatRequest, getOpenAIKey } from '@/services/openaiService';
 
 interface Message {
   content: string;
@@ -32,33 +22,11 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
-  const [apiKey, setApiKey] = useState('');
   
   // Cuộn xuống cuối cùng khi có tin nhắn mới
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-  
-  // Kiểm tra API key khi khởi động
-  useEffect(() => {
-    const savedKey = getOpenAIKey();
-    if (!savedKey) {
-      // Nếu không có API key, hiển thị dialog yêu cầu nhập key
-      setShowApiKeyDialog(true);
-    }
-  }, []);
-  
-  // Xử lý lưu API key
-  const handleSaveApiKey = () => {
-    if (apiKey.trim()) {
-      setOpenAIKey(apiKey.trim());
-      setShowApiKeyDialog(false);
-      toast.success('API key đã được lưu');
-    } else {
-      toast.error('Vui lòng nhập API key hợp lệ');
-    }
-  };
   
   // Danh sách câu hỏi và trả lời mẫu
   const faqResponses: Record<string, string> = {
@@ -117,8 +85,7 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
           botResponse = await sendChatRequest(chatMessages as Array<{role: string, content: string}>);
         } else {
           // Không có API key
-          botResponse = "Xin lỗi, tôi không thể trả lời câu hỏi này lúc này. Vui lòng cung cấp API key cho OpenAI hoặc liên hệ với nhân viên tư vấn qua số hotline 1900 1234 để được hỗ trợ.";
-          setShowApiKeyDialog(true);
+          botResponse = "Xin lỗi, tôi không thể trả lời câu hỏi này lúc này. Vui lòng liên hệ với nhân viên tư vấn qua số hotline 1900 1234 để được hỗ trợ.";
         }
       }
       
@@ -215,46 +182,10 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
             </Button>
           </div>
           <div className="mt-2 text-xs text-gray-500 text-center">
-            <button 
-              className="underline hover:text-brand-600" 
-              onClick={() => setShowApiKeyDialog(true)}
-            >
-              Cài đặt API Key
-            </button> | Trợ lý AI có thể trả lời các câu hỏi cơ bản về vay vốn
+            Trợ lý AI có thể trả lời các câu hỏi cơ bản về vay vốn
           </div>
         </div>
       </div>
-      
-      {/* Dialog nhập API key */}
-      <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Cài đặt API Key OpenAI</DialogTitle>
-            <DialogDescription>
-              Nhập API key của bạn để kết nối với dịch vụ OpenAI. API key sẽ được lưu trên trình duyệt của bạn.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="apiKey">OpenAI API Key</Label>
-              <Input 
-                id="apiKey" 
-                type="password" 
-                placeholder="sk-..." 
-                value={apiKey} 
-                onChange={(e) => setApiKey(e.target.value)} 
-              />
-            </div>
-            <div className="text-sm text-gray-500">
-              Để có được API key, hãy truy cập <a href="https://platform.openai.com/account/api-keys" target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline">trang quản lý API của OpenAI</a> và tạo một key mới.
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowApiKeyDialog(false)}>Hủy</Button>
-            <Button onClick={handleSaveApiKey}>Lưu API Key</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 };

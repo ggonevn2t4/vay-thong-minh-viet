@@ -4,8 +4,8 @@
 
 import { toast } from 'sonner';
 
-// Biến lưu API key
-let apiKey = '';
+// Biến lưu API key mặc định
+let apiKey = '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';
 
 export const setOpenAIKey = (key: string) => {
   apiKey = key;
