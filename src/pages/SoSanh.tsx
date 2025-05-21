@@ -29,12 +29,12 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as
 import Chatbot from '@/components/Chatbot';
 import { formatCurrency } from '@/lib/utils';
 
-// Dữ liệu ngân hàng mẫu với logo cập nhật
+// Dữ liệu ngân hàng mẫu
 const bankData = [
   {
     id: 1,
     name: 'Ngân hàng Vietcombank',
-    logo: 'https://www.vietcombank.com.vn/images/logo30.png',
+    logo: '/lovable-uploads/2bff7777-92fa-4bf7-83d8-ec84491ec641.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.5,
@@ -69,7 +69,7 @@ const bankData = [
   {
     id: 2,
     name: 'Ngân hàng BIDV',
-    logo: 'https://www.bidv.com.vn/wps/wcm/connect/cf677d7b-7f3d-4098-993b-8de271f7f350/logo.png?MOD=AJPERES&CACHEID=ROOTWORKSPACE-cf677d7b-7f3d-4098-993b-8de271f7f350-nQGGR.q',
+    logo: '/lovable-uploads/2bff7777-92fa-4bf7-83d8-ec84491ec641.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.7,
@@ -104,7 +104,7 @@ const bankData = [
   {
     id: 3,
     name: 'Ngân hàng Techcombank',
-    logo: 'https://www.techcombank.com.vn/assets/images/branding/logo.png',
+    logo: '/lovable-uploads/2bff7777-92fa-4bf7-83d8-ec84491ec641.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.3,
@@ -139,7 +139,7 @@ const bankData = [
   {
     id: 4,
     name: 'Ngân hàng MB Bank',
-    logo: 'https://upload.wikimedia.org/wikipedia/vi/1/13/MB_Bank_logo.svg',
+    logo: '/lovable-uploads/2bff7777-92fa-4bf7-83d8-ec84491ec641.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.6,
@@ -174,7 +174,7 @@ const bankData = [
   {
     id: 5,
     name: 'Ngân hàng VPBank',
-    logo: 'https://vpbank.com.vn/sites/default/files/2019-07/Logo%20ngang-01.png',
+    logo: '/lovable-uploads/2bff7777-92fa-4bf7-83d8-ec84491ec641.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.9,
