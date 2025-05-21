@@ -2,7 +2,10 @@
 import React from 'react';
 import Layout from '@/components/layout/Layout';
 import LoanEligibilityChecker from '@/components/LoanEligibilityChecker';
+import LoanSimulator from '@/components/LoanSimulator';
+import FeedbackSystem from '@/components/FeedbackSystem';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
@@ -25,7 +28,27 @@ const LoanEligibility = () => {
             </div>
           </div>
           
-          <LoanEligibilityChecker />
+          <Tabs defaultValue="eligibility" className="max-w-5xl mx-auto">
+            <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsTrigger value="eligibility">Đánh giá khả năng vay</TabsTrigger>
+              <TabsTrigger value="simulator">Mô phỏng khoản vay</TabsTrigger>
+              <TabsTrigger value="feedback">Góp ý cải tiến</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="eligibility">
+              <LoanEligibilityChecker />
+            </TabsContent>
+            
+            <TabsContent value="simulator">
+              <LoanSimulator />
+            </TabsContent>
+            
+            <TabsContent value="feedback">
+              <div className="max-w-2xl mx-auto">
+                <FeedbackSystem />
+              </div>
+            </TabsContent>
+          </Tabs>
           
           <div className="max-w-4xl mx-auto mt-12 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <h2 className="text-xl font-semibold mb-4">Các yếu tố ảnh hưởng đến khả năng vay vốn</h2>
