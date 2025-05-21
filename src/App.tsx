@@ -9,8 +9,6 @@ import NotFound from "./pages/NotFound";
 import KhaoSat from "./pages/KhaoSat";
 import SoSanh from "./pages/SoSanh";
 import KetQua from "./pages/KetQua";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import { ClerkLoaded, ClerkLoading } from "@clerk/clerk-react";
 
 const queryClient = new QueryClient();
 
@@ -21,30 +19,14 @@ function App() {
         <Toaster />
         <Sonner />
         <Router>
-          <ClerkLoading>
-            <div className="flex items-center justify-center min-h-screen">
-              Đang tải...
-            </div>
-          </ClerkLoading>
-          
-          <ClerkLoaded>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/khao-sat" element={
-                <ProtectedRoute>
-                  <KhaoSat />
-                </ProtectedRoute>
-              } />
-              <Route path="/so-sanh" element={<SoSanh />} />
-              <Route path="/ket-qua" element={
-                <ProtectedRoute>
-                  <KetQua />
-                </ProtectedRoute>
-              } />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </ClerkLoaded>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/khao-sat" element={<KhaoSat />} />
+            <Route path="/so-sanh" element={<SoSanh />} />
+            <Route path="/ket-qua" element={<KetQua />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </Router>
       </TooltipProvider>
     </QueryClientProvider>

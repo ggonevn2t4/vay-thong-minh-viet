@@ -2,11 +2,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { SignInButton, SignUpButton, UserButton, useAuth } from '@clerk/clerk-react';
 
 const Header = () => {
   const location = useLocation();
-  const { isSignedIn } = useAuth();
   
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -34,23 +32,12 @@ const Header = () => {
         </nav>
         
         <div className="flex items-center space-x-3">
-          {isSignedIn ? (
-            <UserButton afterSignOutUrl="/" />
-          ) : (
-            <>
-              <SignInButton mode="modal">
-                <Button variant="outline" className="hidden sm:inline-flex">Đăng nhập</Button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <Button className="bg-brand-600 hover:bg-brand-700">Đăng ký</Button>
-              </SignUpButton>
-            </>
-          )}
-          {isSignedIn && (
-            <Link to="/khao-sat">
-              <Button className="bg-brand-600 hover:bg-brand-700">Bắt đầu khảo sát</Button>
-            </Link>
-          )}
+          <Link to="/dang-nhap">
+            <Button variant="outline" className="hidden sm:inline-flex">Đăng nhập</Button>
+          </Link>
+          <Link to="/khao-sat">
+            <Button className="bg-brand-600 hover:bg-brand-700">Bắt đầu khảo sát</Button>
+          </Link>
         </div>
       </div>
     </header>
