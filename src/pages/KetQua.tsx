@@ -10,6 +10,7 @@ import {
   ChevronRight,
   MessageCircle,
   FileText,
+  Info,
 } from 'lucide-react';
 import {
   Card,
@@ -25,6 +26,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const KetQua = () => {
   const location = useLocation();
@@ -560,35 +567,3 @@ const KetQua = () => {
 };
 
 export default KetQua;
-
-// Thêm AccordionItem và AccordionContent ở đây nếu chưa có
-const AccordionItem = ({ value, children }: { value: string, children: React.ReactNode }) => {
-  return (
-    <div data-value={value}>
-      {children}
-    </div>
-  );
-};
-
-const AccordionContent = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="pb-4 pt-1 px-1 text-sm">
-      {children}
-    </div>
-  );
-};
-
-const AccordionTrigger = ({ 
-  children, 
-  className 
-}: { 
-  children: React.ReactNode,
-  className?: string
-}) => {
-  return (
-    <div className={`flex justify-between items-center py-2 font-medium ${className || ''}`}>
-      {children}
-      <ChevronRight className="h-4 w-4" />
-    </div>
-  );
-};
