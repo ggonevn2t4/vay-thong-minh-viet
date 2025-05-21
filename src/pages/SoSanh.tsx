@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -28,12 +29,12 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as
 import Chatbot from '@/components/Chatbot';
 import { formatCurrency } from '@/lib/utils';
 
-// Dữ liệu ngân hàng mẫu
+// Dữ liệu ngân hàng mẫu với logo cập nhật
 const bankData = [
   {
     id: 1,
     name: 'Ngân hàng Vietcombank',
-    logo: 'https://upload.wikimedia.org/wikipedia/vi/7/7c/Vietcombank_logo.svg',
+    logo: 'https://www.vietcombank.com.vn/images/logo30.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.5,
@@ -68,7 +69,7 @@ const bankData = [
   {
     id: 2,
     name: 'Ngân hàng BIDV',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/BIDV_logo.svg',
+    logo: 'https://www.bidv.com.vn/wps/wcm/connect/cf677d7b-7f3d-4098-993b-8de271f7f350/logo.png?MOD=AJPERES&CACHEID=ROOTWORKSPACE-cf677d7b-7f3d-4098-993b-8de271f7f350-nQGGR.q',
     loanTypes: {
       muaNha: {
         interestRate: 7.7,
@@ -103,7 +104,7 @@ const bankData = [
   {
     id: 3,
     name: 'Ngân hàng Techcombank',
-    logo: 'https://upload.wikimedia.org/wikipedia/vi/7/7e/Techcombank_logo.png',
+    logo: 'https://www.techcombank.com.vn/assets/images/branding/logo.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.3,
@@ -138,7 +139,7 @@ const bankData = [
   {
     id: 4,
     name: 'Ngân hàng MB Bank',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_MB_new.png',
+    logo: 'https://upload.wikimedia.org/wikipedia/vi/1/13/MB_Bank_logo.svg',
     loanTypes: {
       muaNha: {
         interestRate: 7.6,
@@ -173,7 +174,7 @@ const bankData = [
   {
     id: 5,
     name: 'Ngân hàng VPBank',
-    logo: 'https://upload.wikimedia.org/wikipedia/vi/8/8c/VPBank_logo.png',
+    logo: 'https://vpbank.com.vn/sites/default/files/2019-07/Logo%20ngang-01.png',
     loanTypes: {
       muaNha: {
         interestRate: 7.9,
