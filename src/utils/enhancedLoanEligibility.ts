@@ -1,9 +1,8 @@
-
 // Enhanced loan eligibility calculation utilities
 // Implements more detailed scoring algorithm with multiple factors
 
 import { toast } from "sonner";
-import { formatCurrency } from "./utils";
+import { formatCurrency } from "@/lib/utils"; // Corrected import path
 
 // Expanded loan eligibility form data interface
 export interface EnhancedEligibilityFormData {
@@ -813,18 +812,14 @@ export const showLoanWarning = (formData: EnhancedEligibilityFormData): void => 
   const monthlyDebtPayment = formData.existingDebts / 12;
   
   if (loanAmount > monthlyIncome * 12 * 5) {
-    toast({
-      title: "Cảnh báo khoản vay cao",
+    toast.error("Cảnh báo khoản vay cao", {
       description: "Khoản vay yêu cầu vượt quá 5 lần thu nhập hàng năm của bạn, có thể gặp khó khăn khi duyệt.",
-      variant: "destructive",
     });
   }
   
   if ((monthlyDebtPayment / monthlyIncome) > 0.5) {
-    toast({
-      title: "Cảnh báo nợ hiện tại",
+    toast.error("Cảnh báo nợ hiện tại", {
       description: "Các khoản nợ hiện tại của bạn đã chiếm hơn 50% thu nhập, có thể khó được phê duyệt thêm khoản vay.",
-      variant: "destructive",
     });
   }
 };
