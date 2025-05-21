@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import {
@@ -12,664 +13,678 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
-import { Search, ArrowRight, ChevronsUpDown, Check, Download } from 'lucide-react';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend as RechartsLegend, ResponsiveContainer } from 'recharts';
-import Chatbot from '@/components/Chatbot';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { analyzeUserResponse } from '@/services/openaiService';
 import { formatCurrency } from '@/lib/utils';
 
-// Dữ liệu ngân hàng mẫu
-const bankData = [
-  {
-    id: 1,
-    name: 'Ngân hàng Vietcombank',
-    logo: 'https://upload.wikimedia.org/wikipedia/vi/7/7c/Vietcombank_logo.svg',
-    loanTypes: {
-      muaNha: {
-        interestRate: 7.5,
-        maxTerm: 25,
-        maxAmount: 1000000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'Hợp đồng lao động', 'Sao kê lương 3 tháng'],
-        approvalTime: 5,
-      },
-      muaXe: {
-        interestRate: 8.0,
-        maxTerm: 7,
-        maxAmount: 500000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'Hợp đồng lao động', 'Sao kê lương 3 tháng'],
-        approvalTime: 3,
-      },
-      kinhDoanh: {
-        interestRate: 9.0,
-        maxTerm: 5,
-        maxAmount: 300000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'GPKD', 'BCTC 2 năm'],
-        approvalTime: 7,
-      },
-    },
-    ranking: 4.5,
-  },
-  {
-    id: 2,
-    name: 'Ngân hàng BIDV',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7c/BIDV_logo.svg',
-    loanTypes: {
-      muaNha: {
-        interestRate: 7.7,
-        maxTerm: 25,
-        maxAmount: 1000000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'Hợp đồng lao động', 'Sao kê lương 6 tháng'],
-        approvalTime: 7,
-      },
-      muaXe: {
-        interestRate: 8.2,
-        maxTerm: 7,
-        maxAmount: 500000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'Hợp đồng lao động', 'Sao kê lương 6 tháng'],
-        approvalTime: 5,
-      },
-      kinhDoanh: {
-        interestRate: 9.2,
-        maxTerm: 5,
-        maxAmount: 300000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'GPKD', 'BCTC 2 năm'],
-        approvalTime: 7,
-      },
-    },
-    ranking: 4.3,
-  },
-  {
-    id: 3,
-    name: 'Ngân hàng Techcombank',
-    logo: 'https://upload.wikimedia.org/wikipedia/vi/7/7e/Techcombank_logo.png',
-    loanTypes: {
-      muaNha: {
-        interestRate: 7.3,
-        maxTerm: 25,
-        maxAmount: 1000000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'Hợp đồng lao động', 'Sao kê lương 3 tháng'],
-        approvalTime: 4,
-      },
-      muaXe: {
-        interestRate: 7.9,
-        maxTerm: 7,
-        maxAmount: 500000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'Hợp đồng lao động', 'Sao kê lương 3 tháng'],
-        approvalTime: 2,
-      },
-      kinhDoanh: {
-        interestRate: 8.5,
-        maxTerm: 5,
-        maxAmount: 300000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'GPKD', 'BCTC 2 năm'],
-        approvalTime: 5,
-      },
-    },
-    ranking: 4.7,
-  },
-  {
-    id: 4,
-    name: 'Ngân hàng MB Bank',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/2/25/Logo_MB_new.png',
-    loanTypes: {
-      muaNha: {
-        interestRate: 7.6,
-        maxTerm: 25,
-        maxAmount: 1000000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'Hợp đồng lao động', 'Sao kê lương 3 tháng'],
-        approvalTime: 5,
-      },
-      muaXe: {
-        interestRate: 8.1,
-        maxTerm: 7,
-        maxAmount: 500000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'Hợp đồng lao động', 'Sao kê lương 3 tháng'],
-        approvalTime: 4,
-      },
-      kinhDoanh: {
-        interestRate: 8.8,
-        maxTerm: 5,
-        maxAmount: 300000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'GPKD', 'BCTC 2 năm'],
-        approvalTime: 6,
-      },
-    },
-    ranking: 4.4,
-  },
-  {
-    id: 5,
-    name: 'Ngân hàng VPBank',
-    logo: 'https://upload.wikimedia.org/wikipedia/vi/8/8c/VPBank_logo.png',
-    loanTypes: {
-      muaNha: {
-        interestRate: 7.9,
-        maxTerm: 25,
-        maxAmount: 1000000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'Hợp đồng lao động', 'Sao kê lương 3 tháng'],
-        approvalTime: 6,
-      },
-      muaXe: {
-        interestRate: 8.3,
-        maxTerm: 7,
-        maxAmount: 500000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'Hợp đồng lao động', 'Sao kê lương 3 tháng'],
-        approvalTime: 4,
-      },
-      kinhDoanh: {
-        interestRate: 9.1,
-        maxTerm: 5,
-        maxAmount: 300000000,
-        processingFee: 0.5,
-        earlyPaymentFee: 2,
-        requirements: ['CMND/CCCD', 'Hộ khẩu', 'GPKD', 'BCTC 2 năm'],
-        approvalTime: 7,
-      },
-    },
-    ranking: 4.2,
-  },
-];
-
-const SoSanh = () => {
+const KhaoSat = () => {
   const navigate = useNavigate();
-  const [loanAmount, setLoanAmount] = useState('500000000');
-  const [loanTerm, setLoanTerm] = useState('5');
-  const [loanType, setLoanType] = useState('muaNha');
-  const [selectedBanks, setSelectedBanks] = useState<number[]>([1, 2, 3]);
-  const [comparisonResults, setComparisonResults] = useState<any[]>([]);
-  const [sortField, setSortField] = useState('interestRate');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  
-  // Kết quả khảo sát từ localStorage (nếu có)
-  const [surveyData, setSurveyData] = useState<any>(null);
-  
-  useEffect(() => {
-    // Lấy kết quả khảo sát từ localStorage nếu có
-    const savedSurvey = localStorage.getItem('ketQuaKhaoSat');
-    if (savedSurvey) {
-      const parsedData = JSON.parse(savedSurvey);
-      setSurveyData(parsedData);
-      
-      // Tự động điền thông tin từ khảo sát
-      if (parsedData.thongTinKhoanVay) {
-        if (parsedData.thongTinKhoanVay.soTienVay) {
-          setLoanAmount(parsedData.thongTinKhoanVay.soTienVay.replace(/[^0-9]/g, ''));
-        }
-        if (parsedData.thongTinKhoanVay.mucDichVay) {
-          setLoanType(parsedData.thongTinKhoanVay.mucDichVay);
-        }
-        if (parsedData.thongTinKhoanVay.thoiHanVay) {
-          switch (parsedData.thongTinKhoanVay.thoiHanVay) {
-            case 'duoi12thang':
-              setLoanTerm('1');
-              break;
-            case '1-3nam':
-              setLoanTerm('3');
-              break;
-            case '3-5nam':
-              setLoanTerm('5');
-              break;
-            case '5-10nam':
-              setLoanTerm('10');
-              break;
-            case 'tren10nam':
-              setLoanTerm('20');
-              break;
-            default:
-              setLoanTerm('5');
-          }
-        }
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [surveyData, setSurveyData] = useState({
+    thongTinCaNhan: {
+      hoTen: '',
+      email: '',
+      soDienThoai: '',
+      tuoi: '',
+      gioiTinh: 'nam',
+    },
+    thongTinThuNhap: {
+      thuNhapHangThang: '',
+      chiPhiHangThang: '',
+      nguonThuNhap: [],
+      taiSan: '',
+    },
+    thongTinKhoanVay: {
+      mucDichVay: 'muaNha',
+      soTienVay: '',
+      thoiHanVay: '3-5nam',
+      taiSanTheChap: 'co',
+      daVayTruocDay: 'khong',
+    },
+    yKienKhaoSat: {
+      khoKhan: '',
+      uuTien: [],
+      mucDoSanSang: 50,
+    },
+  });
+
+  const [ketQua, setKetQua] = useState({
+    phanKhuc: '',
+    khoangLaiSuat: '',
+    danhGia: '',
+    goiYNganHang: [],
+    goiY: '',
+  });
+
+  const handleNext = async () => {
+    // Validate form based on current step
+    let isValid = true;
+    
+    if (currentStep === 1) {
+      const { hoTen, email, soDienThoai } = surveyData.thongTinCaNhan;
+      if (!hoTen || !email || !soDienThoai) {
+        toast.error('Vui lòng điền đầy đủ thông tin cá nhân');
+        isValid = false;
+      } else if (!email.includes('@')) {
+        toast.error('Email không hợp lệ');
+        isValid = false;
+      }
+    } else if (currentStep === 2) {
+      const { thuNhapHangThang, chiPhiHangThang } = surveyData.thongTinThuNhap;
+      if (!thuNhapHangThang || !chiPhiHangThang) {
+        toast.error('Vui lòng điền đầy đủ thông tin thu nhập');
+        isValid = false;
+      }
+    } else if (currentStep === 3) {
+      const { soTienVay } = surveyData.thongTinKhoanVay;
+      if (!soTienVay) {
+        toast.error('Vui lòng điền số tiền vay');
+        isValid = false;
       }
     }
-  }, []);
-  
-  // Tính toán kết quả so sánh khi các tham số thay đổi
-  useEffect(() => {
-    calculateComparison();
-  }, [loanAmount, loanTerm, loanType, selectedBanks, sortField, sortOrder]);
-  
-  // Hàm tính toán kết quả so sánh
-  const calculateComparison = () => {
-    const amount = parseFloat(loanAmount);
-    const term = parseInt(loanTerm);
     
-    if (isNaN(amount) || isNaN(term) || amount <= 0 || term <= 0) {
-      return;
-    }
+    if (!isValid) return;
     
-    const results = bankData
-      .filter(bank => selectedBanks.includes(bank.id))
-      .map(bank => {
-        const loanInfo = bank.loanTypes[loanType as keyof typeof bank.loanTypes];
-        const monthlyRate = loanInfo.interestRate / 100 / 12;
-        const totalMonths = term * 12;
-        
-        // Tính toán theo công thức PMT
-        const monthlyPayment = (amount * monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) / 
-                              (Math.pow(1 + monthlyRate, totalMonths) - 1);
-        
-        const totalPayment = monthlyPayment * totalMonths;
-        const totalInterest = totalPayment - amount;
-        const processingFeeAmount = (amount * loanInfo.processingFee) / 100;
-        
-        return {
-          bankId: bank.id,
-          bankName: bank.name,
-          bankLogo: bank.logo,
-          interestRate: loanInfo.interestRate,
-          monthlyPayment,
-          totalInterest,
-          totalPayment,
-          processingFee: loanInfo.processingFee,
-          processingFeeAmount,
-          earlyPaymentFee: loanInfo.earlyPaymentFee,
-          requirements: loanInfo.requirements,
-          approvalTime: loanInfo.approvalTime,
-          totalCost: totalInterest + processingFeeAmount,
-          ranking: bank.ranking,
-        };
-      });
-    
-    // Sắp xếp kết quả
-    const sortedResults = [...results].sort((a, b) => {
-      if (sortOrder === 'asc') {
-        return a[sortField] - b[sortField];
-      } else {
-        return b[sortField] - a[sortField];
-      }
-    });
-    
-    setComparisonResults(sortedResults);
-  };
-  
-  // Xử lý thay đổi trường sắp xếp
-  const handleSort = (field: string) => {
-    if (field === sortField) {
-      // Đảo chiều sắp xếp nếu đang sắp xếp theo trường này
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    if (currentStep < 4) {
+      // Go to next step
+      setCurrentStep(currentStep + 1);
+      window.scrollTo(0, 0);
     } else {
-      // Đặt trường sắp xếp mới và đặt lại chiều sắp xếp thành tăng dần
-      setSortField(field);
-      setSortOrder('asc');
+      // Submit form
+      await handleSubmitSurvey();
     }
   };
-  
-  // Xử lý chọn/bỏ chọn ngân hàng
-  const toggleBank = (bankId: number) => {
-    setSelectedBanks(prev => {
-      if (prev.includes(bankId)) {
-        return prev.filter(id => id !== bankId);
-      } else {
-        return [...prev, bankId];
-      }
-    });
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+      window.scrollTo(0, 0);
+    }
   };
-  
-  // Tạo dữ liệu cho biểu đồ so sánh
-  const getChartData = () => {
-    if (comparisonResults.length === 0) return [];
-    
-    return comparisonResults.map(result => ({
-      name: result.bankName,
-      'Lãi suất (%)': result.interestRate,
-      'Tiền lãi (triệu)': Math.round(result.totalInterest / 1000000),
-      'Tổng chi phí (triệu)': Math.round(result.totalCost / 1000000),
+
+  const handleInputChange = (section: string, field: string, value: any) => {
+    setSurveyData(prevData => ({
+      ...prevData,
+      [section]: {
+        ...prevData[section as keyof typeof prevData],
+        [field]: value,
+      },
     }));
   };
-  
+
+  const handleCheckboxChange = (section: string, field: string, value: string) => {
+    setSurveyData(prevData => {
+      const currentValues = prevData[section as keyof typeof prevData][field] as string[];
+      if (currentValues.includes(value)) {
+        return {
+          ...prevData,
+          [section]: {
+            ...prevData[section as keyof typeof prevData],
+            [field]: currentValues.filter(v => v !== value),
+          },
+        };
+      } else {
+        return {
+          ...prevData,
+          [section]: {
+            ...prevData[section as keyof typeof prevData],
+            [field]: [...currentValues, value],
+          },
+        };
+      }
+    });
+  };
+
+  const calculateLoanProfile = () => {
+    // Tính phân khúc tín dụng
+    const { thuNhapHangThang, chiPhiHangThang } = surveyData.thongTinThuNhap;
+    const { soTienVay, thoiHanVay, taiSanTheChap } = surveyData.thongTinKhoanVay;
+    
+    const thuNhap = parseInt(thuNhapHangThang.replace(/[^0-9]/g, ''));
+    const chiPhi = parseInt(chiPhiHangThang.replace(/[^0-9]/g, ''));
+    const soTien = parseInt(soTienVay.replace(/[^0-9]/g, ''));
+    
+    // Tiền có thể trả nợ hàng tháng
+    const khaDoiTra = thuNhap - chiPhi;
+    
+    // Ước tính thời hạn vay theo năm
+    let thoiHan = 5;
+    if (thoiHanVay === 'duoi12thang') thoiHan = 1;
+    else if (thoiHanVay === '1-3nam') thoiHan = 3;
+    else if (thoiHanVay === '3-5nam') thoiHan = 5;
+    else if (thoiHanVay === '5-10nam') thoiHan = 10;
+    else if (thoiHanVay === 'tren10nam') thoiHan = 20;
+    
+    // Ước tính tiền trả hàng tháng (với lãi suất trung bình 8%)
+    const laiSuat = 0.08 / 12; // 8% hằng năm, 0.67% hàng tháng
+    const soThang = thoiHan * 12;
+    const tienTraHangThang = (soTien * laiSuat * Math.pow(1 + laiSuat, soThang)) / 
+                            (Math.pow(1 + laiSuat, soThang) - 1);
+    
+    // Tỉ lệ trả nợ trên thu nhập
+    const tiLe = tienTraHangThang / thuNhap;
+    
+    let phanKhuc, khoangLaiSuat, goiYNganHang, danhGia;
+    
+    // Đánh giá phân khúc tín dụng
+    if (tiLe <= 0.3 && taiSanTheChap === 'co') {
+      phanKhuc = 'Cao';
+      khoangLaiSuat = '6% - 8%';
+      danhGia = 'Khả năng vay rất tốt';
+      goiYNganHang = ['Vietcombank', 'Techcombank', 'MB Bank'];
+    } else if (tiLe <= 0.4) {
+      phanKhuc = 'Trung bình';
+      khoangLaiSuat = '8% - 10%';
+      danhGia = 'Khả năng vay khá tốt, cần chuẩn bị thêm tài sản thế chấp';
+      goiYNganHang = ['BIDV', 'VPBank', 'ACB'];
+    } else {
+      phanKhuc = 'Thấp';
+      khoangLaiSuat = '10% - 14%';
+      danhGia = 'Khả năng vay hạn chế, cần giảm số tiền vay hoặc tăng thời hạn vay';
+      goiYNganHang = ['SHB', 'HDBank', 'OCB'];
+    }
+    
+    // Gợi ý cá nhân hóa
+    let goiY = '';
+    if (tiLe > 0.5) {
+      goiY = 'Bạn nên giảm số tiền vay xuống hoặc tăng thời hạn vay để giảm áp lực trả nợ hàng tháng.';
+    } else if (thuNhap < 10000000) {
+      goiY = 'Với mức thu nhập hiện tại, bạn nên tìm các gói vay ưu đãi dành cho khách hàng thu nhập thấp.';
+    } else if (soTien > thuNhap * 36) {
+      goiY = 'Số tiền vay khá cao so với thu nhập, bạn nên cân nhắc vay thêm người thân hoặc đồng vay.';
+    } else {
+      goiY = 'Hồ sơ vay của bạn khá tốt, bạn có thể đàm phán lãi suất tốt hơn với ngân hàng.';
+    }
+    
+    return {
+      phanKhuc,
+      khoangLaiSuat,
+      danhGia,
+      goiYNganHang,
+      goiY,
+    };
+  };
+
+  const handleSubmitSurvey = async () => {
+    setIsLoading(true);
+    try {
+      // Tính toán kết quả
+      const result = calculateLoanProfile();
+      
+      // Phân tích phản hồi của người dùng bằng OpenAI
+      if (surveyData.yKienKhaoSat.khoKhan) {
+        try {
+          const aiAnalysis = await analyzeUserResponse(surveyData.yKienKhaoSat.khoKhan);
+          console.log('AI Analysis:', aiAnalysis);
+          // Có thể sử dụng kết quả phân tích để điều chỉnh gợi ý
+        } catch (error) {
+          console.error('Error analyzing response:', error);
+        }
+      }
+      
+      setKetQua(result);
+      
+      // Lưu kết quả khảo sát vào localStorage
+      const fullResult = {
+        ...surveyData,
+        ketQua: result,
+        ngayKhaoSat: new Date().toISOString(),
+      };
+      
+      localStorage.setItem('ketQuaKhaoSat', JSON.stringify(fullResult));
+      
+      // Chuyển đến trang kết quả
+      navigate('/ket-qua');
+      
+      toast.success('Khảo sát đã hoàn thành!');
+    } catch (error) {
+      console.error('Error submitting survey:', error);
+      toast.error('Đã xảy ra lỗi khi xử lý khảo sát');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatNumber = (value: string) => {
+    // Chỉ giữ lại các chữ số
+    const numericValue = value.replace(/[^0-9]/g, '');
+    
+    // Format với dấu phân cách hàng nghìn
+    return numericValue === '' ? '' : formatCurrency(parseInt(numericValue));
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Thông tin cá nhân</CardTitle>
+              <CardDescription>
+                Vui lòng cung cấp thông tin cá nhân chính xác để chúng tôi có thể đánh giá tốt nhất.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="hoTen">Họ và tên <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="hoTen"
+                    placeholder="Nguyễn Văn A"
+                    value={surveyData.thongTinCaNhan.hoTen}
+                    onChange={(e) => handleInputChange('thongTinCaNhan', 'hoTen', e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="example@email.com"
+                    value={surveyData.thongTinCaNhan.email}
+                    onChange={(e) => handleInputChange('thongTinCaNhan', 'email', e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="soDienThoai">Số điện thoại <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="soDienThoai"
+                    placeholder="0912345678"
+                    value={surveyData.thongTinCaNhan.soDienThoai}
+                    onChange={(e) => handleInputChange('thongTinCaNhan', 'soDienThoai', e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="tuoi">Tuổi</Label>
+                  <Input
+                    id="tuoi"
+                    placeholder="30"
+                    value={surveyData.thongTinCaNhan.tuoi}
+                    onChange={(e) => handleInputChange('thongTinCaNhan', 'tuoi', e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Giới tính</Label>
+                  <RadioGroup
+                    value={surveyData.thongTinCaNhan.gioiTinh}
+                    onValueChange={(value) => handleInputChange('thongTinCaNhan', 'gioiTinh', value)}
+                    className="flex flex-row space-x-4"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="nam" id="nam" />
+                      <Label htmlFor="nam">Nam</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="nu" id="nu" />
+                      <Label htmlFor="nu">Nữ</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="khac" id="khac" />
+                      <Label htmlFor="khac">Khác</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="justify-between">
+              <Button variant="outline" onClick={() => navigate('/')}>
+                Hủy
+              </Button>
+              <Button onClick={handleNext}>
+                Tiếp theo
+              </Button>
+            </CardFooter>
+          </Card>
+        );
+      
+      case 2:
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Thông tin thu nhập</CardTitle>
+              <CardDescription>
+                Thông tin này giúp chúng tôi đánh giá khả năng trả nợ của bạn.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="thuNhapHangThang">Thu nhập hàng tháng (VND) <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="thuNhapHangThang"
+                    placeholder="10,000,000"
+                    value={surveyData.thongTinThuNhap.thuNhapHangThang}
+                    onChange={(e) => {
+                      const formattedValue = formatNumber(e.target.value);
+                      handleInputChange('thongTinThuNhap', 'thuNhapHangThang', formattedValue);
+                    }}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="chiPhiHangThang">Chi phí sinh hoạt hàng tháng (VND) <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="chiPhiHangThang"
+                    placeholder="5,000,000"
+                    value={surveyData.thongTinThuNhap.chiPhiHangThang}
+                    onChange={(e) => {
+                      const formattedValue = formatNumber(e.target.value);
+                      handleInputChange('thongTinThuNhap', 'chiPhiHangThang', formattedValue);
+                    }}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Nguồn thu nhập</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {['Lương', 'Kinh doanh', 'Cho thuê', 'Đầu tư', 'Khác'].map((option) => (
+                      <div className="flex items-center space-x-2" key={option}>
+                        <Checkbox
+                          id={`nguonThuNhap-${option}`}
+                          checked={(surveyData.thongTinThuNhap.nguonThuNhap as string[]).includes(option)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              handleCheckboxChange('thongTinThuNhap', 'nguonThuNhap', option);
+                            } else {
+                              handleCheckboxChange('thongTinThuNhap', 'nguonThuNhap', option);
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`nguonThuNhap-${option}`}>{option}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="taiSan">Tài sản hiện có</Label>
+                  <Textarea
+                    id="taiSan"
+                    placeholder="Nhà, đất, xe cộ, tiền tiết kiệm..."
+                    value={surveyData.thongTinThuNhap.taiSan}
+                    onChange={(e) => handleInputChange('thongTinThuNhap', 'taiSan', e.target.value)}
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="justify-between">
+              <Button variant="outline" onClick={handleBack}>
+                Quay lại
+              </Button>
+              <Button onClick={handleNext}>
+                Tiếp theo
+              </Button>
+            </CardFooter>
+          </Card>
+        );
+      
+      case 3:
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Thông tin khoản vay</CardTitle>
+              <CardDescription>
+                Cho chúng tôi biết nhu cầu vay vốn của bạn.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label>Mục đích vay</Label>
+                  <RadioGroup
+                    value={surveyData.thongTinKhoanVay.mucDichVay}
+                    onValueChange={(value) => handleInputChange('thongTinKhoanVay', 'mucDichVay', value)}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="muaNha" id="muaNha" />
+                      <Label htmlFor="muaNha">Mua nhà</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="muaXe" id="muaXe" />
+                      <Label htmlFor="muaXe">Mua xe</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="kinhDoanh" id="kinhDoanh" />
+                      <Label htmlFor="kinhDoanh">Kinh doanh</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="tieuDung" id="tieuDung" />
+                      <Label htmlFor="tieuDung">Tiêu dùng</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="soTienVay">Số tiền vay (VND) <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="soTienVay"
+                    placeholder="500,000,000"
+                    value={surveyData.thongTinKhoanVay.soTienVay}
+                    onChange={(e) => {
+                      const formattedValue = formatNumber(e.target.value);
+                      handleInputChange('thongTinKhoanVay', 'soTienVay', formattedValue);
+                    }}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Thời hạn vay</Label>
+                  <RadioGroup
+                    value={surveyData.thongTinKhoanVay.thoiHanVay}
+                    onValueChange={(value) => handleInputChange('thongTinKhoanVay', 'thoiHanVay', value)}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="duoi12thang" id="duoi12thang" />
+                      <Label htmlFor="duoi12thang">Dưới 12 tháng</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="1-3nam" id="1-3nam" />
+                      <Label htmlFor="1-3nam">1 - 3 năm</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="3-5nam" id="3-5nam" />
+                      <Label htmlFor="3-5nam">3 - 5 năm</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="5-10nam" id="5-10nam" />
+                      <Label htmlFor="5-10nam">5 - 10 năm</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="tren10nam" id="tren10nam" />
+                      <Label htmlFor="tren10nam">Trên 10 năm</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Tài sản thế chấp</Label>
+                  <RadioGroup
+                    value={surveyData.thongTinKhoanVay.taiSanTheChap}
+                    onValueChange={(value) => handleInputChange('thongTinKhoanVay', 'taiSanTheChap', value)}
+                    className="flex flex-row space-x-4"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="co" id="co" />
+                      <Label htmlFor="co">Có</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="khong" id="khong" />
+                      <Label htmlFor="khong">Không</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Đã từng vay ngân hàng trước đây</Label>
+                  <RadioGroup
+                    value={surveyData.thongTinKhoanVay.daVayTruocDay}
+                    onValueChange={(value) => handleInputChange('thongTinKhoanVay', 'daVayTruocDay', value)}
+                    className="flex flex-row space-x-4"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="co" id="daTungVay" />
+                      <Label htmlFor="daTungVay">Có</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="khong" id="chuaTungVay" />
+                      <Label htmlFor="chuaTungVay">Không</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="justify-between">
+              <Button variant="outline" onClick={handleBack}>
+                Quay lại
+              </Button>
+              <Button onClick={handleNext}>
+                Tiếp theo
+              </Button>
+            </CardFooter>
+          </Card>
+        );
+      
+      case 4:
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Ý kiến khảo sát</CardTitle>
+              <CardDescription>
+                Cho chúng tôi biết thêm về mong muốn của bạn.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="khoKhan">Khó khăn bạn gặp phải khi vay vốn</Label>
+                  <Textarea
+                    id="khoKhan"
+                    placeholder="Mô tả khó khăn bạn gặp phải..."
+                    value={surveyData.yKienKhaoSat.khoKhan}
+                    onChange={(e) => handleInputChange('yKienKhaoSat', 'khoKhan', e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Ưu tiên khi chọn khoản vay</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {['Lãi suất thấp', 'Thủ tục đơn giản', 'Giải ngân nhanh', 'Thời hạn linh hoạt', 'Phí trả nợ sớm thấp'].map((option) => (
+                      <div className="flex items-center space-x-2" key={option}>
+                        <Checkbox
+                          id={`uuTien-${option}`}
+                          checked={(surveyData.yKienKhaoSat.uuTien as string[]).includes(option)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              handleCheckboxChange('yKienKhaoSat', 'uuTien', option);
+                            } else {
+                              handleCheckboxChange('yKienKhaoSat', 'uuTien', option);
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`uuTien-${option}`}>{option}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <Label>Mức độ sẵn sàng vay vốn: {surveyData.yKienKhaoSat.mucDoSanSang}%</Label>
+                  </div>
+                  <Slider
+                    value={[surveyData.yKienKhaoSat.mucDoSanSang as number]}
+                    onValueChange={(value) => handleInputChange('yKienKhaoSat', 'mucDoSanSang', value[0])}
+                    max={100}
+                    step={10}
+                  />
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>Đang cân nhắc</span>
+                    <span>Rất sẵn sàng</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="justify-between">
+              <Button variant="outline" onClick={handleBack}>
+                Quay lại
+              </Button>
+              <Button onClick={handleNext} disabled={isLoading}>
+                {isLoading ? 'Đang xử lý...' : 'Hoàn thành khảo sát'}
+              </Button>
+            </CardFooter>
+          </Card>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
   return (
     <Layout>
       <div className="container mx-auto py-8 px-4">
-        <h1 className="text-2xl md:text-3xl font-bold mb-6 text-center">So sánh khoản vay</h1>
-        
-        {surveyData && (
-          <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
-            <div className="flex">
-              <div className="ml-3">
-                <p className="text-sm text-green-700">
-                  Thông tin của bạn đã được tải từ kết quả khảo sát. Xếp hạng tín dụng của bạn: 
-                  <span className="font-bold ml-1">{surveyData.ketQua.phanKhuc}</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Tham số khoản vay</CardTitle>
-            <CardDescription>Điền thông tin khoản vay bạn muốn so sánh</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="loanAmount">Số tiền vay (VND)</Label>
-                <Input
-                  id="loanAmount"
-                  type="text"
-                  value={loanAmount}
-                  onChange={(e) => setLoanAmount(e.target.value.replace(/[^0-9]/g, ''))}
-                  placeholder="500,000,000"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="loanTerm">Thời hạn vay (năm)</Label>
-                <Select value={loanTerm} onValueChange={setLoanTerm}>
-                  <SelectTrigger id="loanTerm">
-                    <SelectValue placeholder="Chọn thời hạn vay" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1 năm</SelectItem>
-                    <SelectItem value="3">3 năm</SelectItem>
-                    <SelectItem value="5">5 năm</SelectItem>
-                    <SelectItem value="10">10 năm</SelectItem>
-                    <SelectItem value="15">15 năm</SelectItem>
-                    <SelectItem value="20">20 năm</SelectItem>
-                    <SelectItem value="25">25 năm</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="loanType">Loại khoản vay</Label>
-                <Select value={loanType} onValueChange={setLoanType}>
-                  <SelectTrigger id="loanType">
-                    <SelectValue placeholder="Chọn loại khoản vay" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="muaNha">Vay mua nhà</SelectItem>
-                    <SelectItem value="muaXe">Vay mua xe</SelectItem>
-                    <SelectItem value="kinhDoanh">Vay kinh doanh</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button onClick={calculateComparison} className="ml-auto">
-              <Search className="mr-2 h-4 w-4" />
-              So sánh ngay
-            </Button>
-          </CardFooter>
-        </Card>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2 text-center">Khảo sát nhu cầu vay vốn</h1>
+        <p className="text-muted-foreground text-center mb-6">
+          Hoàn thành khảo sát để nhận đánh giá chi tiết về khả năng vay vốn của bạn
+        </p>
         
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Chọn ngân hàng để so sánh</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {bankData.map((bank) => (
-              <Card 
-                key={bank.id}
-                className={`cursor-pointer transition-all ${
-                  selectedBanks.includes(bank.id) 
-                    ? 'border-brand-500 bg-brand-50' 
-                    : 'border-gray-200 hover:border-brand-300'
-                }`}
-                onClick={() => toggleBank(bank.id)}
+          <div className="flex justify-between mb-2">
+            {[1, 2, 3, 4].map((step) => (
+              <div 
+                key={step}
+                className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                  step === currentStep 
+                    ? 'bg-primary text-primary-foreground' 
+                    : step < currentStep 
+                    ? 'bg-primary/20 text-primary' 
+                    : 'bg-muted text-muted-foreground'
+                } text-sm font-medium`}
               >
-                <CardContent className="p-4 flex flex-col items-center justify-center">
-                  <div className="h-16 flex items-center justify-center mb-2">
-                    <img 
-                      src={bank.logo} 
-                      alt={bank.name} 
-                      className="max-h-full max-w-full object-contain"
-                    />
-                  </div>
-                  <h3 className="text-sm text-center font-medium">
-                    {bank.name}
-                  </h3>
-                  {selectedBanks.includes(bank.id) && (
-                    <div className="mt-2 flex items-center justify-center text-brand-600">
-                      <Check className="h-4 w-4" />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                {step}
+              </div>
             ))}
+          </div>
+          <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="absolute top-0 left-0 h-full bg-primary transition-all duration-300"
+              style={{ width: `${(currentStep / 4) * 100}%` }}
+            />
+          </div>
+          <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+            <span>Thông tin cá nhân</span>
+            <span>Thu nhập</span>
+            <span>Khoản vay</span>
+            <span>Khảo sát</span>
           </div>
         </div>
         
-        {comparisonResults.length > 0 && (
-          <>
-            <h2 className="text-xl font-semibold mb-4">Kết quả so sánh</h2>
-            
-            <Card>
-              <CardContent className="p-6">
-                <Table>
-                  <TableCaption>So sánh các khoản vay theo tham số đã nhập</TableCaption>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Ngân hàng</TableHead>
-                      <TableHead 
-                        className="cursor-pointer hover:bg-gray-50" 
-                        onClick={() => handleSort('interestRate')}
-                      >
-                        Lãi suất (%)
-                        {sortField === 'interestRate' && (
-                          <ChevronsUpDown className="inline-block ml-1 h-4 w-4" />
-                        )}
-                      </TableHead>
-                      <TableHead 
-                        className="cursor-pointer hover:bg-gray-50" 
-                        onClick={() => handleSort('monthlyPayment')}
-                      >
-                        Trả hàng tháng
-                        {sortField === 'monthlyPayment' && (
-                          <ChevronsUpDown className="inline-block ml-1 h-4 w-4" />
-                        )}
-                      </TableHead>
-                      <TableHead 
-                        className="cursor-pointer hover:bg-gray-50" 
-                        onClick={() => handleSort('totalInterest')}
-                      >
-                        Tổng tiền lãi
-                        {sortField === 'totalInterest' && (
-                          <ChevronsUpDown className="inline-block ml-1 h-4 w-4" />
-                        )}
-                      </TableHead>
-                      <TableHead 
-                        className="cursor-pointer hover:bg-gray-50" 
-                        onClick={() => handleSort('totalPayment')}
-                      >
-                        Tổng tiền trả
-                        {sortField === 'totalPayment' && (
-                          <ChevronsUpDown className="inline-block ml-1 h-4 w-4" />
-                        )}
-                      </TableHead>
-                      <TableHead 
-                        className="cursor-pointer hover:bg-gray-50" 
-                        onClick={() => handleSort('processingFee')}
-                      >
-                        Phí xử lý (%)
-                        {sortField === 'processingFee' && (
-                          <ChevronsUpDown className="inline-block ml-1 h-4 w-4" />
-                        )}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {comparisonResults.map((result) => (
-                      <TableRow key={result.bankId}>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <img 
-                              src={result.bankLogo} 
-                              alt={result.bankName} 
-                              className="h-6 w-auto"
-                            />
-                            <span>{result.bankName}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>{result.interestRate.toFixed(2)}%</TableCell>
-                        <TableCell>{formatCurrency(Math.round(result.monthlyPayment))} VND</TableCell>
-                        <TableCell>{formatCurrency(Math.round(result.totalInterest))} VND</TableCell>
-                        <TableCell>{formatCurrency(Math.round(result.totalPayment))} VND</TableCell>
-                        <TableCell>{result.processingFee.toFixed(2)}%</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-            
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-              {comparisonResults.map((result) => (
-                <Card key={result.bankId} className="overflow-hidden">
-                  <CardHeader className="bg-gray-50">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <img 
-                          src={result.bankLogo} 
-                          alt={result.bankName} 
-                          className="h-8 w-auto"
-                        />
-                        <CardTitle className="text-lg">{result.bankName}</CardTitle>
-                      </div>
-                      <div className="flex items-center">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <svg 
-                            key={i}
-                            className={`w-4 h-4 ${i < Math.floor(result.ranking) ? 'text-yellow-400' : 'text-gray-300'}`}
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                        ))}
-                        <span className="ml-1 text-sm">{result.ranking.toFixed(1)}</span>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-6">
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      <div>
-                        <div className="text-sm text-gray-500 mb-1">Lãi suất</div>
-                        <div className="text-xl font-bold text-brand-600">{result.interestRate.toFixed(2)}%</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-500 mb-1">Trả hàng tháng</div>
-                        <div className="text-xl font-bold">{formatCurrency(Math.round(result.monthlyPayment))} VND</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-500 mb-1">Tổng tiền lãi</div>
-                        <div className="font-semibold">{formatCurrency(Math.round(result.totalInterest))} VND</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-500 mb-1">Tổng tiền trả</div>
-                        <div className="font-semibold">{formatCurrency(Math.round(result.totalPayment))} VND</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-500 mb-1">Phí xử lý</div>
-                        <div className="font-semibold">{formatCurrency(Math.round(result.processingFeeAmount))} VND</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-500 mb-1">Thời gian phê duyệt</div>
-                        <div className="font-semibold">{result.approvalTime} ngày</div>
-                      </div>
-                    </div>
-                    
-                    <div className="mb-4">
-                      <div className="text-sm text-gray-500 mb-1">Giấy tờ yêu cầu</div>
-                      <ul className="text-sm list-disc pl-5">
-                        {result.requirements.map((req: string, index: number) => (
-                          <li key={index}>{req}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="bg-gray-50 flex justify-between">
-                    <Button variant="outline" onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(result.bankName)}+vay+${loanType === 'muaNha' ? 'mua+nhà' : loanType === 'muaXe' ? 'mua+xe' : 'kinh+doanh'}`, '_blank')}>
-                      Tìm hiểu thêm
-                    </Button>
-                    <Button>
-                      Liên hệ ngay
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-            
-            <Card className="mt-8">
-              <CardHeader>
-                <CardTitle>Biểu đồ so sánh</CardTitle>
-                <CardDescription>So sánh trực quan giữa các ngân hàng</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="w-full h-72 md:h-96">
-                  {comparisonResults.length > 0 && (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={getChartData()}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <RechartsTooltip />
-                        <RechartsLegend />
-                        <Bar dataKey="Lãi suất (%)" fill="#8884d8" />
-                        <Bar dataKey="Tổng chi phí (triệu)" fill="#82ca9d" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  )}
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="ml-auto" onClick={() => toast.success("Đã tải báo cáo so sánh!")}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Tải báo cáo PDF
-                </Button>
-              </CardFooter>
-            </Card>
-          </>
-        )}
-        
-        <div className="mt-8 text-center">
-          <p className="text-gray-500 mb-4">Chưa tìm thấy khoản vay phù hợp?</p>
-          <Button variant="outline" onClick={() => navigate('/khao-sat')}>
-            Thực hiện khảo sát chi tiết
-          </Button>
-        </div>
+        {renderStep()}
       </div>
-      
-      {/* Chatbot */}
-      <Chatbot initialMessage="Xin chào! Tôi có thể giúp gì cho bạn về việc so sánh các khoản vay?" />
     </Layout>
   );
 };
 
-export default SoSanh;
+export default KhaoSat;
