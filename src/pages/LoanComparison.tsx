@@ -20,6 +20,7 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const LoanComparison = () => {
   return (
@@ -58,7 +59,15 @@ const LoanComparison = () => {
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell className="font-medium">Vietcombank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/vietcombank.png" alt="Vietcombank" />
+                            <AvatarFallback>VCB</AvatarFallback>
+                          </Avatar>
+                          Vietcombank
+                        </div>
+                      </TableCell>
                       <TableCell>7.5% - 9.5%</TableCell>
                       <TableCell>500 triệu VND</TableCell>
                       <TableCell>6 - 60 tháng</TableCell>
@@ -66,7 +75,15 @@ const LoanComparison = () => {
                       <TableCell>Không yêu cầu</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">BIDV</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/bidv.png" alt="BIDV" />
+                            <AvatarFallback>BIDV</AvatarFallback>
+                          </Avatar>
+                          BIDV
+                        </div>
+                      </TableCell>
                       <TableCell>7.8% - 10.2%</TableCell>
                       <TableCell>600 triệu VND</TableCell>
                       <TableCell>6 - 72 tháng</TableCell>
@@ -74,7 +91,15 @@ const LoanComparison = () => {
                       <TableCell>Không yêu cầu</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">Techcombank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/techcombank.png" alt="Techcombank" />
+                            <AvatarFallback>TCB</AvatarFallback>
+                          </Avatar>
+                          Techcombank
+                        </div>
+                      </TableCell>
                       <TableCell>8.0% - 9.8%</TableCell>
                       <TableCell>700 triệu VND</TableCell>
                       <TableCell>6 - 60 tháng</TableCell>
@@ -82,7 +107,15 @@ const LoanComparison = () => {
                       <TableCell>Không yêu cầu</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">VPBank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/vpbank.png" alt="VPBank" />
+                            <AvatarFallback>VPB</AvatarFallback>
+                          </Avatar>
+                          VPBank
+                        </div>
+                      </TableCell>
                       <TableCell>8.2% - 10.5%</TableCell>
                       <TableCell>500 triệu VND</TableCell>
                       <TableCell>6 - 60 tháng</TableCell>
@@ -90,7 +123,15 @@ const LoanComparison = () => {
                       <TableCell>Không yêu cầu</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">MB Bank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/mbbank.png" alt="MB Bank" />
+                            <AvatarFallback>MB</AvatarFallback>
+                          </Avatar>
+                          MB Bank
+                        </div>
+                      </TableCell>
                       <TableCell>7.9% - 9.9%</TableCell>
                       <TableCell>500 triệu VND</TableCell>
                       <TableCell>6 - 60 tháng</TableCell>
@@ -126,7 +167,15 @@ const LoanComparison = () => {
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell className="font-medium">Vietcombank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/vietcombank.png" alt="Vietcombank" />
+                            <AvatarFallback>VCB</AvatarFallback>
+                          </Avatar>
+                          Vietcombank
+                        </div>
+                      </TableCell>
                       <TableCell>6.5% trong 12 tháng</TableCell>
                       <TableCell>8.5% - 10.5%</TableCell>
                       <TableCell>70% giá trị tài sản</TableCell>
@@ -134,7 +183,15 @@ const LoanComparison = () => {
                       <TableCell>Tối đa 70%</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">BIDV</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/bidv.png" alt="BIDV" />
+                            <AvatarFallback>BIDV</AvatarFallback>
+                          </Avatar>
+                          BIDV
+                        </div>
+                      </TableCell>
                       <TableCell>6.8% trong 12 tháng</TableCell>
                       <TableCell>8.8% - 11.0%</TableCell>
                       <TableCell>80% giá trị tài sản</TableCell>
@@ -142,7 +199,15 @@ const LoanComparison = () => {
                       <TableCell>Tối đa 80%</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">Techcombank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/techcombank.png" alt="Techcombank" />
+                            <AvatarFallback>TCB</AvatarFallback>
+                          </Avatar>
+                          Techcombank
+                        </div>
+                      </TableCell>
                       <TableCell>6.49% trong 12 tháng</TableCell>
                       <TableCell>8.2% - 10.2%</TableCell>
                       <TableCell>75% giá trị tài sản</TableCell>
@@ -150,7 +215,15 @@ const LoanComparison = () => {
                       <TableCell>Tối đa 75%</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">VPBank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/vpbank.png" alt="VPBank" />
+                            <AvatarFallback>VPB</AvatarFallback>
+                          </Avatar>
+                          VPBank
+                        </div>
+                      </TableCell>
                       <TableCell>7.0% trong 12 tháng</TableCell>
                       <TableCell>9.0% - 11.5%</TableCell>
                       <TableCell>70% giá trị tài sản</TableCell>
@@ -186,7 +259,15 @@ const LoanComparison = () => {
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell className="font-medium">Vietcombank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/vietcombank.png" alt="Vietcombank" />
+                            <AvatarFallback>VCB</AvatarFallback>
+                          </Avatar>
+                          Vietcombank
+                        </div>
+                      </TableCell>
                       <TableCell>8.5% - 11.0%</TableCell>
                       <TableCell>Lên đến 10 tỷ VND</TableCell>
                       <TableCell>Lên đến 10 năm</TableCell>
@@ -194,7 +275,15 @@ const LoanComparison = () => {
                       <TableCell>Hoạt động tối thiểu 2 năm</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">BIDV</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/bidv.png" alt="BIDV" />
+                            <AvatarFallback>BIDV</AvatarFallback>
+                          </Avatar>
+                          BIDV
+                        </div>
+                      </TableCell>
                       <TableCell>9.0% - 11.5%</TableCell>
                       <TableCell>Lên đến 15 tỷ VND</TableCell>
                       <TableCell>Lên đến 15 năm</TableCell>
@@ -202,7 +291,15 @@ const LoanComparison = () => {
                       <TableCell>Hoạt động tối thiểu 2 năm</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">Techcombank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/techcombank.png" alt="Techcombank" />
+                            <AvatarFallback>TCB</AvatarFallback>
+                          </Avatar>
+                          Techcombank
+                        </div>
+                      </TableCell>
                       <TableCell>8.7% - 11.2%</TableCell>
                       <TableCell>Lên đến 20 tỷ VND</TableCell>
                       <TableCell>Lên đến 12 năm</TableCell>
@@ -210,7 +307,15 @@ const LoanComparison = () => {
                       <TableCell>Hoạt động tối thiểu 1 năm</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">VIB</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/vib.png" alt="VIB" />
+                            <AvatarFallback>VIB</AvatarFallback>
+                          </Avatar>
+                          VIB
+                        </div>
+                      </TableCell>
                       <TableCell>9.2% - 11.8%</TableCell>
                       <TableCell>Lên đến 15 tỷ VND</TableCell>
                       <TableCell>Lên đến 10 năm</TableCell>
@@ -246,7 +351,15 @@ const LoanComparison = () => {
                   </TableHeader>
                   <TableBody>
                     <TableRow>
-                      <TableCell className="font-medium">Vietcombank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/vietcombank.png" alt="Vietcombank" />
+                            <AvatarFallback>VCB</AvatarFallback>
+                          </Avatar>
+                          Vietcombank
+                        </div>
+                      </TableCell>
                       <TableCell>7.0% - 9.0%</TableCell>
                       <TableCell>Tối đa 80% xe mới</TableCell>
                       <TableCell>Đến 8 năm</TableCell>
@@ -254,7 +367,15 @@ const LoanComparison = () => {
                       <TableCell>Thu nhập {'>'} 10 triệu/tháng</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">TPBank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/tpbank.png" alt="TPBank" />
+                            <AvatarFallback>TPB</AvatarFallback>
+                          </Avatar>
+                          TPBank
+                        </div>
+                      </TableCell>
                       <TableCell>7.2% - 9.5%</TableCell>
                       <TableCell>Tối đa 85% xe mới</TableCell>
                       <TableCell>Đến 8 năm</TableCell>
@@ -262,7 +383,15 @@ const LoanComparison = () => {
                       <TableCell>Thu nhập {'>'} 8 triệu/tháng</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">VPBank</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/vpbank.png" alt="VPBank" />
+                            <AvatarFallback>VPB</AvatarFallback>
+                          </Avatar>
+                          VPBank
+                        </div>
+                      </TableCell>
                       <TableCell>7.5% - 10.0%</TableCell>
                       <TableCell>Tối đa 80% xe mới</TableCell>
                       <TableCell>Đến 7 năm</TableCell>
@@ -270,7 +399,15 @@ const LoanComparison = () => {
                       <TableCell>Thu nhập {'>'} 10 triệu/tháng</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell className="font-medium">OCB</TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src="/assets/banks/ocb.png" alt="OCB" />
+                            <AvatarFallback>OCB</AvatarFallback>
+                          </Avatar>
+                          OCB
+                        </div>
+                      </TableCell>
                       <TableCell>7.8% - 9.8%</TableCell>
                       <TableCell>Tối đa 90% xe mới</TableCell>
                       <TableCell>Đến 8 năm</TableCell>
