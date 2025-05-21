@@ -12,6 +12,8 @@ import KetQua from "./pages/KetQua";
 import UserDashboard from "./pages/UserDashboard";
 import LoanComparison from "./pages/LoanComparison";
 import FAQ from "./pages/FAQ";
+import LoanEligibility from "./pages/LoanEligibility";
+import DocumentChecklistPage from "./pages/DocumentChecklistPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,8 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/loan-comparison" element={<LoanComparison />} />
+            <Route path="/loan-eligibility" element={<LoanEligibility />} />
+            <Route path="/document-checklist" element={<DocumentChecklistPage />} />
             <Route path="/faq" element={<FAQ />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
