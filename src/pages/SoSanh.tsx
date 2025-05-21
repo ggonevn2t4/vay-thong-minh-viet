@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
@@ -25,32 +24,9 @@ import {
 } from "@/components/ui/table";
 import { toast } from 'sonner';
 import { Search, ArrowRight, ChevronsUpDown, Check, Download } from 'lucide-react';
-import { 
-  Chart, 
-  CategoryScale, 
-  LinearScale, 
-  BarElement, 
-  LineElement, 
-  PointElement, 
-  Title, 
-  Tooltip, 
-  Legend 
-} from 'chart.js';
-import { Bar, Line } from 'recharts';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend as RechartsLegend, ResponsiveContainer } from 'recharts';
 import Chatbot from '@/components/Chatbot';
 import { formatCurrency } from '@/lib/utils';
-
-// Đăng ký các thành phần Chart.js
-Chart.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend
-);
 
 // Dữ liệu ngân hàng mẫu
 const bankData = [
@@ -657,14 +633,19 @@ const SoSanh = () => {
               </CardHeader>
               <CardContent>
                 <div className="w-full h-72 md:h-96">
-                  {/* Biểu đồ so sánh sẽ được hiển thị tại đây */}
-                  {/* Do đây là mockup nên chúng ta không thực sự render biểu đồ Recharts */}
-                  <div className="flex items-center justify-center h-full bg-gray-50 rounded-md border border-dashed border-gray-300">
-                    <div className="text-center">
-                      <p className="text-gray-500">Biểu đồ so sánh các khoản vay</p>
-                      <p className="text-sm text-gray-400 mt-2">Hiển thị so sánh trực quan giữa các ngân hàng</p>
-                    </div>
-                  </div>
+                  {comparisonResults.length > 0 && (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={getChartData()}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <RechartsTooltip />
+                        <RechartsLegend />
+                        <Bar dataKey="Lãi suất (%)" fill="#8884d8" />
+                        <Bar dataKey="Tổng chi phí (triệu)" fill="#82ca9d" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
               </CardContent>
               <CardFooter>
