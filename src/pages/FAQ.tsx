@@ -17,7 +17,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { MessageSquareQuestion, HelpCircle, ListOrdered, ListX } from 'lucide-react';
+import { MessageCircleQuestion, HelpCircle, ListOrdered, ListX } from 'lucide-react';
 
 const FAQ = () => {
   return (
@@ -40,7 +40,7 @@ const FAQ = () => {
                 <span>Các loại khoản vay</span>
               </TabsTrigger>
               <TabsTrigger value="apply" className="flex items-center gap-2">
-                <MessageSquareQuestion className="h-4 w-4" />
+                <MessageCircleQuestion className="h-4 w-4" />
                 <span>Quy trình đăng ký</span>
               </TabsTrigger>
               <TabsTrigger value="payment" className="flex items-center gap-2">
