@@ -4,10 +4,14 @@ import Layout from '@/components/layout/Layout';
 import LoanEligibilityChecker from '@/components/LoanEligibilityChecker';
 import LoanSimulator from '@/components/LoanSimulator';
 import FeedbackSystem from '@/components/FeedbackSystem';
+import CreditProfileOptimizer from '@/components/CreditProfileOptimizer';
+import InterestRateNegotiator from '@/components/InterestRateNegotiator';
+import SmartLoanTracker from '@/components/SmartLoanTracker';
+import PersonalFinanceConsultant from '@/components/PersonalFinanceConsultant';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Target, TrendingUp, MessageSquare, User, Calculator, BarChart } from 'lucide-react';
 
 const LoanEligibility = () => {
   return (
@@ -15,9 +19,9 @@ const LoanEligibility = () => {
       <div className="py-8 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">Kiểm tra khả năng vay vốn</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">Trung tâm tài chính thông minh</h1>
             <p className="text-lg text-gray-600 mb-6">
-              Đánh giá nhanh khả năng được phê duyệt khoản vay của bạn dựa trên các yếu tố tài chính cơ bản
+              Giải pháp toàn diện để tối ưu hóa tài chính cá nhân và có được khoản vay tốt nhất
             </p>
             <div className="flex justify-center space-x-4 mb-8">
               <Link to="/document-checklist">
@@ -28,19 +32,52 @@ const LoanEligibility = () => {
             </div>
           </div>
           
-          <Tabs defaultValue="eligibility" className="max-w-5xl mx-auto">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="eligibility">Đánh giá khả năng vay</TabsTrigger>
-              <TabsTrigger value="simulator">Mô phỏng khoản vay</TabsTrigger>
-              <TabsTrigger value="feedback">Góp ý cải tiến</TabsTrigger>
+          <Tabs defaultValue="eligibility" className="max-w-6xl mx-auto">
+            <TabsList className="grid w-full grid-cols-6 mb-8">
+              <TabsTrigger value="eligibility" className="flex items-center text-xs">
+                <Calculator className="mr-1 h-4 w-4" />
+                Đánh giá khả năng
+              </TabsTrigger>
+              <TabsTrigger value="optimizer" className="flex items-center text-xs">
+                <TrendingUp className="mr-1 h-4 w-4" />
+                Tối ưu hồ sơ
+              </TabsTrigger>
+              <TabsTrigger value="negotiator" className="flex items-center text-xs">
+                <Target className="mr-1 h-4 w-4" />
+                Đàm phán lãi suất
+              </TabsTrigger>
+              <TabsTrigger value="tracker" className="flex items-center text-xs">
+                <BarChart className="mr-1 h-4 w-4" />
+                Theo dõi vay
+              </TabsTrigger>
+              <TabsTrigger value="consultant" className="flex items-center text-xs">
+                <User className="mr-1 h-4 w-4" />
+                Tư vấn chuyên sâu
+              </TabsTrigger>
+              <TabsTrigger value="feedback" className="flex items-center text-xs">
+                <MessageSquare className="mr-1 h-4 w-4" />
+                Góp ý
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="eligibility">
               <LoanEligibilityChecker />
             </TabsContent>
             
-            <TabsContent value="simulator">
-              <LoanSimulator />
+            <TabsContent value="optimizer">
+              <CreditProfileOptimizer />
+            </TabsContent>
+            
+            <TabsContent value="negotiator">
+              <InterestRateNegotiator />
+            </TabsContent>
+            
+            <TabsContent value="tracker">
+              <SmartLoanTracker />
+            </TabsContent>
+            
+            <TabsContent value="consultant">
+              <PersonalFinanceConsultant />
             </TabsContent>
             
             <TabsContent value="feedback">
@@ -51,26 +88,24 @@ const LoanEligibility = () => {
           </Tabs>
           
           <div className="max-w-4xl mx-auto mt-12 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4">Các yếu tố ảnh hưởng đến khả năng vay vốn</h2>
+            <h2 className="text-xl font-semibold mb-4">Lợi ích của nền tảng tài chính thông minh</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-medium text-gray-800 mb-2">Yếu tố tích cực</h3>
+                <h3 className="font-medium text-gray-800 mb-2">Tối ưu hóa hồ sơ tín dụng</h3>
                 <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                  <li>Thu nhập ổn định và cao</li>
-                  <li>Lịch sử tín dụng tốt</li>
-                  <li>Công việc ổn định lâu dài</li>
-                  <li>Tài sản đảm bảo giá trị cao</li>
-                  <li>Có khoản tiết kiệm</li>
+                  <li>Phân tích chi tiết điểm tín dụng hiện tại</li>
+                  <li>Kế hoạch cải thiện từng bước cụ thể</li>
+                  <li>Theo dõi tiến độ theo thời gian thực</li>
+                  <li>Dự đoán tác động của từng hành động</li>
                 </ul>
               </div>
               <div>
-                <h3 className="font-medium text-gray-800 mb-2">Yếu tố tiêu cực</h3>
+                <h3 className="font-medium text-gray-800 mb-2">Đàm phán lãi suất hiệu quả</h3>
                 <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                  <li>Nhiều khoản nợ hiện tại</li>
-                  <li>Lịch sử trả nợ không tốt</li>
-                  <li>Thu nhập thấp hoặc không ổn định</li>
-                  <li>Thời gian làm việc ngắn</li>
-                  <li>Không có tài sản đảm bảo</li>
+                  <li>Chiến lược đàm phán được tối ưu</li>
+                  <li>Mẫu thư đàm phán chuyên nghiệp</li>
+                  <li>Tính toán tiết kiệm cụ thể</li>
+                  <li>Theo dõi kết quả đàm phán</li>
                 </ul>
               </div>
             </div>
