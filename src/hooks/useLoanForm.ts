@@ -53,6 +53,7 @@ export const useLoanForm = () => {
     setPaymentType,
     setLoanType,
     setCollateral,
+    setInterestRate,
     handleAmountChange,
     handleAmountInputChange,
     handleRateInputChange,
