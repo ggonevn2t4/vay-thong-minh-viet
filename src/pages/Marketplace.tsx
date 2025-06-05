@@ -12,6 +12,7 @@ import { Search, Filter, MapPin, Clock, User, Building, TrendingUp, Users, Dolla
 import LoanRequestCard from '@/components/marketplace/LoanRequestCard';
 import BankOfferCard from '@/components/marketplace/BankOfferCard';
 import CreateLoanRequestModal from '@/components/marketplace/CreateLoanRequestModal';
+import PageSkeleton from '@/components/ui/page-skeleton';
 
 interface LoanRequest {
   id: string;
@@ -59,6 +60,7 @@ const Marketplace = () => {
   const [locationFilter, setLocationFilter] = useState('all');
   const [amountFilter, setAmountFilter] = useState('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [loanRequests, setLoanRequests] = useState<LoanRequest[]>([
     {
@@ -193,6 +195,40 @@ const Marketplace = () => {
     
     return matchesSearch && matchesLocation;
   });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-gradient-to-b from-brand-50 to-white">
+          <div className="bg-gradient-to-r from-brand-600 to-brand-700 text-white">
+            <div className="container mx-auto px-4 py-16">
+              <div className="max-w-4xl mx-auto text-center">
+                <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                  Marketplace Vay Vốn
+                </h1>
+                <p className="text-xl mb-8 text-brand-100">
+                  Kết nối người vay và tư vấn viên chuyên nghiệp một cách hiệu quả, 
+                  nhanh chóng và minh bạch
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="container mx-auto px-4 py-8">
+            <PageSkeleton type="marketplace" />
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

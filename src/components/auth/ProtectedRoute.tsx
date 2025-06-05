@@ -2,7 +2,7 @@
 import { useAuth, useUser } from "@clerk/clerk-react";
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import LoadingSpinner from "@/components/ui/loading-spinner";
+import AuthLoadingScreen from "./AuthLoadingScreen";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -13,16 +13,9 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   const { isLoaded, userId } = useAuth();
   const { user } = useUser();
   
-  // If auth is still loading, show loading state
+  // If auth is still loading, show enhanced loading state
   if (!isLoaded) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center">
-          <LoadingSpinner size="lg" className="mx-auto mb-4" />
-          <p className="text-gray-600 font-medium">Đang xác thực...</p>
-        </div>
-      </div>
-    );
+    return <AuthLoadingScreen />;
   }
   
   // If user is not authenticated, redirect to home page

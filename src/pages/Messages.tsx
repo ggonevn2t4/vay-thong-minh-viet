@@ -2,11 +2,11 @@
 import Layout from '@/components/layout/Layout';
 import MessagingInterface from '@/components/messaging/MessagingInterface';
 import { useAuth } from '@clerk/clerk-react';
-import { Navigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SignInButton } from '@clerk/clerk-react';
 import { MessageCircle, Users, Shield } from 'lucide-react';
+import PageSkeleton from '@/components/ui/page-skeleton';
 
 const Messages = () => {
   const { isSignedIn, isLoaded } = useAuth();
@@ -16,12 +16,7 @@ const Messages = () => {
       <Layout>
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-center min-h-[400px]">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Đang tải...</p>
-              </div>
-            </div>
+            <PageSkeleton type="list" />
           </div>
         </div>
       </Layout>
