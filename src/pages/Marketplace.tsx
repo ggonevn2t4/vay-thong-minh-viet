@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import Layout from '@/components/layout/Layout';
@@ -9,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatCurrency } from '@/lib/utils';
-import { Search, Filter, MapPin, Clock, User, Building } from 'lucide-react';
+import { Search, Filter, MapPin, Clock, User, Building, TrendingUp, Users, DollarSign } from 'lucide-react';
 import LoanRequestCard from '@/components/marketplace/LoanRequestCard';
 import BankOfferCard from '@/components/marketplace/BankOfferCard';
 import CreateLoanRequestModal from '@/components/marketplace/CreateLoanRequestModal';
@@ -162,111 +161,189 @@ const Marketplace = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Marketplace Vay Vốn</h1>
-            <p className="text-gray-600">Kết nối người vay và nhân viên ngân hàng một cách hiệu quả</p>
-          </div>
-          {isSignedIn && (
-            <Button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="mt-4 md:mt-0 bg-brand-600 hover:bg-brand-700"
-            >
-              Đăng yêu cầu vay
-            </Button>
-          )}
-        </div>
-
-        {/* Search and Filters */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Tìm kiếm theo tên, mục đích vay..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+      <div className="min-h-screen bg-gradient-to-b from-brand-50 to-white">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-brand-600 to-brand-700 text-white">
+          <div className="container mx-auto px-4 py-16">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                Marketplace Vay Vốn
+              </h1>
+              <p className="text-xl mb-8 text-brand-100">
+                Kết nối người vay và nhân viên ngân hàng một cách hiệu quả, 
+                nhanh chóng và minh bạch
+              </p>
+              
+              {/* Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <Users className="h-8 w-8 mr-2" />
+                    <span className="text-3xl font-bold">1,200+</span>
+                  </div>
+                  <p className="text-brand-100">Người dùng đã tham gia</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <DollarSign className="h-8 w-8 mr-2" />
+                    <span className="text-3xl font-bold">50 tỷ+</span>
+                  </div>
+                  <p className="text-brand-100">Giá trị khoản vay đã kết nối</p>
+                </div>
+                <div className="text-center">
+                  <div className="flex items-center justify-center mb-2">
+                    <TrendingUp className="h-8 w-8 mr-2" />
+                    <span className="text-3xl font-bold">95%</span>
+                  </div>
+                  <p className="text-brand-100">Tỷ lệ thành công</p>
+                </div>
               </div>
-              <Select value={locationFilter} onValueChange={setLocationFilter}>
-                <SelectTrigger className="w-full md:w-[180px]">
-                  <SelectValue placeholder="Khu vực" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tất cả khu vực</SelectItem>
-                  <SelectItem value="Hà Nội">Hà Nội</SelectItem>
-                  <SelectItem value="TP.HCM">TP.HCM</SelectItem>
-                  <SelectItem value="Đà Nẵng">Đà Nẵng</SelectItem>
-                </SelectContent>
-              </Select>
-              {activeTab === 'requests' && (
-                <Select value={amountFilter} onValueChange={setAmountFilter}>
-                  <SelectTrigger className="w-full md:w-[200px]">
-                    <SelectValue placeholder="Mức vay" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tất cả mức vay</SelectItem>
-                    <SelectItem value="under_100m">Dưới 100 triệu</SelectItem>
-                    <SelectItem value="100m_500m">100 - 500 triệu</SelectItem>
-                    <SelectItem value="over_500m">Trên 500 triệu</SelectItem>
-                  </SelectContent>
-                </Select>
+
+              {isSignedIn && (
+                <div className="mt-8">
+                  <Button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    size="lg"
+                    className="bg-white text-brand-600 hover:bg-brand-50 px-8 py-3 text-lg font-semibold"
+                  >
+                    Đăng yêu cầu vay ngay
+                  </Button>
+                </div>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="requests" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Yêu cầu vay ({filteredRequests.length})
-            </TabsTrigger>
-            <TabsTrigger value="offers" className="flex items-center gap-2">
-              <Building className="h-4 w-4" />
-              Sản phẩm ngân hàng ({filteredOffers.length})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="requests" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredRequests.map((request) => (
-                <LoanRequestCard key={request.id} request={request} />
-              ))}
-            </div>
-            {filteredRequests.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-500">Không tìm thấy yêu cầu vay nào phù hợp.</p>
+        <div className="container mx-auto px-4 py-8">
+          {/* Enhanced Search and Filters */}
+          <Card className="mb-8 shadow-lg border-0">
+            <CardContent className="pt-6">
+              <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Input
+                    placeholder="Tìm kiếm theo tên, mục đích vay, ngân hàng..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 h-12 text-base border-gray-200 focus:border-brand-500"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Select value={locationFilter} onValueChange={setLocationFilter}>
+                    <SelectTrigger className="w-full sm:w-[200px] h-12 border-gray-200">
+                      <MapPin className="h-4 w-4 mr-2 text-gray-500" />
+                      <SelectValue placeholder="Khu vực" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tất cả khu vực</SelectItem>
+                      <SelectItem value="Hà Nội">Hà Nội</SelectItem>
+                      <SelectItem value="TP.HCM">TP.HCM</SelectItem>
+                      <SelectItem value="Đà Nẵng">Đà Nẵng</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  {activeTab === 'requests' && (
+                    <Select value={amountFilter} onValueChange={setAmountFilter}>
+                      <SelectTrigger className="w-full sm:w-[220px] h-12 border-gray-200">
+                        <DollarSign className="h-4 w-4 mr-2 text-gray-500" />
+                        <SelectValue placeholder="Mức vay" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tất cả mức vay</SelectItem>
+                        <SelectItem value="under_100m">Dưới 100 triệu</SelectItem>
+                        <SelectItem value="100m_500m">100 - 500 triệu</SelectItem>
+                        <SelectItem value="over_500m">Trên 500 triệu</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
               </div>
-            )}
-          </TabsContent>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="offers" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredOffers.map((offer) => (
-                <BankOfferCard key={offer.id} offer={offer} />
-              ))}
+          {/* Enhanced Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="flex justify-center mb-8">
+              <TabsList className="grid w-full max-w-md grid-cols-2 h-12 bg-gray-100 p-1">
+                <TabsTrigger value="requests" className="flex items-center gap-2 h-10 data-[state=active]:bg-white data-[state=active]:text-brand-600">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">Yêu cầu vay</span>
+                  <Badge variant="secondary" className="ml-1 bg-brand-100 text-brand-700">
+                    {filteredRequests.length}
+                  </Badge>
+                </TabsTrigger>
+                <TabsTrigger value="offers" className="flex items-center gap-2 h-10 data-[state=active]:bg-white data-[state=active]:text-brand-600">
+                  <Building className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sản phẩm ngân hàng</span>
+                  <Badge variant="secondary" className="ml-1 bg-brand-100 text-brand-700">
+                    {filteredOffers.length}
+                  </Badge>
+                </TabsTrigger>
+              </TabsList>
             </div>
-            {filteredOffers.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-500">Không tìm thấy sản phẩm ngân hàng nào phù hợp.</p>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
 
-        <CreateLoanRequestModal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          onSubmit={(newRequest) => {
-            setLoanRequests(prev => [newRequest, ...prev]);
-            setIsCreateModalOpen(false);
-          }}
-        />
+            <TabsContent value="requests" className="mt-6">
+              {filteredRequests.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {filteredRequests.map((request) => (
+                    <LoanRequestCard key={request.id} request={request} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                    <Search className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    Không tìm thấy yêu cầu vay
+                  </h3>
+                  <p className="text-gray-500 mb-4">
+                    Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
+                  </p>
+                  {isSignedIn && (
+                    <Button 
+                      onClick={() => setIsCreateModalOpen(true)}
+                      className="bg-brand-600 hover:bg-brand-700"
+                    >
+                      Đăng yêu cầu vay mới
+                    </Button>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="offers" className="mt-6">
+              {filteredOffers.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {filteredOffers.map((offer) => (
+                    <BankOfferCard key={offer.id} offer={offer} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                    <Building className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    Không tìm thấy sản phẩm ngân hàng
+                  </h3>
+                  <p className="text-gray-500">
+                    Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+
+          <CreateLoanRequestModal
+            isOpen={isCreateModalOpen}
+            onClose={() => setIsCreateModalOpen(false)}
+            onSubmit={(newRequest) => {
+              setLoanRequests(prev => [newRequest, ...prev]);
+              setIsCreateModalOpen(false);
+            }}
+          />
+        </div>
       </div>
     </Layout>
   );
