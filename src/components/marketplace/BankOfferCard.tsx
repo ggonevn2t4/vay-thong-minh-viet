@@ -2,8 +2,9 @@
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatCurrency } from '@/lib/utils';
-import { MapPin, Clock, Star, CheckCircle, ArrowRight } from 'lucide-react';
+import { MapPin, Clock, Star, CheckCircle, ArrowRight, User } from 'lucide-react';
 
 interface BankOffer {
   id: string;
@@ -18,6 +19,11 @@ interface BankOffer {
   processingTime: string;
   location: string;
   rating: number;
+  advisor?: {
+    name: string;
+    avatar?: string;
+    title: string;
+  };
 }
 
 interface BankOfferCardProps {
@@ -57,6 +63,24 @@ const BankOfferCard = ({ offer }: BankOfferCardProps) => {
             {renderStars(offer.rating)}
           </div>
         </div>
+
+        {/* Advisor Section */}
+        {offer.advisor && (
+          <div className="flex items-center gap-3 p-3 bg-brand-50 rounded-lg border border-brand-100">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={offer.advisor.avatar} alt={offer.advisor.name} />
+              <AvatarFallback className="bg-brand-600 text-white">
+                {offer.advisor.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-800 text-sm">{offer.advisor.name}</p>
+              <p className="text-xs text-brand-600">{offer.advisor.title}</p>
+            </div>
+            <User className="h-4 w-4 text-brand-500" />
+          </div>
+        )}
+
         <Badge variant="secondary" className="w-fit bg-brand-100 text-brand-700 font-medium">
           {offer.loanType}
         </Badge>

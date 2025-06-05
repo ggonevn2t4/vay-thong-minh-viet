@@ -25,6 +25,11 @@ interface LoanRequest {
   status: 'open' | 'in_negotiation' | 'approved' | 'closed';
   createdAt: string;
   offers: number;
+  assignedAdvisor?: {
+    name: string;
+    avatar?: string;
+    title: string;
+  };
 }
 
 interface BankOffer {
@@ -40,6 +45,11 @@ interface BankOffer {
   processingTime: string;
   location: string;
   rating: number;
+  advisor?: {
+    name: string;
+    avatar?: string;
+    title: string;
+  };
 }
 
 const Marketplace = () => {
@@ -60,9 +70,14 @@ const Marketplace = () => {
       location: 'Hà Nội',
       creditScore: 750,
       description: 'Cần vay để mua căn hộ đầu tiên, có thu nhập ổn định và lịch sử tín dụng tốt.',
-      status: 'open',
+      status: 'in_negotiation',
       createdAt: '2024-01-15',
-      offers: 3
+      offers: 3,
+      assignedAdvisor: {
+        name: 'Trần Minh Tú',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+        title: 'Chuyên gia tư vấn vay mua nhà'
+      }
     },
     {
       id: 'LR-002',
@@ -73,7 +88,7 @@ const Marketplace = () => {
       location: 'TP.HCM',
       creditScore: 720,
       description: 'Mở rộng cửa hàng kinh doanh thời trang, đã có 5 năm kinh nghiệm.',
-      status: 'in_negotiation',
+      status: 'open',
       createdAt: '2024-01-10',
       offers: 5
     },
@@ -86,9 +101,14 @@ const Marketplace = () => {
       location: 'Đà Nẵng',
       creditScore: 680,
       description: 'Cần mua xe để phục vụ công việc kinh doanh vận tải.',
-      status: 'open',
+      status: 'approved',
       createdAt: '2024-01-12',
-      offers: 2
+      offers: 2,
+      assignedAdvisor: {
+        name: 'Phạm Hoàng Nam',
+        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+        title: 'Tư vấn viên vay tiêu dùng'
+      }
     }
   ]);
 
@@ -105,7 +125,12 @@ const Marketplace = () => {
       requirements: ['Thu nhập tối thiểu 15 triệu/tháng', 'Có tài sản đảm bảo', 'Lịch sử tín dụng tốt'],
       processingTime: '7-14 ngày',
       location: 'Toàn quốc',
-      rating: 4.5
+      rating: 4.5,
+      advisor: {
+        name: 'Nguyễn Thị Hoa',
+        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b5b96d2a?w=100&h=100&fit=crop&crop=face',
+        title: 'Chuyên gia vay mua nhà'
+      }
     },
     {
       id: 'BO-002',
@@ -119,7 +144,12 @@ const Marketplace = () => {
       requirements: ['Doanh nghiệp hoạt động tối thiểu 2 năm', 'Doanh thu ổn định', 'Kế hoạch kinh doanh rõ ràng'],
       processingTime: '5-10 ngày',
       location: 'Hà Nội, TP.HCM',
-      rating: 4.7
+      rating: 4.7,
+      advisor: {
+        name: 'Lê Văn Đức',
+        avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face',
+        title: 'Chuyên gia tài chính doanh nghiệp'
+      }
     },
     {
       id: 'BO-003',
@@ -133,7 +163,12 @@ const Marketplace = () => {
       requirements: ['Thu nhập tối thiểu 8 triệu/tháng', 'Công việc ổn định', 'Không nợ xấu'],
       processingTime: '3-7 ngày',
       location: 'Toàn quốc',
-      rating: 4.3
+      rating: 4.3,
+      advisor: {
+        name: 'Vũ Minh Châu',
+        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=face',
+        title: 'Tư vấn viên vay cá nhân'
+      }
     }
   ]);
 
@@ -170,7 +205,7 @@ const Marketplace = () => {
                 Marketplace Vay Vốn
               </h1>
               <p className="text-xl mb-8 text-brand-100">
-                Kết nối người vay và nhân viên ngân hàng một cách hiệu quả, 
+                Kết nối người vay và tư vấn viên chuyên nghiệp một cách hiệu quả, 
                 nhanh chóng và minh bạch
               </p>
               
