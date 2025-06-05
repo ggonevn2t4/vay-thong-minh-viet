@@ -22,6 +22,7 @@ const Header = () => {
       { name: "Khảo sát", path: "/khao-sat" },
       { name: "So sánh", path: "/so-sanh" },
       { name: "Marketplace", path: "/marketplace" },
+      { name: "Tin nhắn", path: "/messages" },
       { name: "So sánh khoản vay", path: "/loan-comparison" },
       { name: "FAQ", path: "/faq" }
     ];

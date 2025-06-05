@@ -4,9 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatCurrency } from '@/lib/utils';
-import { MapPin, Clock, User, TrendingUp, MessageCircle, ArrowRight } from 'lucide-react';
+import { MapPin, Clock, User, TrendingUp, MessageCircle, ArrowRight, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface LoanRequest {
   id: string;
@@ -34,6 +35,7 @@ interface LoanRequestCardProps {
 const LoanRequestCard = ({ request }: LoanRequestCardProps) => {
   const navigate = useNavigate();
   const { isSignedIn } = useAuth();
+  const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -74,9 +76,31 @@ const LoanRequestCard = ({ request }: LoanRequestCardProps) => {
   const handleContactAdvisor = () => {
     if (isSignedIn) {
       navigate('/messages');
+      toast({
+        title: "Chuyển hướng đến tin nhắn",
+        description: `Bạn có thể liên hệ với ${request.assignedAdvisor?.name} tại đây.`,
+      });
     } else {
-      // Redirect to sign in
-      navigate('/');
+      toast({
+        title: "Yêu cầu đăng nhập",
+        description: "Vui lòng đăng nhập để liên hệ với tư vấn viên.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSendOffer = () => {
+    if (isSignedIn) {
+      toast({
+        title: "Tính năng đang phát triển",
+        description: "Chức năng gửi đề nghị sẽ sớm được ra mắt.",
+      });
+    } else {
+      toast({
+        title: "Yêu cầu đăng nhập",
+        description: "Vui lòng đăng nhập để gửi đề nghị tư vấn.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -113,7 +137,10 @@ const LoanRequestCard = ({ request }: LoanRequestCardProps) => {
               <p className="font-semibold text-gray-800 text-sm">{request.assignedAdvisor.name}</p>
               <p className="text-xs text-brand-600">{request.assignedAdvisor.title}</p>
             </div>
-            <TrendingUp className="h-4 w-4 text-brand-500" />
+            <div className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <span className="text-xs text-green-600 font-medium">Đã có tư vấn viên</span>
+            </div>
           </div>
         )}
 
@@ -187,7 +214,11 @@ const LoanRequestCard = ({ request }: LoanRequestCardProps) => {
         )}
         
         {!request.assignedAdvisor && request.status === 'open' && (
-          <Button variant="outline" className="w-full border-brand-200 text-brand-600 hover:bg-brand-50 font-medium py-3">
+          <Button 
+            variant="outline" 
+            className="w-full border-brand-200 text-brand-600 hover:bg-brand-50 font-medium py-3"
+            onClick={handleSendOffer}
+          >
             Đề nghị tư vấn
           </Button>
         )}
