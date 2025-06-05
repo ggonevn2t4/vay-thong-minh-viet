@@ -34,17 +34,17 @@ function App() {
             <Route path="/so-sanh" element={<SoSanh />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/dashboard" element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="customer">
                 <UserDashboard />
               </ProtectedRoute>
             } />
             <Route path="/admin-dashboard" element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="admin">
                 <AdminDashboard />
               </ProtectedRoute>
             } />
             <Route path="/advisor-dashboard" element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="advisor">
                 <AdvisorDashboard />
               </ProtectedRoute>
             } />

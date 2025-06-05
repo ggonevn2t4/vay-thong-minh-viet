@@ -3,13 +3,13 @@ import { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, UserCheck, TrendingUp, DollarSign, FileText, Clock } from 'lucide-react';
+import { Users, UserCheck, TrendingUp, DollarSign, FileText, BarChart3 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { DashboardStats } from '@/types/dashboard';
 import AdvisorManagement from '@/components/dashboard/AdvisorManagement';
 import CustomerManagement from '@/components/dashboard/CustomerManagement';
+import AnalyticsDashboard from '@/components/dashboard/AnalyticsDashboard';
 
 const AdminDashboard = () => {
   const [stats] = useState<DashboardStats>({
@@ -63,6 +63,7 @@ const AdminDashboard = () => {
             <p className="text-gray-600 mt-2">Quản lý hệ thống VayThôngMinh</p>
           </div>
           <Badge variant="secondary" className="bg-green-100 text-green-800">
+            <TrendingUp className="h-4 w-4 mr-1" />
             Tăng trưởng {stats.monthlyGrowth}% tháng này
           </Badge>
         </div>
@@ -70,7 +71,7 @@ const AdminDashboard = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {statsCards.map((stat, index) => (
-            <Card key={index}>
+            <Card key={index} className="hover:shadow-lg transition-shadow">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-medium text-gray-600">
@@ -89,11 +90,25 @@ const AdminDashboard = () => {
         </div>
 
         {/* Management Tabs */}
-        <Tabs defaultValue="advisors" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="advisors">Quản lý tư vấn viên</TabsTrigger>
-            <TabsTrigger value="customers">Quản lý khách hàng</TabsTrigger>
+        <Tabs defaultValue="analytics" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Phân tích
+            </TabsTrigger>
+            <TabsTrigger value="advisors" className="flex items-center gap-2">
+              <UserCheck className="h-4 w-4" />
+              Tư vấn viên
+            </TabsTrigger>
+            <TabsTrigger value="customers" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Khách hàng
+            </TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="analytics" className="space-y-6">
+            <AnalyticsDashboard />
+          </TabsContent>
           
           <TabsContent value="advisors" className="space-y-6">
             <AdvisorManagement />
