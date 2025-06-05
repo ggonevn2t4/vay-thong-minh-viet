@@ -6,7 +6,10 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatCurrency } from '@/lib/utils';
+import EnhancedAnalyticsDashboard from '@/components/dashboard/EnhancedAnalyticsDashboard';
+import { BarChart3, FileText, User, TrendingUp } from 'lucide-react';
 
 interface LoanApplication {
   id: string;
@@ -19,6 +22,7 @@ interface LoanApplication {
 
 const UserDashboard = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('overview');
   const [applications, setApplications] = useState<LoanApplication[]>([
     {
       id: 'LA-2023-001',
@@ -94,88 +98,154 @@ const UserDashboard = () => {
           </div>
           <Button
             onClick={() => navigate('/khao-sat')}
-            className="mt-4 md:mt-0"
+            className="mt-4 md:mt-0 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
           >
             Đăng ký khoản vay mới
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Tổng số khoản vay</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{applications.length}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Khoản vay đã được duyệt</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-600">
-                {applications.filter(app => app.status === 'approved').length}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Đang chờ duyệt</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-yellow-600">
-                {applications.filter(app => app.status === 'pending' || app.status === 'reviewing').length}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto mb-8">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span className="hidden sm:inline">Tổng quan</span>
+            </TabsTrigger>
+            <TabsTrigger value="loans" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              <span className="hidden sm:inline">Khoản vay</span>
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Phân tích</span>
+            </TabsTrigger>
+          </TabsList>
 
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Khoản vay của bạn</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Mã khoản vay</TableHead>
-                  <TableHead>Ngày đăng ký</TableHead>
-                  <TableHead>Loại khoản vay</TableHead>
-                  <TableHead>Số tiền</TableHead>
-                  <TableHead>Kỳ hạn (tháng)</TableHead>
-                  <TableHead>Trạng thái</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {applications.map((application) => (
-                  <TableRow key={application.id}>
-                    <TableCell className="font-medium">{application.id}</TableCell>
-                    <TableCell>{application.date}</TableCell>
-                    <TableCell>{application.type}</TableCell>
-                    <TableCell>{formatCurrency(application.amount)} đ</TableCell>
-                    <TableCell>{application.term}</TableCell>
-                    <TableCell>
-                      <Badge className={`${getStatusColor(application.status)} text-white`}>
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Tổng số khoản vay</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">{applications.length}</div>
+                  <div className="flex items-center mt-2">
+                    <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
+                    <span className="text-sm text-green-600">+2 tháng này</span>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Khoản vay đã được duyệt</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-green-600">
+                    {applications.filter(app => app.status === 'approved').length}
+                  </div>
+                  <div className="text-sm text-gray-500 mt-2">
+                    Tổng giá trị: {formatCurrency(applications
+                      .filter(app => app.status === 'approved')
+                      .reduce((sum, app) => sum + app.amount, 0))} đ
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Đang chờ duyệt</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-yellow-600">
+                    {applications.filter(app => app.status === 'pending' || app.status === 'reviewing').length}
+                  </div>
+                  <div className="text-sm text-gray-500 mt-2">
+                    Thời gian xử lý trung bình: 3-5 ngày
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Khoản vay gần nhất</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {applications.slice(0, 3).map((application) => (
+                  <div key={application.id} className="flex items-center justify-between p-4 border rounded-lg mb-3 last:mb-0 hover:bg-gray-50 transition-colors">
+                    <div>
+                      <h4 className="font-medium">{application.type}</h4>
+                      <p className="text-sm text-gray-600">{formatCurrency(application.amount)} đ</p>
+                    </div>
+                    <div className="text-right">
+                      <Badge className={`${getStatusColor(application.status)} text-white mb-1`}>
                         {getStatusText(application.status)}
                       </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => navigate(`/chi-tiet-vay/${application.id}`)}
-                      >
-                        Xem chi tiết
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                      <p className="text-xs text-gray-500">{application.date}</p>
+                    </div>
+                  </div>
                 ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                <Button 
+                  variant="outline" 
+                  className="w-full mt-4"
+                  onClick={() => setActiveTab('loans')}
+                >
+                  Xem tất cả khoản vay
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="loans" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Tất cả khoản vay của bạn</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Mã khoản vay</TableHead>
+                      <TableHead>Ngày đăng ký</TableHead>
+                      <TableHead>Loại khoản vay</TableHead>
+                      <TableHead>Số tiền</TableHead>
+                      <TableHead>Kỳ hạn (tháng)</TableHead>
+                      <TableHead>Trạng thái</TableHead>
+                      <TableHead></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {applications.map((application) => (
+                      <TableRow key={application.id}>
+                        <TableCell className="font-medium">{application.id}</TableCell>
+                        <TableCell>{application.date}</TableCell>
+                        <TableCell>{application.type}</TableCell>
+                        <TableCell>{formatCurrency(application.amount)} đ</TableCell>
+                        <TableCell>{application.term}</TableCell>
+                        <TableCell>
+                          <Badge className={`${getStatusColor(application.status)} text-white`}>
+                            {getStatusText(application.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => navigate(`/chi-tiet-vay/${application.id}`)}
+                          >
+                            Xem chi tiết
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <EnhancedAnalyticsDashboard />
+          </TabsContent>
+        </Tabs>
       </div>
     </Layout>
   );
