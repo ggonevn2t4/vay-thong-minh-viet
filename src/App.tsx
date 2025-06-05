@@ -17,6 +17,7 @@ import FAQ from "./pages/FAQ";
 import LoanEligibility from "./pages/LoanEligibility";
 import DocumentChecklistPage from "./pages/DocumentChecklistPage";
 import Marketplace from "./pages/Marketplace";
+import Messages from "./pages/Messages";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,11 @@ function App() {
             <Route path="/khao-sat" element={<KhaoSat />} />
             <Route path="/so-sanh" element={<SoSanh />} />
             <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/messages" element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
+            } />
             <Route path="/dashboard" element={
               <ProtectedRoute requiredRole="customer">
                 <UserDashboard />
