@@ -10,15 +10,32 @@ const Header = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   
-  const navLinks = [
-    { name: "Trang chủ", path: "/" },
-    { name: "Khảo sát", path: "/khao-sat" },
-    { name: "So sánh", path: "/so-sanh" },
-    { name: "Marketplace", path: "/marketplace" },
-    { name: "So sánh khoản vay", path: "/loan-comparison" },
-    { name: "FAQ", path: "/faq" },
-    { name: "Khu vực khách hàng", path: "/dashboard" },
-  ];
+  // Mock user role - in real app this would come from auth context
+  const userRole = 'admin'; // This would be dynamic based on authenticated user
+  
+  const getNavLinks = () => {
+    const baseLinks = [
+      { name: "Trang chủ", path: "/" },
+      { name: "Khảo sát", path: "/khao-sat" },
+      { name: "So sánh", path: "/so-sanh" },
+      { name: "Marketplace", path: "/marketplace" },
+      { name: "So sánh khoản vay", path: "/loan-comparison" },
+      { name: "FAQ", path: "/faq" }
+    ];
+
+    // Add role-specific dashboard links
+    if (userRole === 'admin') {
+      baseLinks.push({ name: "Quản trị", path: "/admin-dashboard" });
+    } else if (userRole === 'advisor') {
+      baseLinks.push({ name: "Tư vấn viên", path: "/advisor-dashboard" });
+    } else {
+      baseLinks.push({ name: "Khu vực khách hàng", path: "/dashboard" });
+    }
+
+    return baseLinks;
+  };
+
+  const navLinks = getNavLinks();
 
   const closeSheet = () => {
     setIsOpen(false);

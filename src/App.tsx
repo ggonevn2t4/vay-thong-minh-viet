@@ -10,6 +10,8 @@ import KhaoSat from "./pages/KhaoSat";
 import SoSanh from "./pages/SoSanh";
 import KetQua from "./pages/KetQua";
 import UserDashboard from "./pages/UserDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdvisorDashboard from "./pages/AdvisorDashboard";
 import LoanComparison from "./pages/LoanComparison";
 import FAQ from "./pages/FAQ";
 import LoanEligibility from "./pages/LoanEligibility";
@@ -34,6 +36,16 @@ function App() {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <UserDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-dashboard" element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/advisor-dashboard" element={
+              <ProtectedRoute>
+                <AdvisorDashboard />
               </ProtectedRoute>
             } />
             <Route path="/ket-qua" element={
