@@ -18,6 +18,7 @@ import LoanEligibility from "./pages/LoanEligibility";
 import DocumentChecklistPage from "./pages/DocumentChecklistPage";
 import Marketplace from "./pages/Marketplace";
 import Messages from "./pages/Messages";
+import AboutUs from "./pages/AboutUs";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -63,6 +64,7 @@ function App() {
             <Route path="/loan-eligibility" element={<LoanEligibility />} />
             <Route path="/document-checklist" element={<DocumentChecklistPage />} />
             <Route path="/faq" element={<FAQ />} />
+            <Route path="/gioi-thieu" element={<AboutUs />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
