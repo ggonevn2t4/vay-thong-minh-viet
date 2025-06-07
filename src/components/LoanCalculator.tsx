@@ -34,6 +34,7 @@ const LoanCalculator = ({ className }: LoanCalculatorProps) => {
     setPaymentType,
     setLoanType,
     setCollateral,
+    setInterestRate,
     handleAmountChange,
     handleAmountInputChange,
     handleRateInputChange,
