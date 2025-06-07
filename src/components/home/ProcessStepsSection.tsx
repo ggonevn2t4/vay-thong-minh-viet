@@ -1,45 +1,54 @@
 
 import { FileText, Check, Info, MessageCircle } from 'lucide-react';
 
-const ProcessStepsSection = () => {
-  const steps = [
-    {
-      title: "Điền khảo sát",
-      description: "Hoàn thành mẫu khảo sát ngắn về thông tin tài chính của bạn",
-      icon: "FileText"
-    },
-    {
-      title: "Nhận đánh giá",
-      description: "Hệ thống AI phân tích và xếp hạng hồ sơ vay vốn của bạn",
-      icon: "Check"
-    },
-    {
-      title: "Xem đề xuất",
-      description: "Nhận danh sách các ngân hàng phù hợp với điều kiện của bạn",
-      icon: "Info"
-    },
-    {
-      title: "Nhận tư vấn",
-      description: "Trò chuyện với chuyên viên tư vấn để được hỗ trợ thêm",
-      icon: "MessageCircle"
-    }
-  ];
+/**
+ * Process steps configuration
+ */
+const PROCESS_STEPS = [
+  {
+    title: "Điền khảo sát",
+    description: "Hoàn thành mẫu khảo sát ngắn về thông tin tài chính của bạn",
+    icon: "FileText"
+  },
+  {
+    title: "Nhận đánh giá",
+    description: "Hệ thống AI phân tích và xếp hạng hồ sơ vay vốn của bạn",
+    icon: "Check"
+  },
+  {
+    title: "Xem đề xuất",
+    description: "Nhận danh sách các ngân hàng phù hợp với điều kiện của bạn",
+    icon: "Info"
+  },
+  {
+    title: "Nhận tư vấn",
+    description: "Trò chuyện với chuyên viên tư vấn để được hỗ trợ thêm",
+    icon: "MessageCircle"
+  }
+];
 
-  const getIcon = (iconName: string) => {
-    switch(iconName) {
-      case "FileText":
-        return <FileText className="h-6 w-6" />;
-      case "Check":
-        return <Check className="h-6 w-6" />;
-      case "Info":
-        return <Info className="h-6 w-6" />;
-      case "MessageCircle":
-        return <MessageCircle className="h-6 w-6" />;
-      default:
-        return <FileText className="h-6 w-6" />;
-    }
+/**
+ * Get the appropriate Lucide icon component based on icon name
+ * @param {string} iconName - The name of the icon to render
+ * @returns {JSX.Element} The corresponding Lucide icon component
+ */
+const getIcon = (iconName: string): JSX.Element => {
+  const iconMap = {
+    FileText: <FileText className="h-6 w-6" />,
+    Check: <Check className="h-6 w-6" />,
+    Info: <Info className="h-6 w-6" />,
+    MessageCircle: <MessageCircle className="h-6 w-6" />
   };
+  
+  return iconMap[iconName as keyof typeof iconMap] || <FileText className="h-6 w-6" />;
+};
 
+/**
+ * Process steps section component
+ * Displays the 4-step process for using the loan service
+ * @returns {JSX.Element} The process steps section
+ */
+const ProcessStepsSection = () => {
   return (
     <section className="py-24 bg-white">
       <div className="container mx-auto px-4">
@@ -52,7 +61,7 @@ const ProcessStepsSection = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {steps.map((step, index) => (
+          {PROCESS_STEPS.map((step, index) => (
             <div 
               key={index} 
               className="bg-white p-8 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-xl transition-all hover:-translate-y-2"

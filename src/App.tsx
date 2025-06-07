@@ -21,8 +21,23 @@ import Messages from "./pages/Messages";
 import AboutUs from "./pages/AboutUs";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
-const queryClient = new QueryClient();
+/**
+ * Create a new QueryClient instance for React Query
+ * Configured with default options for caching and error handling
+ */
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
+/**
+ * Main App component that sets up the routing and providers
+ * @returns {JSX.Element} The main application component
+ */
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -65,7 +80,7 @@ function App() {
             <Route path="/document-checklist" element={<DocumentChecklistPage />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/gioi-thieu" element={<AboutUs />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Catch-all route for 404 pages */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>

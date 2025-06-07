@@ -5,19 +5,34 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import NotificationSystem from '@/components/NotificationSystem';
 
+/**
+ * Type definition for user roles
+ */
+type UserRole = 'admin' | 'advisor' | 'customer';
+
+/**
+ * Configuration for role badges
+ */
+const ROLE_CONFIG = {
+  admin: { label: "Quản trị viên", color: "bg-red-100 text-red-800" },
+  advisor: { label: "Tư vấn viên", color: "bg-blue-100 text-blue-800" },
+  customer: { label: "Khách hàng", color: "bg-green-100 text-green-800" }
+};
+
+/**
+ * User profile component
+ * Displays user authentication status, role badge, and action buttons
+ * @returns {JSX.Element} The user profile section
+ */
 const UserProfile = () => {
   const { user } = useUser();
-  const userRole = user?.publicMetadata?.role as 'admin' | 'advisor' | 'customer' || 'customer';
+  const userRole = (user?.publicMetadata?.role as UserRole) || 'customer';
 
-  const getRoleBadge = () => {
-    const roleConfig = {
-      admin: { label: "Quản trị viên", color: "bg-red-100 text-red-800" },
-      advisor: { label: "Tư vấn viên", color: "bg-blue-100 text-blue-800" },
-      customer: { label: "Khách hàng", color: "bg-green-100 text-green-800" }
-    };
-    
-    return roleConfig[userRole];
-  };
+  /**
+   * Get role badge configuration based on user role
+   * @returns {Object} Role badge configuration
+   */
+  const getRoleBadge = () => ROLE_CONFIG[userRole];
 
   return (
     <div className="flex items-center space-x-3">
@@ -29,6 +44,7 @@ const UserProfile = () => {
           <Button variant="outline" className="hidden sm:inline-flex">Đăng nhập</Button>
         </SignInButton>
       </SignedOut>
+      
       <SignedIn>
         <div className="hidden sm:flex items-center space-x-3">
           <Badge className={getRoleBadge().color}>

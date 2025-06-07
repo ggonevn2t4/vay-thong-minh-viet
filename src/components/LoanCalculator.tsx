@@ -11,9 +11,16 @@ import PaymentOptions from './loan-calculator/PaymentOptions';
 import LoanResults from './loan-calculator/LoanResults';
 
 interface LoanCalculatorProps {
+  /** Optional CSS classes for styling */
   className?: string;
 }
 
+/**
+ * Main loan calculator component
+ * Provides interactive loan calculation with tabs for basic and advanced options
+ * @param {LoanCalculatorProps} props - The component props
+ * @returns {JSX.Element} The complete loan calculator interface
+ */
 const LoanCalculator = ({ className }: LoanCalculatorProps) => {
   const {
     amount,
@@ -27,7 +34,6 @@ const LoanCalculator = ({ className }: LoanCalculatorProps) => {
     setPaymentType,
     setLoanType,
     setCollateral,
-    setInterestRate,
     handleAmountChange,
     handleAmountInputChange,
     handleRateInputChange,
@@ -35,6 +41,22 @@ const LoanCalculator = ({ className }: LoanCalculatorProps) => {
   } = useLoanForm();
 
   const { loanResult, schedule } = useLoanCalculations(amount, interestRate, term, paymentType);
+
+  /**
+   * Reset all form values to defaults
+   */
+  const handleReset = () => {
+    // This would need to be implemented in the useLoanForm hook
+    console.log('Reset calculator values');
+  };
+
+  /**
+   * Navigate to loan registration page
+   */
+  const handleRegister = () => {
+    // This would navigate to the loan registration flow
+    console.log('Navigate to loan registration');
+  };
 
   return (
     <Card className={className}>
@@ -87,8 +109,12 @@ const LoanCalculator = ({ className }: LoanCalculatorProps) => {
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button variant="outline">Đặt lại</Button>
-        <Button>Đăng ký khoản vay</Button>
+        <Button variant="outline" onClick={handleReset}>
+          Đặt lại
+        </Button>
+        <Button onClick={handleRegister}>
+          Đăng ký khoản vay
+        </Button>
       </CardFooter>
     </Card>
   );

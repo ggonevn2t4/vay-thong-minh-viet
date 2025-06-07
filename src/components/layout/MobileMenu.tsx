@@ -10,24 +10,44 @@ import NotificationSystem from '@/components/NotificationSystem';
 import Navigation from './Navigation';
 
 interface MobileMenuProps {
+  /** Array of navigation links */
   navLinks: Array<{ name: string; path: string }>;
 }
 
+/**
+ * Type definition for user roles
+ */
+type UserRole = 'admin' | 'advisor' | 'customer';
+
+/**
+ * Configuration for role badges
+ */
+const ROLE_CONFIG = {
+  admin: { label: "Quản trị viên", color: "bg-red-100 text-red-800" },
+  advisor: { label: "Tư vấn viên", color: "bg-blue-100 text-blue-800" },
+  customer: { label: "Khách hàng", color: "bg-green-100 text-green-800" }
+};
+
+/**
+ * Mobile menu component
+ * Provides mobile-responsive navigation drawer
+ * @param {MobileMenuProps} props - The component props
+ * @returns {JSX.Element} The mobile menu component
+ */
 const MobileMenu = ({ navLinks }: MobileMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
-  const userRole = user?.publicMetadata?.role as 'admin' | 'advisor' | 'customer' || 'customer';
+  const userRole = (user?.publicMetadata?.role as UserRole) || 'customer';
 
-  const getRoleBadge = () => {
-    const roleConfig = {
-      admin: { label: "Quản trị viên", color: "bg-red-100 text-red-800" },
-      advisor: { label: "Tư vấn viên", color: "bg-blue-100 text-blue-800" },
-      customer: { label: "Khách hàng", color: "bg-green-100 text-green-800" }
-    };
-    
-    return roleConfig[userRole];
-  };
+  /**
+   * Get role badge configuration based on user role
+   * @returns {Object} Role badge configuration
+   */
+  const getRoleBadge = () => ROLE_CONFIG[userRole];
 
+  /**
+   * Close the mobile menu sheet
+   */
   const closeSheet = () => {
     setIsOpen(false);
   };
@@ -60,7 +80,9 @@ const MobileMenu = ({ navLinks }: MobileMenuProps) => {
             <div className="mt-4 space-y-4">
               <SignedOut>
                 <Link to="/khao-sat" onClick={closeSheet}>
-                  <Button className="w-full bg-brand-600 hover:bg-brand-700">Bắt đầu khảo sát</Button>
+                  <Button className="w-full bg-brand-600 hover:bg-brand-700">
+                    Bắt đầu khảo sát
+                  </Button>
                 </Link>
                 <SignInButton mode="modal">
                   <Button variant="outline" className="w-full mt-2">Đăng nhập</Button>
@@ -68,7 +90,9 @@ const MobileMenu = ({ navLinks }: MobileMenuProps) => {
               </SignedOut>
               <SignedIn>
                 <Link to="/khao-sat" onClick={closeSheet}>
-                  <Button className="w-full bg-brand-600 hover:bg-brand-700">Bắt đầu khảo sát</Button>
+                  <Button className="w-full bg-brand-600 hover:bg-brand-700">
+                    Bắt đầu khảo sát
+                  </Button>
                 </Link>
               </SignedIn>
             </div>

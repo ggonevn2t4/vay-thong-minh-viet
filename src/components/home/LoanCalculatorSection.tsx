@@ -1,6 +1,11 @@
 
 import LoanCalculator from "@/components/LoanCalculator";
 
+/**
+ * Section component that wraps the loan calculator
+ * Provides consistent styling and layout for the calculator on the homepage
+ * @returns {JSX.Element} The loan calculator section
+ */
 const LoanCalculatorSection = () => {
   return (
     <section className="py-16 bg-gray-50">

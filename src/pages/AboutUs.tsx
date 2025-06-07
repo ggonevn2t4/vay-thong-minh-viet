@@ -4,30 +4,72 @@ import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Target, Award, Shield } from 'lucide-react';
 
-const AboutUs = () => {
-  const values = [
-    {
-      icon: <Users className="h-8 w-8" />,
-      title: "Tận tâm với khách hàng",
-      description: "Chúng tôi luôn đặt lợi ích của khách hàng lên hàng đầu và cung cấp dịch vụ tư vấn miễn phí, chính xác nhất."
-    },
-    {
-      icon: <Target className="h-8 w-8" />,
-      title: "Minh bạch & Chính xác",
-      description: "Thông tin về lãi suất, điều kiện vay và quy trình được cung cấp một cách rõ ràng, minh bạch."
-    },
-    {
-      icon: <Award className="h-8 w-8" />,
-      title: "Chuyên nghiệp",
-      description: "Đội ngũ tư vấn viên có kinh nghiệm nhiều năm trong lĩnh vực tài chính ngân hàng."
-    },
-    {
-      icon: <Shield className="h-8 w-8" />,
-      title: "Bảo mật thông tin",
-      description: "Cam kết bảo vệ tuyệt đối thông tin cá nhân và tài chính của khách hàng."
-    }
-  ];
+/**
+ * Company values configuration
+ */
+const COMPANY_VALUES = [
+  {
+    icon: <Users className="h-8 w-8" />,
+    title: "Tận tâm với khách hàng",
+    description: "Chúng tôi luôn đặt lợi ích của khách hàng lên hàng đầu và cung cấp dịch vụ tư vấn miễn phí, chính xác nhất."
+  },
+  {
+    icon: <Target className="h-8 w-8" />,
+    title: "Minh bạch & Chính xác",
+    description: "Thông tin về lãi suất, điều kiện vay và quy trình được cung cấp một cách rõ ràng, minh bạch."
+  },
+  {
+    icon: <Award className="h-8 w-8" />,
+    title: "Chuyên nghiệp",
+    description: "Đội ngũ tư vấn viên có kinh nghiệm nhiều năm trong lĩnh vực tài chính ngân hàng."
+  },
+  {
+    icon: <Shield className="h-8 w-8" />,
+    title: "Bảo mật thông tin",
+    description: "Cam kết bảo vệ tuyệt đối thông tin cá nhân và tài chính của khách hàng."
+  }
+];
 
+/**
+ * Team members configuration
+ */
+const TEAM_MEMBERS = [
+  {
+    name: "Nguyễn Văn A",
+    position: "CEO & Founder",
+    description: "Cựu Giám đốc Khối Bán lẻ tại Vietcombank, 12 năm kinh nghiệm ngành ngân hàng",
+    icon: <Users className="h-12 w-12 text-brand-600" />
+  },
+  {
+    name: "Trần Thị B",
+    position: "CTO",
+    description: "Cựu Senior Engineer tại Grab, chuyên gia về AI và machine learning",
+    icon: <Target className="h-12 w-12 text-brand-600" />
+  },
+  {
+    name: "Lê Văn C",
+    position: "Head of Business",
+    description: "Cựu Giám đốc Kinh doanh tại Techcombank, 10 năm kinh nghiệm phát triển sản phẩm",
+    icon: <Award className="h-12 w-12 text-brand-600" />
+  }
+];
+
+/**
+ * Company statistics
+ */
+const COMPANY_STATS = [
+  { value: "50,000+", label: "Khách hàng tin tưởng" },
+  { value: "25+", label: "Ngân hàng đối tác" },
+  { value: "15 tỷ+", label: "VNĐ đã hỗ trợ vay" },
+  { value: "98%", label: "Tỷ lệ hài lòng" }
+];
+
+/**
+ * About Us page component
+ * Displays company information, mission, values, team, and statistics
+ * @returns {JSX.Element} The complete about us page
+ */
+const AboutUs = () => {
   return (
     <Layout>
       <div className="min-h-screen bg-gray-50">
@@ -72,7 +114,7 @@ const AboutUs = () => {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {values.map((value, index) => (
+              {COMPANY_VALUES.map((value, index) => (
                 <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex justify-center text-brand-600 mb-4">
@@ -99,42 +141,18 @@ const AboutUs = () => {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <Card className="text-center">
-                <CardContent className="pt-6">
-                  <div className="w-24 h-24 bg-brand-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <Users className="h-12 w-12 text-brand-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Nguyễn Văn A</h3>
-                  <p className="text-brand-600 font-medium mb-2">CEO & Founder</p>
-                  <p className="text-gray-600 text-sm">
-                    Cựu Giám đốc Khối Bán lẻ tại Vietcombank, 12 năm kinh nghiệm ngành ngân hàng
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="text-center">
-                <CardContent className="pt-6">
-                  <div className="w-24 h-24 bg-brand-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <Target className="h-12 w-12 text-brand-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Trần Thị B</h3>
-                  <p className="text-brand-600 font-medium mb-2">CTO</p>
-                  <p className="text-gray-600 text-sm">
-                    Cựu Senior Engineer tại Grab, chuyên gia về AI và machine learning
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="text-center">
-                <CardContent className="pt-6">
-                  <div className="w-24 h-24 bg-brand-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <Award className="h-12 w-12 text-brand-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">Lê Văn C</h3>
-                  <p className="text-brand-600 font-medium mb-2">Head of Business</p>
-                  <p className="text-gray-600 text-sm">
-                    Cựu Giám đốc Kinh doanh tại Techcombank, 10 năm kinh nghiệm phát triển sản phẩm
-                  </p>
-                </CardContent>
-              </Card>
+              {TEAM_MEMBERS.map((member, index) => (
+                <Card key={index} className="text-center">
+                  <CardContent className="pt-6">
+                    <div className="w-24 h-24 bg-brand-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                      {member.icon}
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">{member.name}</h3>
+                    <p className="text-brand-600 font-medium mb-2">{member.position}</p>
+                    <p className="text-gray-600 text-sm">{member.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </section>
@@ -143,22 +161,12 @@ const AboutUs = () => {
         <section className="py-16 bg-brand-600 text-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-4xl font-bold mb-2">50,000+</div>
-                <div className="text-brand-100">Khách hàng tin tưởng</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">25+</div>
-                <div className="text-brand-100">Ngân hàng đối tác</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">15 tỷ+</div>
-                <div className="text-brand-100">VNĐ đã hỗ trợ vay</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">98%</div>
-                <div className="text-brand-100">Tỷ lệ hài lòng</div>
-              </div>
+              {COMPANY_STATS.map((stat, index) => (
+                <div key={index}>
+                  <div className="text-4xl font-bold mb-2">{stat.value}</div>
+                  <div className="text-brand-100">{stat.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -171,10 +179,16 @@ const AboutUs = () => {
               Hãy để chúng tôi giúp bạn tìm được khoản vay phù hợp nhất. Hoàn toàn miễn phí và không ràng buộc.
             </p>
             <div className="space-x-4">
-              <a href="/khao-sat" className="inline-flex items-center px-6 py-3 bg-brand-600 text-white font-semibold rounded-lg hover:bg-brand-700 transition-colors">
+              <a 
+                href="/khao-sat" 
+                className="inline-flex items-center px-6 py-3 bg-brand-600 text-white font-semibold rounded-lg hover:bg-brand-700 transition-colors"
+              >
                 Bắt đầu khảo sát
               </a>
-              <a href="/lien-he" className="inline-flex items-center px-6 py-3 border border-brand-600 text-brand-600 font-semibold rounded-lg hover:bg-brand-50 transition-colors">
+              <a 
+                href="/lien-he" 
+                className="inline-flex items-center px-6 py-3 border border-brand-600 text-brand-600 font-semibold rounded-lg hover:bg-brand-50 transition-colors"
+              >
                 Liên hệ tư vấn
               </a>
             </div>

@@ -2,34 +2,47 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+/**
+ * Utility function to merge and conditionally apply CSS classes
+ * @param {...ClassValue[]} inputs - Class values to merge
+ * @returns {string} Merged and optimized class string
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Format currency function
+/**
+ * Format a number as Vietnamese currency
+ * @param {number} amount - The amount to format
+ * @returns {string} Formatted currency string
+ */
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('vi-VN').format(amount);
 }
 
-// Tính toán khoản vay
+/**
+ * Calculate loan payment details using standard loan formulas
+ * @param {number} principal - The loan principal amount
+ * @param {number} interestRate - Annual interest rate (as percentage)
+ * @param {number} termInYears - Loan term in years
+ * @returns {Object} Object containing monthly payment, total payment, and total interest
+ */
 export function calculateLoan(
   principal: number,
   interestRate: number,
   termInYears: number
 ) {
-  // Chuyển lãi suất hàng năm thành lãi suất hàng tháng
+  // Convert annual interest rate to monthly rate
   const monthlyRate = interestRate / 100 / 12;
-  // Chuyển kỳ hạn từ năm sang tháng
+  // Convert term from years to months
   const termInMonths = termInYears * 12;
   
-  // Tính toán khoản thanh toán hàng tháng (công thức PMT)
+  // Calculate monthly payment using PMT formula
   const monthlyPayment = (principal * monthlyRate * Math.pow(1 + monthlyRate, termInMonths)) / 
                         (Math.pow(1 + monthlyRate, termInMonths) - 1);
   
-  // Tổng số tiền thanh toán
+  // Calculate total payment and interest
   const totalPayment = monthlyPayment * termInMonths;
-  
-  // Tổng tiền lãi
   const totalInterest = totalPayment - principal;
   
   return {
@@ -39,7 +52,13 @@ export function calculateLoan(
   };
 }
 
-// Generate lịch trả nợ
+/**
+ * Generate a detailed repayment schedule for a loan
+ * @param {number} principal - The loan principal amount
+ * @param {number} interestRate - Annual interest rate (as percentage)
+ * @param {number} termInYears - Loan term in years
+ * @returns {Array} Array of payment objects with monthly breakdown
+ */
 export function generateRepaymentSchedule(
   principal: number,
   interestRate: number,
@@ -49,27 +68,24 @@ export function generateRepaymentSchedule(
   const termInMonths = termInYears * 12;
   const monthlyPayment = calculateLoan(principal, interestRate, termInYears).monthlyPayment;
   
-  let schedule = [];
+  const schedule = [];
   let remainingPrincipal = principal;
-  let totalInterestPaid = 0;
   
   for (let month = 1; month <= termInMonths; month++) {
-    // Tính tiền lãi hàng tháng
+    // Calculate monthly interest and principal payments
     const interestPayment = remainingPrincipal * monthlyRate;
-    // Tính tiền gốc trả trong tháng
     const principalPayment = monthlyPayment - interestPayment;
     
-    // Cập nhật dư nợ gốc
+    // Update remaining principal
     remainingPrincipal -= principalPayment;
-    totalInterestPaid += interestPayment;
     
-    // Xử lý làm tròn số cho tháng cuối
+    // Handle rounding for final month
     let actualRemainingPrincipal = remainingPrincipal;
     if (month === termInMonths) {
       actualRemainingPrincipal = 0;
     }
     
-    // Thêm vào lịch trả nợ
+    // Add to repayment schedule
     schedule.push({
       month,
       principalPayment,
@@ -82,19 +98,31 @@ export function generateRepaymentSchedule(
   return schedule;
 }
 
-// Kiểm tra định dạng email
+/**
+ * Validate email format using regex
+ * @param {string} email - Email address to validate
+ * @returns {boolean} True if email format is valid
+ */
 export function isValidEmail(email: string): boolean {
   const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
   return regex.test(email);
 }
 
-// Kiểm tra định dạng số điện thoại
+/**
+ * Validate Vietnamese phone number format
+ * @param {string} phone - Phone number to validate
+ * @returns {boolean} True if phone number format is valid
+ */
 export function isValidPhoneNumber(phone: string): boolean {
   const regex = /^(0|\+84)\d{9,10}$/;
   return regex.test(phone);
 }
 
-// Chuyển đổi số tiền thành định dạng có phân cách
+/**
+ * Format a number with thousand separators (dots)
+ * @param {number | string} num - Number to format
+ * @returns {string} Formatted number string
+ */
 export function formatNumber(num: number | string): string {
   const parsedNum = typeof num === 'string' ? parseFloat(num.replace(/[^\d.-]/g, '')) : num;
   
@@ -105,36 +133,44 @@ export function formatNumber(num: number | string): string {
   return parsedNum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
-// Phân tích chuỗi số tiền thành số
+/**
+ * Parse a formatted amount string to a number
+ * @param {string} amountStr - Formatted amount string
+ * @returns {number} Parsed number value
+ */
 export function parseAmount(amountStr: string): number {
-  // Loại bỏ tất cả các ký tự không phải số
+  // Remove all non-digit characters
   const cleanStr = amountStr.replace(/[^\d]/g, '');
   return parseInt(cleanStr, 10) || 0;
 }
 
-// Tính toán xếp hạng tín dụng đơn giản
+/**
+ * Calculate a simple credit score based on user data
+ * @param {any} userData - User financial data object
+ * @returns {number} Calculated credit score (0-100)
+ */
 export function calculateCreditScore(userData: any): number {
   let score = 0;
   
-  // Thu nhập
+  // Income scoring (max 25 points)
   if (userData.income > 20000000) score += 25;
   else if (userData.income > 10000000) score += 20;
   else if (userData.income > 5000000) score += 15;
   else score += 5;
   
-  // Thời gian làm việc
-  if (userData.workExperience > 36) score += 20; // > 3 năm
-  else if (userData.workExperience > 12) score += 15; // 1-3 năm
-  else score += 5; // < 1 năm
+  // Work experience scoring (max 20 points)
+  if (userData.workExperience > 36) score += 20; // > 3 years
+  else if (userData.workExperience > 12) score += 15; // 1-3 years
+  else score += 5; // < 1 year
   
-  // Tài sản đảm bảo
+  // Collateral scoring (max 20 points)
   if (userData.hasCollateral) score += 20;
   
-  // Lịch sử tín dụng
+  // Credit history scoring (max 15 points)
   if (!userData.hasExistingLoan) score += 15;
   else score += 10;
   
-  // Nợ xấu
+  // Bad debt penalty (max -30 points)
   if (userData.hasBadDebt) score -= 30;
   
   return Math.max(0, score);
