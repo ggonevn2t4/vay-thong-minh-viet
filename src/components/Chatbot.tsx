@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { sendSecureChatRequest, ChatMessage } from '@/services/chatService';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   content: string;
@@ -21,12 +23,57 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
   
   // Cuộn xuống cuối cùng khi có tin nhắn mới
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Tạo session chat khi user đăng nhập và mở chatbot
+  useEffect(() => {
+    if (isOpen && user && !sessionId) {
+      createChatSession();
+    }
+  }, [isOpen, user, sessionId]);
+
+  const createChatSession = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .insert({
+          user_id: user.id,
+          session_data: messages
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      setSessionId(data.id);
+    } catch (error) {
+      console.error('Error creating chat session:', error);
+    }
+  };
+
+  const updateChatSession = async (newMessages: Message[]) => {
+    if (!user || !sessionId) return;
+
+    try {
+      await supabase
+        .from('chat_sessions')
+        .update({
+          session_data: newMessages,
+          last_activity: new Date().toISOString()
+        })
+        .eq('id', sessionId);
+    } catch (error) {
+      console.error('Error updating chat session:', error);
+    }
+  };
   
   // Danh sách câu hỏi và trả lời mẫu
   const faqResponses: Record<string, string> = {
@@ -83,17 +130,27 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
       
       // Thêm phản hồi của bot sau một khoảng thời gian ngắn để tạo hiệu ứng đang nhập
       setTimeout(() => {
-        setMessages(prevMessages => [...prevMessages, { content: botResponse, type: 'bot' }]);
+        const updatedMessages = [...newMessages, { content: botResponse, type: 'bot' }];
+        setMessages(updatedMessages);
         setIsLoading(false);
+        
+        // Cập nhật chat session nếu user đã đăng nhập
+        if (user && sessionId) {
+          updateChatSession(updatedMessages);
+        }
       }, 500);
       
     } catch (error) {
       console.error('Lỗi khi xử lý tin nhắn:', error);
-      setMessages(prevMessages => [...prevMessages, { 
-        content: "Xin lỗi, đã xảy ra lỗi khi xử lý yêu cầu của bạn. Vui lòng thử lại sau.", 
-        type: 'bot' 
-      }]);
+      const errorResponse = "Xin lỗi, đã xảy ra lỗi khi xử lý yêu cầu của bạn. Vui lòng thử lại sau.";
+      const updatedMessages = [...newMessages, { content: errorResponse, type: 'bot' }];
+      setMessages(updatedMessages);
       setIsLoading(false);
+      
+      // Cập nhật chat session ngay cả khi có lỗi
+      if (user && sessionId) {
+        updateChatSession(updatedMessages);
+      }
     }
   };
   
@@ -106,7 +163,7 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
   if (!isOpen) {
     return (
       <button
-        className="fixed bottom-6 right-6 bg-brand-600 text-white rounded-full p-4 shadow-lg hover:bg-brand-700 transition-colors"
+        className="fixed bottom-6 right-6 bg-brand-600 text-white rounded-full p-4 shadow-lg hover:bg-brand-700 transition-colors z-50"
         onClick={() => setIsOpen(true)}
       >
         <MessageCircle className="h-6 w-6" />
@@ -175,6 +232,11 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
           </div>
           <div className="mt-2 text-xs text-gray-500 text-center">
             Trợ lý AI được hỗ trợ bởi OpenAI
+            {user && (
+              <span className="block text-green-600">
+                ✓ Phiên chat đã được lưu
+              </span>
+            )}
           </div>
         </div>
       </div>

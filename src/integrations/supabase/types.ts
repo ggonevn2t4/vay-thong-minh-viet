@@ -9,7 +9,166 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      chat_sessions: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_activity: string | null
+          session_data: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_activity?: string | null
+          session_data?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_activity?: string | null
+          session_data?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      financial_assessments: {
+        Row: {
+          ai_analysis: string | null
+          assessment_data: Json | null
+          created_at: string | null
+          credit_score: number | null
+          debt_to_income_ratio: number | null
+          id: string
+          loan_application_id: string | null
+          recommendations: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_analysis?: string | null
+          assessment_data?: Json | null
+          created_at?: string | null
+          credit_score?: number | null
+          debt_to_income_ratio?: number | null
+          id?: string
+          loan_application_id?: string | null
+          recommendations?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_analysis?: string | null
+          assessment_data?: Json | null
+          created_at?: string | null
+          credit_score?: number | null
+          debt_to_income_ratio?: number | null
+          id?: string
+          loan_application_id?: string | null
+          recommendations?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_assessments_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loan_applications: {
+        Row: {
+          amount: number
+          bank_responses: Json | null
+          created_at: string | null
+          employment_type: Database["public"]["Enums"]["employment_type"] | null
+          id: string
+          loan_type: Database["public"]["Enums"]["loan_type"]
+          monthly_income: number | null
+          purpose: string | null
+          status: Database["public"]["Enums"]["loan_status"] | null
+          term_months: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          bank_responses?: Json | null
+          created_at?: string | null
+          employment_type?:
+            | Database["public"]["Enums"]["employment_type"]
+            | null
+          id?: string
+          loan_type: Database["public"]["Enums"]["loan_type"]
+          monthly_income?: number | null
+          purpose?: string | null
+          status?: Database["public"]["Enums"]["loan_status"] | null
+          term_months: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          bank_responses?: Json | null
+          created_at?: string | null
+          employment_type?:
+            | Database["public"]["Enums"]["employment_type"]
+            | null
+          id?: string
+          loan_type?: Database["public"]["Enums"]["loan_type"]
+          monthly_income?: number | null
+          purpose?: string | null
+          status?: Database["public"]["Enums"]["loan_status"] | null
+          term_months?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          company_name: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          employment_type: Database["public"]["Enums"]["employment_type"] | null
+          full_name: string | null
+          id: string
+          monthly_income: number | null
+          phone: string | null
+          updated_at: string | null
+          work_experience_years: number | null
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          employment_type?:
+            | Database["public"]["Enums"]["employment_type"]
+            | null
+          full_name?: string | null
+          id: string
+          monthly_income?: number | null
+          phone?: string | null
+          updated_at?: string | null
+          work_experience_years?: number | null
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          employment_type?:
+            | Database["public"]["Enums"]["employment_type"]
+            | null
+          full_name?: string | null
+          id?: string
+          monthly_income?: number | null
+          phone?: string | null
+          updated_at?: string | null
+          work_experience_years?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +177,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      employment_type:
+        | "employee"
+        | "self_employed"
+        | "freelancer"
+        | "retired"
+        | "student"
+        | "unemployed"
+      loan_status: "draft" | "pending" | "approved" | "rejected" | "reviewing"
+      loan_type: "personal" | "mortgage" | "business" | "auto" | "education"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +300,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      employment_type: [
+        "employee",
+        "self_employed",
+        "freelancer",
+        "retired",
+        "student",
+        "unemployed",
+      ],
+      loan_status: ["draft", "pending", "approved", "rejected", "reviewing"],
+      loan_type: ["personal", "mortgage", "business", "auto", "education"],
+    },
   },
 } as const
