@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { sendChatRequest, getOpenAIKey } from '@/services/openaiService';
+import { sendSecureChatRequest, ChatMessage } from '@/services/chatService';
 
 interface Message {
   content: string;
@@ -43,7 +43,8 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
     if (inputValue.trim() === '') return;
     
     // Thêm tin nhắn của người dùng
-    setMessages([...messages, { content: inputValue, type: 'user' }]);
+    const newMessages = [...messages, { content: inputValue, type: 'user' as const }];
+    setMessages(newMessages);
     
     const userInput = inputValue;
     setInputValue('');
@@ -63,30 +64,21 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
         }
       }
       
-      // Nếu không tìm thấy trong FAQ, sử dụng OpenAI API
+      // Nếu không tìm thấy trong FAQ, sử dụng secure OpenAI API
       if (!foundInFaq) {
-        if (getOpenAIKey()) {
-          // Chuẩn bị tin nhắn cho OpenAI API
-          const chatMessages = [
-            {
-              role: "system",
-              content: "Bạn là trợ lý ảo của VayThôngMinh, một nền tảng so sánh và tư vấn các khoản vay. Hãy trả lời các câu hỏi của người dùng về vay vốn, điều kiện vay, lãi suất, và các vấn đề liên quan đến tài chính cá nhân một cách ngắn gọn, chính xác và hữu ích. Trả lời bằng tiếng Việt. Giữ câu trả lời ngắn gọn dưới 3 câu."
-            },
-            ...messages.map(msg => ({
-              role: msg.type === 'user' ? 'user' : 'assistant',
-              content: msg.content
-            })),
-            {
-              role: "user",
-              content: userInput
-            }
-          ];
-          
-          botResponse = await sendChatRequest(chatMessages as Array<{role: string, content: string}>);
-        } else {
-          // Không có API key
-          botResponse = "Xin lỗi, tôi không thể trả lời câu hỏi này lúc này. Vui lòng liên hệ với nhân viên tư vấn qua số hotline 1900 1234 để được hỗ trợ.";
-        }
+        // Chuẩn bị tin nhắn cho OpenAI API
+        const chatMessages: ChatMessage[] = [
+          {
+            role: "system",
+            content: "Bạn là trợ lý ảo của VayThôngMinh, một nền tảng so sánh và tư vấn các khoản vay. Hãy trả lời các câu hỏi của người dùng về vay vốn, điều kiện vay, lãi suất, và các vấn đề liên quan đến tài chính cá nhân một cách ngắn gọn, chính xác và hữu ích. Trả lời bằng tiếng Việt. Giữ câu trả lời ngắn gọn dưới 3 câu."
+          },
+          ...newMessages.slice(1).map(msg => ({
+            role: msg.type === 'user' ? 'user' as const : 'assistant' as const,
+            content: msg.content
+          }))
+        ];
+        
+        botResponse = await sendSecureChatRequest(chatMessages);
       }
       
       // Thêm phản hồi của bot sau một khoảng thời gian ngắn để tạo hiệu ứng đang nhập
@@ -182,7 +174,7 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
             </Button>
           </div>
           <div className="mt-2 text-xs text-gray-500 text-center">
-            Trợ lý AI có thể trả lời các câu hỏi cơ bản về vay vốn
+            Trợ lý AI được hỗ trợ bởi OpenAI
           </div>
         </div>
       </div>
