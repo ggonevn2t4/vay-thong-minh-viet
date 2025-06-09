@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Layout from "./components/layout/Layout";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import KhaoSat from "./pages/KhaoSat";
@@ -46,46 +45,44 @@ function App() {
         <Toaster />
         <Sonner />
         <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/khao-sat" element={<KhaoSat />} />
-              <Route path="/so-sanh" element={<SoSanh />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/messages" element={
-                <ProtectedRoute>
-                  <Messages />
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard" element={
-                <ProtectedRoute requiredRole="customer">
-                  <UserDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin-dashboard" element={
-                <ProtectedRoute requiredRole="admin">
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/advisor-dashboard" element={
-                <ProtectedRoute requiredRole="advisor">
-                  <AdvisorDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/ket-qua" element={
-                <ProtectedRoute>
-                  <KetQua />
-                </ProtectedRoute>
-              } />
-              <Route path="/loan-comparison" element={<LoanComparison />} />
-              <Route path="/loan-eligibility" element={<LoanEligibility />} />
-              <Route path="/document-checklist" element={<DocumentChecklistPage />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/gioi-thieu" element={<AboutUs />} />
-              {/* Catch-all route for 404 pages */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/khao-sat" element={<KhaoSat />} />
+            <Route path="/so-sanh" element={<SoSanh />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/messages" element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard" element={
+              <ProtectedRoute requiredRole="customer">
+                <UserDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-dashboard" element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/advisor-dashboard" element={
+              <ProtectedRoute requiredRole="advisor">
+                <AdvisorDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/ket-qua" element={
+              <ProtectedRoute>
+                <KetQua />
+              </ProtectedRoute>
+            } />
+            <Route path="/loan-comparison" element={<LoanComparison />} />
+            <Route path="/loan-eligibility" element={<LoanEligibility />} />
+            <Route path="/document-checklist" element={<DocumentChecklistPage />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/gioi-thieu" element={<AboutUs />} />
+            {/* Catch-all route for 404 pages */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </Router>
       </TooltipProvider>
     </QueryClientProvider>
