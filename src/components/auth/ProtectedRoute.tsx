@@ -1,7 +1,7 @@
 
-import { useAuth, useUser } from "@clerk/clerk-react";
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import AuthLoadingScreen from "./AuthLoadingScreen";
 
 interface ProtectedRouteProps {
@@ -10,22 +10,23 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
-  const { isLoaded, userId } = useAuth();
-  const { user } = useUser();
+  const { user, loading } = useAuth();
   
   // If auth is still loading, show enhanced loading state
-  if (!isLoaded) {
+  if (loading) {
     return <AuthLoadingScreen />;
   }
   
-  // If user is not authenticated, redirect to home page
-  if (!userId) {
-    return <Navigate to="/" replace />;
+  // If user is not authenticated, redirect to auth page
+  if (!user) {
+    return <Navigate to="/auth" replace />;
   }
   
   // Check role-based access if requiredRole is specified
   if (requiredRole) {
-    const userRole = user?.publicMetadata?.role as string || 'customer';
+    // For now, we'll default to customer role until we implement role management
+    // This will be updated when we add the user roles system
+    const userRole = 'customer';
     
     if (userRole !== requiredRole) {
       // Redirect to appropriate dashboard based on user's actual role

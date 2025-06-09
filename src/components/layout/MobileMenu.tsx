@@ -1,11 +1,11 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Menu } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import NotificationSystem from '@/components/NotificationSystem';
 import Navigation from './Navigation';
 
@@ -36,8 +36,9 @@ const ROLE_CONFIG = {
  */
 const MobileMenu = ({ navLinks }: MobileMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useUser();
-  const userRole = (user?.publicMetadata?.role as UserRole) || 'customer';
+  const { user } = useAuth();
+  // For now, default to customer role - will be updated with role management
+  const userRole: UserRole = 'customer';
 
   /**
    * Get role badge configuration based on user role
@@ -63,14 +64,14 @@ const MobileMenu = ({ navLinks }: MobileMenuProps) => {
         </SheetTrigger>
         <SheetContent side="right" className="w-[80%] pt-10">
           <div className="flex flex-col gap-6 py-6">
-            <SignedIn>
+            {user && (
               <div className="pb-4 border-b flex items-center justify-between">
                 <Badge className={getRoleBadge().color}>
                   {getRoleBadge().label}
                 </Badge>
                 <NotificationSystem />
               </div>
-            </SignedIn>
+            )}
             
             <Navigation 
               navLinks={navLinks}
@@ -78,23 +79,24 @@ const MobileMenu = ({ navLinks }: MobileMenuProps) => {
             />
             
             <div className="mt-4 space-y-4">
-              <SignedOut>
+              {!user ? (
+                <>
+                  <Link to="/khao-sat" onClick={closeSheet}>
+                    <Button className="w-full bg-brand-600 hover:bg-brand-700">
+                      Bắt đầu khảo sát
+                    </Button>
+                  </Link>
+                  <Link to="/auth" onClick={closeSheet}>
+                    <Button variant="outline" className="w-full mt-2">Đăng nhập</Button>
+                  </Link>
+                </>
+              ) : (
                 <Link to="/khao-sat" onClick={closeSheet}>
                   <Button className="w-full bg-brand-600 hover:bg-brand-700">
                     Bắt đầu khảo sát
                   </Button>
                 </Link>
-                <SignInButton mode="modal">
-                  <Button variant="outline" className="w-full mt-2">Đăng nhập</Button>
-                </SignInButton>
-              </SignedOut>
-              <SignedIn>
-                <Link to="/khao-sat" onClick={closeSheet}>
-                  <Button className="w-full bg-brand-600 hover:bg-brand-700">
-                    Bắt đầu khảo sát
-                  </Button>
-                </Link>
-              </SignedIn>
+              )}
             </div>
           </div>
         </SheetContent>
