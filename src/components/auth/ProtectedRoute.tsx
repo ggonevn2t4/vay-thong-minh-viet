@@ -26,7 +26,7 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   if (requiredRole) {
     // For now, we'll default to customer role until we implement role management
     // This will be updated when we add the user roles system
-    const userRole = 'customer';
+    const userRole: 'admin' | 'advisor' | 'customer' = 'customer';
     
     if (userRole !== requiredRole) {
       // Redirect to appropriate dashboard based on user's actual role

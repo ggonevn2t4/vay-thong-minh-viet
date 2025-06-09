@@ -52,8 +52,9 @@ export const useNavigation = () => {
         case 'advisor':
           baseLinks.push({ name: "Tư vấn viên", path: "/advisor-dashboard" });
           break;
-        default:
+        case 'customer':
           baseLinks.push({ name: "Khu vực khách hàng", path: "/dashboard" });
+          break;
       }
     }
 
