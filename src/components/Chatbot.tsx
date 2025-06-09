@@ -47,7 +47,7 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
         .from('chat_sessions')
         .insert({
           user_id: user.id,
-          session_data: messages
+          session_data: messages as any // Cast to any for Json compatibility
         })
         .select()
         .single();
@@ -66,7 +66,7 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
       await supabase
         .from('chat_sessions')
         .update({
-          session_data: newMessages,
+          session_data: newMessages as any, // Cast to any for Json compatibility
           last_activity: new Date().toISOString()
         })
         .eq('id', sessionId);
@@ -130,7 +130,7 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
       
       // Thêm phản hồi của bot sau một khoảng thời gian ngắn để tạo hiệu ứng đang nhập
       setTimeout(() => {
-        const updatedMessages = [...newMessages, { content: botResponse, type: 'bot' }];
+        const updatedMessages = [...newMessages, { content: botResponse, type: 'bot' as const }];
         setMessages(updatedMessages);
         setIsLoading(false);
         
@@ -143,7 +143,7 @@ const Chatbot = ({ initialMessage = "Xin chào! Tôi là trợ lý ảo của Va
     } catch (error) {
       console.error('Lỗi khi xử lý tin nhắn:', error);
       const errorResponse = "Xin lỗi, đã xảy ra lỗi khi xử lý yêu cầu của bạn. Vui lòng thử lại sau.";
-      const updatedMessages = [...newMessages, { content: errorResponse, type: 'bot' }];
+      const updatedMessages = [...newMessages, { content: errorResponse, type: 'bot' as const }];
       setMessages(updatedMessages);
       setIsLoading(false);
       
