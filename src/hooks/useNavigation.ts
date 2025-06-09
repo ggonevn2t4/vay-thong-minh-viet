@@ -22,7 +22,7 @@ interface NavLink {
 export const useNavigation = () => {
   const { user } = useAuth();
   // For now, default to customer role - will be updated with role management
-  const userRole: UserRole = 'customer';
+  const userRole: UserRole = 'customer' as UserRole;
   
   /**
    * Get navigation links based on user role
