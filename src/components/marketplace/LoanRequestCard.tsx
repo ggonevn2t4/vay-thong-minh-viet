@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatCurrency } from '@/lib/utils';
 import { MapPin, Clock, User, TrendingUp, MessageCircle, ArrowRight, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 interface LoanRequest {
@@ -34,7 +33,8 @@ interface LoanRequestCardProps {
 
 const LoanRequestCard = ({ request }: LoanRequestCardProps) => {
   const navigate = useNavigate();
-  const { isSignedIn } = useAuth();
+  const { user } = useAuth();
+  const isSignedIn = !!user;
   const { toast } = useToast();
 
   const getStatusColor = (status: string) => {
