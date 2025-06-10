@@ -18,7 +18,7 @@ import {
   predictBankApprovals,
   updateConsultationSession,
   createFinancialAnalysisReport
-} from '@/services/aiAdvisoryService';
+} from '@/services/ai-advisory';
 import AIAdvisoryForm from './AIAdvisoryForm';
 
 interface AIAdvisorySystemProps {

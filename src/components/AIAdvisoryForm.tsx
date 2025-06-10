@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
-import { FinancialData } from '@/services/aiAdvisoryService';
+import { FinancialData } from '@/services/ai-advisory';
 
 const formSchema = z.object({
   monthly_income: z.number().min(1000000, 'Thu nhập tối thiểu 1,000,000 VNĐ'),
