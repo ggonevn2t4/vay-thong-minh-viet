@@ -21,6 +21,7 @@ import DocumentChecklistPage from "./pages/DocumentChecklistPage";
 import Marketplace from "./pages/Marketplace";
 import Messages from "./pages/Messages";
 import AboutUs from "./pages/AboutUs";
+import AIAdvisory from "./pages/AIAdvisory";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 /**
@@ -77,6 +78,11 @@ function App() {
               <Route path="/ket-qua" element={
                 <ProtectedRoute>
                   <KetQua />
+                </ProtectedRoute>
+              } />
+              <Route path="/ai-advisory" element={
+                <ProtectedRoute>
+                  <AIAdvisory />
                 </ProtectedRoute>
               } />
               <Route path="/loan-comparison" element={<LoanComparison />} />
