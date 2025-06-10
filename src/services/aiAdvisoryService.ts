@@ -49,7 +49,7 @@ export const createConsultationSession = async (
       .insert({
         user_id: user.id,
         session_type: 'financial_analysis',
-        financial_data: financialData,
+        financial_data: financialData as any,
         status: 'processing'
       })
       .select('id')
@@ -165,9 +165,9 @@ export const updateConsultationSession = async (
     const { error } = await supabase
       .from('ai_consultation_sessions')
       .update({
-        ai_analysis: aiAnalysis,
-        loan_optimization: loanOptimization,
-        bank_approval_predictions: bankPredictions,
+        ai_analysis: aiAnalysis as any,
+        loan_optimization: loanOptimization as any,
+        bank_approval_predictions: bankPredictions as any,
         status: 'completed',
         updated_at: new Date().toISOString()
       })
@@ -193,9 +193,9 @@ export const createFinancialAnalysisReport = async (
       .insert({
         user_id: user.id,
         consultation_session_id: sessionId,
-        income_analysis: { status: 'analyzed' },
-        expense_analysis: { status: 'analyzed' },
-        debt_analysis: { debt_to_income_ratio: aiAnalysis.debt_to_income_ratio },
+        income_analysis: { status: 'analyzed' } as any,
+        expense_analysis: { status: 'analyzed' } as any,
+        debt_analysis: { debt_to_income_ratio: aiAnalysis.debt_to_income_ratio } as any,
         ai_confidence_score: aiAnalysis.risk_score / 100
       });
 
