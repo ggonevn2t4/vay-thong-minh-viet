@@ -11,7 +11,7 @@ import Navigation from './Navigation';
 
 interface MobileMenuProps {
   /** Array of navigation links */
-  navLinks: Array<{ name: string; path: string }>;
+  navLinks: Array<{ name: string; href: string; isActive?: boolean }>;
 }
 
 /**
