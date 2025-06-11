@@ -2,8 +2,8 @@
 import { Link, useLocation } from 'react-router-dom';
 
 interface NavigationProps {
-  /** Array of navigation links with name and path */
-  navLinks: Array<{ name: string; path: string }>;
+  /** Array of navigation links with name and href */
+  navLinks: Array<{ name: string; href: string; isActive?: boolean }>;
   /** Optional CSS classes for styling */
   className?: string;
 }
@@ -21,10 +21,10 @@ const Navigation = ({ navLinks, className }: NavigationProps) => {
     <nav className={className}>
       {navLinks.map((link) => (
         <Link 
-          key={link.path}
-          to={link.path} 
+          key={link.href}
+          to={link.href} 
           className={`text-sm font-medium transition-colors ${
-            location.pathname === link.path 
+            location.pathname === link.href 
               ? 'text-brand-600' 
               : 'text-gray-600 hover:text-brand-600'
           }`}
