@@ -1,65 +1,61 @@
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
 
-/**
- * Type definition for user roles
- */
-type UserRole = 'admin' | 'advisor' | 'customer';
-
-/**
- * Type definition for navigation links
- */
-interface NavLink {
+export interface NavLink {
   name: string;
-  path: string;
+  href: string;
+  description?: string;
+  isActive?: boolean;
 }
 
-/**
- * Custom hook for navigation management
- * Provides role-based navigation links based on user authentication and role
- * @returns {Object} Object containing navigation links array
- */
 export const useNavigation = () => {
-  const { user } = useAuth();
-  // For now, default to customer role - will be updated with role management
-  const userRole: UserRole = 'customer' as UserRole;
-  
-  /**
-   * Get navigation links based on user role
-   * @returns {NavLink[]} Array of navigation links
-   */
-  const getNavLinks = (): NavLink[] => {
-    const baseLinks: NavLink[] = [
-      { name: "Trang chủ", path: "/" },
-      { name: "Khảo sát", path: "/khao-sat" },
-      { name: "So sánh", path: "/so-sanh" },
-      { name: "Marketplace", path: "/marketplace" },
-      { name: "So sánh khoản vay", path: "/loan-comparison" },
-      { name: "FAQ", path: "/faq" }
-    ];
+  const location = useLocation();
 
-    // Add authenticated user links
-    if (user) {
-      baseLinks.splice(4, 0, { name: "Tin nhắn", path: "/messages" });
-    }
+  const navLinks: NavLink[] = [
+    {
+      name: 'Trang chủ',
+      href: '/',
+      description: 'Trang chủ VayThôngMinh',
+    },
+    {
+      name: 'Kiểm tra điều kiện',
+      href: '/kiem-tra-dieu-kien',
+      description: 'Kiểm tra điều kiện vay vốn',
+    },
+    {
+      name: 'So sánh lãi suất',
+      href: '/so-sanh',
+      description: 'So sánh lãi suất các ngân hàng',
+    },
+    {
+      name: 'Tối ưu hóa vay',
+      href: '/toi-uu-hoa-vay',
+      description: 'Tối ưu hóa khoản vay hiện tại',
+    },
+    {
+      name: 'Marketplace',
+      href: '/marketplace',
+      description: 'Sàn giao dịch vay vốn',
+    },
+    {
+      name: 'Tư vấn AI',
+      href: '/tu-van-ai',
+      description: 'Tư vấn thông minh với AI',
+    },
+    {
+      name: 'Hồ sơ tài liệu',
+      href: '/ho-so-tai-lieu',
+      description: 'Danh sách hồ sơ cần thiết',
+    },
+  ];
 
-    // Add role-specific dashboard links
-    if (user) {
-      switch (userRole) {
-        case 'admin':
-          baseLinks.push({ name: "Quản trị", path: "/admin-dashboard" });
-          break;
-        case 'advisor':
-          baseLinks.push({ name: "Tư vấn viên", path: "/advisor-dashboard" });
-          break;
-        case 'customer':
-          baseLinks.push({ name: "Khu vực khách hàng", path: "/dashboard" });
-          break;
-      }
-    }
+  // Add isActive property based on current location
+  const navLinksWithActive = navLinks.map(link => ({
+    ...link,
+    isActive: location.pathname === link.href,
+  }));
 
-    return baseLinks;
+  return {
+    navLinks: navLinksWithActive,
   };
-
-  return { navLinks: getNavLinks() };
 };

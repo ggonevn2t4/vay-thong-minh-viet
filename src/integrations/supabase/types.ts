@@ -78,6 +78,57 @@ export type Database = {
         }
         Relationships: []
       }
+      existing_loans: {
+        Row: {
+          additional_info: Json | null
+          bank_name: string
+          created_at: string
+          current_amount: number
+          current_interest_rate: number
+          id: string
+          loan_purpose: string | null
+          loan_type: string
+          monthly_payment: number
+          original_loan_date: string | null
+          remaining_amount: number
+          remaining_term_months: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_info?: Json | null
+          bank_name: string
+          created_at?: string
+          current_amount: number
+          current_interest_rate: number
+          id?: string
+          loan_purpose?: string | null
+          loan_type: string
+          monthly_payment: number
+          original_loan_date?: string | null
+          remaining_amount: number
+          remaining_term_months: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_info?: Json | null
+          bank_name?: string
+          created_at?: string
+          current_amount?: number
+          current_interest_rate?: number
+          id?: string
+          loan_purpose?: string | null
+          loan_type?: string
+          monthly_payment?: number
+          original_loan_date?: string | null
+          remaining_amount?: number
+          remaining_term_months?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       financial_analysis_reports: {
         Row: {
           ai_confidence_score: number | null
@@ -262,6 +313,110 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      loan_optimization_alerts: {
+        Row: {
+          alert_data: Json | null
+          alert_type: string
+          created_at: string
+          existing_loan_id: string
+          id: string
+          is_active: boolean | null
+          read_at: string | null
+          triggered_at: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_data?: Json | null
+          alert_type: string
+          created_at?: string
+          existing_loan_id: string
+          id?: string
+          is_active?: boolean | null
+          read_at?: string | null
+          triggered_at?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_data?: Json | null
+          alert_type?: string
+          created_at?: string
+          existing_loan_id?: string
+          id?: string
+          is_active?: boolean | null
+          read_at?: string | null
+          triggered_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_optimization_alerts_existing_loan_id_fkey"
+            columns: ["existing_loan_id"]
+            isOneToOne: false
+            referencedRelation: "existing_loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loan_optimization_analysis: {
+        Row: {
+          ai_confidence_score: number | null
+          alternative_offers: Json | null
+          consultation_session_id: string | null
+          created_at: string
+          current_loan_cost: Json | null
+          existing_loan_id: string
+          id: string
+          optimization_recommendations: Json | null
+          potential_savings: Json | null
+          recommended_actions: Json | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_confidence_score?: number | null
+          alternative_offers?: Json | null
+          consultation_session_id?: string | null
+          created_at?: string
+          current_loan_cost?: Json | null
+          existing_loan_id: string
+          id?: string
+          optimization_recommendations?: Json | null
+          potential_savings?: Json | null
+          recommended_actions?: Json | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_confidence_score?: number | null
+          alternative_offers?: Json | null
+          consultation_session_id?: string | null
+          created_at?: string
+          current_loan_cost?: Json | null
+          existing_loan_id?: string
+          id?: string
+          optimization_recommendations?: Json | null
+          potential_savings?: Json | null
+          recommended_actions?: Json | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_optimization_analysis_consultation_session_id_fkey"
+            columns: ["consultation_session_id"]
+            isOneToOne: false
+            referencedRelation: "ai_consultation_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loan_optimization_analysis_existing_loan_id_fkey"
+            columns: ["existing_loan_id"]
+            isOneToOne: false
+            referencedRelation: "existing_loans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
