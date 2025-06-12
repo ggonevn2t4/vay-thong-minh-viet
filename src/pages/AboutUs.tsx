@@ -84,7 +84,7 @@ const AboutUs = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-3xl font-bold text-gray-800 mb-6">Sứ mệnh của chúng tôi</h2>
-              <p className="text-lg text-gray-600 mb-8">Finzy được thành lập với sứ mệnh democratize việc tiếp cận các sản phẩm tài chính. Chúng tôi tin rằng mọi người đều có quyền được tiếp cận thông tin minh bạch về các khoản vay và nhận được tư vấn chuyên nghiệp để đưa ra quyết định tài chính đúng đắn.</p>
+              <p className="text-lg text-gray-600 mb-8">Finzy tin rằng mọi người đều có quyền được tiếp cận thông tin minh bạch về các khoản vay và nhận được tư vấn chuyên nghiệp để đưa ra quyết định tài chính đúng đắn.</p>
               <div className="bg-white rounded-lg shadow-lg p-8">
                 <h3 className="text-2xl font-semibold text-gray-800 mb-4">Tầm nhìn 2030</h3>
                 <p className="text-gray-600">
