@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -9,16 +8,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Mail, Phone, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
-
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Tên phải có ít nhất 2 ký tự" }),
-  email: z.string().email({ message: "Email không hợp lệ" }),
-  phone: z.string().min(10, { message: "Số điện thoại phải có ít nhất 10 chữ số" }),
-  message: z.string().min(10, { message: "Tin nhắn phải có ít nhất 10 ký tự" })
+  name: z.string().min(2, {
+    message: "Tên phải có ít nhất 2 ký tự"
+  }),
+  email: z.string().email({
+    message: "Email không hợp lệ"
+  }),
+  phone: z.string().min(10, {
+    message: "Số điện thoại phải có ít nhất 10 chữ số"
+  }),
+  message: z.string().min(10, {
+    message: "Tin nhắn phải có ít nhất 10 ký tự"
+  })
 });
-
 type FormValues = z.infer<typeof formSchema>;
-
 const ContactForm = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -29,15 +33,12 @@ const ContactForm = () => {
       message: ""
     }
   });
-
   const onSubmit = (data: FormValues) => {
     console.log(data);
     toast.success("Thông tin của bạn đã được gửi. Chúng tôi sẽ liên hệ sớm nhất có thể!");
     form.reset();
   };
-
-  return (
-    <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
+  return <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -57,7 +58,7 @@ const ContactForm = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-800 mb-1">Điện thoại</h3>
-                    <p className="text-gray-600">+84 (0) 123 456 789</p>
+                    <p className="text-gray-600">0765080960</p>
                   </div>
                 </div>
                 
@@ -67,7 +68,7 @@ const ContactForm = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-800 mb-1">Email</h3>
-                    <p className="text-gray-600">info@vaythongminh.vn</p>
+                    <p className="text-gray-600">Finzytechnology@gmail.com</p>
                   </div>
                 </div>
                 
@@ -88,65 +89,45 @@ const ContactForm = () => {
               
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="name" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>Họ và tên</FormLabel>
                         <FormControl>
                           <Input placeholder="Nhập họ tên của bạn" {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                   
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="email" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input placeholder="example@email.com" {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                   
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="phone" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>Số điện thoại</FormLabel>
                         <FormControl>
                           <Input placeholder="Nhập số điện thoại của bạn" {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                   
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="message" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>Tin nhắn</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="Mô tả nhu cầu vay vốn của bạn và thời gian phù hợp để được liên hệ" 
-                            className="min-h-[120px]"
-                            {...field} 
-                          />
+                          <Textarea placeholder="Mô tả nhu cầu vay vốn của bạn và thời gian phù hợp để được liên hệ" className="min-h-[120px]" {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                   
                   <Button type="submit" className="w-full bg-brand-600 hover:bg-brand-700 py-6">
                     Gửi yêu cầu tư vấn
@@ -157,8 +138,6 @@ const ContactForm = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default ContactForm;
