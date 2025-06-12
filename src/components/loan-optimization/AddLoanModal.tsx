@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -30,6 +31,10 @@ const AddLoanModal = ({ open, onClose, onLoanAdded }: AddLoanModalProps) => {
     monthly_payment: '',
     original_loan_date: '',
     loan_purpose: '',
+    has_promotional_period: false,
+    promotional_rate: '',
+    promotional_end_date: '',
+    post_promotional_rate: '',
   });
 
   const loanTypes = [
@@ -48,20 +53,29 @@ const AddLoanModal = ({ open, onClose, onLoanAdded }: AddLoanModalProps) => {
 
     setLoading(true);
     try {
+      const loanData: any = {
+        user_id: user.id,
+        bank_name: formData.bank_name,
+        loan_type: formData.loan_type,
+        current_amount: parseFloat(formData.current_amount),
+        remaining_amount: parseFloat(formData.remaining_amount),
+        current_interest_rate: parseFloat(formData.current_interest_rate),
+        remaining_term_months: parseInt(formData.remaining_term_months),
+        monthly_payment: parseFloat(formData.monthly_payment),
+        original_loan_date: formData.original_loan_date,
+        loan_purpose: formData.loan_purpose,
+        has_promotional_period: formData.has_promotional_period,
+      };
+
+      if (formData.has_promotional_period) {
+        loanData.promotional_rate = parseFloat(formData.promotional_rate);
+        loanData.promotional_end_date = formData.promotional_end_date;
+        loanData.post_promotional_rate = parseFloat(formData.post_promotional_rate);
+      }
+
       const { error } = await supabase
         .from('existing_loans')
-        .insert({
-          user_id: user.id,
-          bank_name: formData.bank_name,
-          loan_type: formData.loan_type,
-          current_amount: parseFloat(formData.current_amount),
-          remaining_amount: parseFloat(formData.remaining_amount),
-          current_interest_rate: parseFloat(formData.current_interest_rate),
-          remaining_term_months: parseInt(formData.remaining_term_months),
-          monthly_payment: parseFloat(formData.monthly_payment),
-          original_loan_date: formData.original_loan_date,
-          loan_purpose: formData.loan_purpose,
-        });
+        .insert(loanData);
 
       if (error) throw error;
 
@@ -81,6 +95,10 @@ const AddLoanModal = ({ open, onClose, onLoanAdded }: AddLoanModalProps) => {
         monthly_payment: '',
         original_loan_date: '',
         loan_purpose: '',
+        has_promotional_period: false,
+        promotional_rate: '',
+        promotional_end_date: '',
+        post_promotional_rate: '',
       });
 
       onLoanAdded();
@@ -97,7 +115,7 @@ const AddLoanModal = ({ open, onClose, onLoanAdded }: AddLoanModalProps) => {
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -214,6 +232,60 @@ const AddLoanModal = ({ open, onClose, onLoanAdded }: AddLoanModalProps) => {
               />
             </div>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="has_promotional_period"
+              checked={formData.has_promotional_period}
+              onCheckedChange={(checked) => handleInputChange('has_promotional_period', checked as boolean)}
+            />
+            <Label htmlFor="has_promotional_period">Khoản vay có giai đoạn ưu đãi</Label>
+          </div>
+
+          {formData.has_promotional_period && (
+            <div className="space-y-4 p-4 border rounded-lg bg-blue-50">
+              <h4 className="font-semibold text-blue-900">Thông tin giai đoạn ưu đãi</h4>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="promotional_rate">Lãi suất ưu đãi (%/năm) *</Label>
+                  <Input
+                    id="promotional_rate"
+                    type="number"
+                    step="0.01"
+                    value={formData.promotional_rate}
+                    onChange={(e) => handleInputChange('promotional_rate', e.target.value)}
+                    placeholder="8.5"
+                    required={formData.has_promotional_period}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="promotional_end_date">Ngày kết thúc ưu đãi *</Label>
+                  <Input
+                    id="promotional_end_date"
+                    type="date"
+                    value={formData.promotional_end_date}
+                    onChange={(e) => handleInputChange('promotional_end_date', e.target.value)}
+                    required={formData.has_promotional_period}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="post_promotional_rate">Lãi suất sau ưu đãi (%/năm) *</Label>
+                <Input
+                  id="post_promotional_rate"
+                  type="number"
+                  step="0.01"
+                  value={formData.post_promotional_rate}
+                  onChange={(e) => handleInputChange('post_promotional_rate', e.target.value)}
+                  placeholder="15.5"
+                  required={formData.has_promotional_period}
+                />
+              </div>
+            </div>
+          )}
 
           <div>
             <Label htmlFor="loan_purpose">Mục đích vay</Label>

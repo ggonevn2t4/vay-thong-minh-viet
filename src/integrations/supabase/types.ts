@@ -85,11 +85,15 @@ export type Database = {
           created_at: string
           current_amount: number
           current_interest_rate: number
+          has_promotional_period: boolean | null
           id: string
           loan_purpose: string | null
           loan_type: string
           monthly_payment: number
           original_loan_date: string | null
+          post_promotional_rate: number | null
+          promotional_end_date: string | null
+          promotional_rate: number | null
           remaining_amount: number
           remaining_term_months: number
           updated_at: string
@@ -101,11 +105,15 @@ export type Database = {
           created_at?: string
           current_amount: number
           current_interest_rate: number
+          has_promotional_period?: boolean | null
           id?: string
           loan_purpose?: string | null
           loan_type: string
           monthly_payment: number
           original_loan_date?: string | null
+          post_promotional_rate?: number | null
+          promotional_end_date?: string | null
+          promotional_rate?: number | null
           remaining_amount: number
           remaining_term_months: number
           updated_at?: string
@@ -117,11 +125,15 @@ export type Database = {
           created_at?: string
           current_amount?: number
           current_interest_rate?: number
+          has_promotional_period?: boolean | null
           id?: string
           loan_purpose?: string | null
           loan_type?: string
           monthly_payment?: number
           original_loan_date?: string | null
+          post_promotional_rate?: number | null
+          promotional_end_date?: string | null
+          promotional_rate?: number | null
           remaining_amount?: number
           remaining_term_months?: number
           updated_at?: string
@@ -461,12 +473,77 @@ export type Database = {
         }
         Relationships: []
       }
+      promotional_loan_alerts: {
+        Row: {
+          alert_data: Json | null
+          alert_type: string
+          created_at: string
+          current_monthly_payment: number | null
+          days_until_change: number | null
+          existing_loan_id: string
+          future_monthly_payment: number | null
+          id: string
+          is_active: boolean | null
+          is_read: boolean | null
+          monthly_increase: number | null
+          read_at: string | null
+          total_cost_increase: number | null
+          triggered_at: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_data?: Json | null
+          alert_type: string
+          created_at?: string
+          current_monthly_payment?: number | null
+          days_until_change?: number | null
+          existing_loan_id: string
+          future_monthly_payment?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_read?: boolean | null
+          monthly_increase?: number | null
+          read_at?: string | null
+          total_cost_increase?: number | null
+          triggered_at?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_data?: Json | null
+          alert_type?: string
+          created_at?: string
+          current_monthly_payment?: number | null
+          days_until_change?: number | null
+          existing_loan_id?: string
+          future_monthly_payment?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_read?: boolean | null
+          monthly_increase?: number | null
+          read_at?: string | null
+          total_cost_increase?: number | null
+          triggered_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotional_loan_alerts_existing_loan_id_fkey"
+            columns: ["existing_loan_id"]
+            isOneToOne: false
+            referencedRelation: "existing_loans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_promotional_cost_increase: {
+        Args: { loan_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       employment_type:

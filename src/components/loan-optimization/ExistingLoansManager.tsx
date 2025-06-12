@@ -3,12 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Building, Calendar, DollarSign } from 'lucide-react';
+import { Plus, Edit, Trash2, Building, Calendar, DollarSign, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { formatCurrency } from '@/lib/utils';
 import AddLoanModal from './AddLoanModal';
+import PromotionalCostAlert from './PromotionalCostAlert';
 
 interface ExistingLoan {
   id: string;
@@ -21,6 +22,10 @@ interface ExistingLoan {
   monthly_payment: number;
   original_loan_date: string;
   loan_purpose: string;
+  has_promotional_period: boolean;
+  promotional_rate?: number;
+  promotional_end_date?: string;
+  post_promotional_rate?: number;
   created_at: string;
 }
 
@@ -82,6 +87,16 @@ const ExistingLoansManager = () => {
     }
   };
 
+  const isPromotionalPeriodEnding = (loan: ExistingLoan) => {
+    if (!loan.has_promotional_period || !loan.promotional_end_date) return false;
+    
+    const endDate = new Date(loan.promotional_end_date);
+    const today = new Date();
+    const daysLeft = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    return daysLeft <= 30 && daysLeft > 0;
+  };
+
   if (!user) {
     return (
       <Card>
@@ -139,9 +154,22 @@ const ExistingLoansManager = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-lg">{loan.bank_name}</CardTitle>
-                    <Badge variant="secondary" className="mt-1">
-                      {loan.loan_type}
-                    </Badge>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      <Badge variant="secondary">
+                        {loan.loan_type}
+                      </Badge>
+                      {loan.has_promotional_period && (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                          Ưu đãi
+                        </Badge>
+                      )}
+                      {isPromotionalPeriodEnding(loan) && (
+                        <Badge variant="destructive" className="bg-orange-100 text-orange-800">
+                          <AlertTriangle className="h-3 w-3 mr-1" />
+                          Sắp hết ưu đãi
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm">
@@ -167,7 +195,11 @@ const ExistingLoansManager = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Lãi suất:</span>
-                    <span className="font-semibold">{loan.current_interest_rate}%/năm</span>
+                    <span className="font-semibold">
+                      {loan.has_promotional_period && loan.promotional_rate ? 
+                        `${loan.promotional_rate}%` : 
+                        `${loan.current_interest_rate}%`}/năm
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Trả hàng tháng:</span>
@@ -180,6 +212,10 @@ const ExistingLoansManager = () => {
                     <span className="font-semibold">{loan.remaining_term_months} tháng</span>
                   </div>
                 </div>
+
+                {loan.has_promotional_period && loan.promotional_end_date && (
+                  <PromotionalCostAlert loan={loan} />
+                )}
 
                 {loan.loan_purpose && (
                   <div>
