@@ -15,6 +15,7 @@ interface ExistingLoan {
   promotional_end_date?: string;
   post_promotional_rate?: number;
   remaining_term_months: number;
+  has_promotional_period?: boolean;
 }
 
 interface PromotionalCostAlertProps {
@@ -37,6 +38,8 @@ const PromotionalCostAlert = ({ loan }: PromotionalCostAlertProps) => {
   useEffect(() => {
     if (loan.has_promotional_period) {
       calculatePromotionalCosts();
+    } else {
+      setLoading(false);
     }
   }, [loan.id]);
 
@@ -47,8 +50,14 @@ const PromotionalCostAlert = ({ loan }: PromotionalCostAlertProps) => {
 
       if (error) throw error;
       
-      if (data && !data.error) {
-        setCostData(data);
+      // Handle the response properly - check if it's an error response
+      if (data && typeof data === 'object' && 'error' in data) {
+        console.log('No promotional data available:', data.error);
+        setCostData(null);
+      } else if (data && typeof data === 'object') {
+        // Type assertion since we know the structure from our function
+        const calculationData = data as CostCalculation;
+        setCostData(calculationData);
       }
     } catch (error) {
       console.error('Error calculating promotional costs:', error);
