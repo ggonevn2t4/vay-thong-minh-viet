@@ -8,14 +8,16 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <Link to="/" className="flex items-center space-x-2 mb-4">
-              <div className="bg-brand-600 text-white font-bold p-2 rounded-lg">
-                <span className="text-xl">VTM</span>
-              </div>
-              <span className="text-xl font-semibold text-gray-900">VayThôngMinh</span>
+            <Link to="/" className="flex items-center space-x-3 mb-4">
+              <img 
+                src="/lovable-uploads/92277533-8a64-40f2-b441-187e4701f7b1.png" 
+                alt="Finzy Logo" 
+                className="h-10 w-auto"
+              />
+              <span className="text-xl font-semibold text-gray-900">Finzy</span>
             </Link>
             <p className="text-sm text-gray-600 mb-4">
-              Giúp bạn tìm kiếm và so sánh các khoản vay phù hợp nhất từ các ngân hàng hàng đầu Việt Nam.
+              Tài chính đơn giản, kết nối an toàn. Giúp bạn tìm kiếm và so sánh các khoản vay phù hợp nhất từ các ngân hàng hàng đầu Việt Nam.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-500 hover:text-brand-600">
@@ -89,13 +91,13 @@ const Footer = () => {
             <h3 className="text-sm font-semibold text-gray-900 mb-4">Liên hệ</h3>
             <ul className="space-y-2">
               <li className="text-sm text-gray-600">
-                <span className="font-medium">Email:</span> info@vaythongminh.vn
+                <span className="font-medium">Email:</span> Finzytechnology@gmail.com
               </li>
               <li className="text-sm text-gray-600">
-                <span className="font-medium">Điện thoại:</span> 1900 1234
+                <span className="font-medium">Điện thoại:</span> 0765080960
               </li>
               <li className="text-sm text-gray-600">
-                <span className="font-medium">Địa chỉ:</span> Tòa nhà Landmark 81, Quận Bình Thạnh, TP. Hồ Chí Minh
+                <span className="font-medium">Địa chỉ:</span> 13A4/3A KV5, Phường An Bình, Quận Ninh Kiều, TP. Cần Thơ
               </li>
               <li className="text-sm text-gray-600">
                 <span className="font-medium">Giờ làm việc:</span> 8:00 - 17:30, Thứ 2 - Thứ 6
@@ -106,7 +108,7 @@ const Footer = () => {
         
         <div className="mt-8 pt-6 border-t border-gray-200">
           <p className="text-sm text-gray-600 text-center">
-            © {new Date().getFullYear()} VayThôngMinh. Tất cả các quyền được bảo lưu.
+            © {new Date().getFullYear()} Finzy. Tất cả các quyền được bảo lưu.
           </p>
         </div>
       </div>
