@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ArrowDown } from 'lucide-react';
@@ -21,11 +20,6 @@ const HeroSection = () => {
                 <Button className="bg-white text-brand-600 hover:bg-brand-50 text-lg py-6 px-8 rounded-full shadow-lg hover:shadow-xl transition-all font-semibold">
                   Bắt đầu ngay
                   <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              <Link to="/gioi-thieu">
-                <Button variant="outline" className="border-white text-white hover:bg-white/10 text-lg py-6 px-8 rounded-full transition-all">
-                  Tìm hiểu thêm
                 </Button>
               </Link>
             </div>
