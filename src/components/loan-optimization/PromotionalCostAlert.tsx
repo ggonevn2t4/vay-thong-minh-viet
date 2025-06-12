@@ -51,13 +51,35 @@ const PromotionalCostAlert = ({ loan }: PromotionalCostAlertProps) => {
       if (error) throw error;
       
       // Handle the response properly - check if it's an error response
-      if (data && typeof data === 'object' && 'error' in data) {
+      if (data && typeof data === 'object' && !Array.isArray(data) && 'error' in data) {
         console.log('No promotional data available:', data.error);
         setCostData(null);
-      } else if (data && typeof data === 'object') {
-        // Type assertion since we know the structure from our function
-        const calculationData = data as CostCalculation;
-        setCostData(calculationData);
+      } else if (data && typeof data === 'object' && !Array.isArray(data)) {
+        // Safely convert the data by checking required properties
+        const responseData = data as Record<string, any>;
+        if (
+          typeof responseData.days_remaining === 'number' &&
+          typeof responseData.current_rate === 'number' &&
+          typeof responseData.future_rate === 'number' &&
+          typeof responseData.monthly_increase === 'number' &&
+          typeof responseData.total_increase === 'number' &&
+          typeof responseData.promotional_end_date === 'string'
+        ) {
+          const calculationData: CostCalculation = {
+            days_remaining: responseData.days_remaining,
+            current_rate: responseData.current_rate,
+            future_rate: responseData.future_rate,
+            monthly_increase: responseData.monthly_increase,
+            total_increase: responseData.total_increase,
+            promotional_end_date: responseData.promotional_end_date
+          };
+          setCostData(calculationData);
+        } else {
+          console.log('Invalid data structure received from promotional cost calculation');
+          setCostData(null);
+        }
+      } else {
+        setCostData(null);
       }
     } catch (error) {
       console.error('Error calculating promotional costs:', error);
