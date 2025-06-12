@@ -1,20 +1,13 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-
 const Footer = () => {
-  return (
-    <footer className="bg-gray-50 border-t border-gray-200 pt-10 pb-6">
+  return <footer className="bg-gray-50 border-t border-gray-200 pt-10 pb-6">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <Link to="/" className="flex items-center space-x-3 mb-4">
-              <img 
-                src="/lovable-uploads/92277533-8a64-40f2-b441-187e4701f7b1.png" 
-                alt="Finzy Logo" 
-                className="h-10 w-auto"
-              />
-              <span className="text-xl font-semibold text-gray-900">Finzy</span>
+              <img src="/lovable-uploads/92277533-8a64-40f2-b441-187e4701f7b1.png" alt="Finzy Logo" className="h-10 w-auto" />
+              <span className="text-xl font-semibold text-gray-900"></span>
             </Link>
             <p className="text-sm text-gray-600 mb-4">
               Tài chính đơn giản, kết nối an toàn. Giúp bạn tìm kiếm và so sánh các khoản vay phù hợp nhất từ các ngân hàng hàng đầu Việt Nam.
@@ -112,8 +105,6 @@ const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
