@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -35,7 +34,13 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            {/* Vietnamese routes */}
             <Route path="/kiem-tra-dieu-kien" element={<LoanEligibility />} />
+            <Route path="/ho-so-tai-lieu" element={<DocumentChecklistPage />} />
+            {/* English routes for backward compatibility */}
+            <Route path="/loan-eligibility" element={<LoanEligibility />} />
+            <Route path="/document-checklist" element={<DocumentChecklistPage />} />
+            {/* Other routes */}
             <Route path="/so-sanh" element={<SoSanh />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/dashboard" element={<UserDashboard />} />
@@ -48,7 +53,6 @@ const App = () => (
             <Route path="/gioi-thieu" element={<AboutUs />} />
             <Route path="/so-sanh-vay" element={<LoanComparison />} />
             <Route path="/tu-van-ai" element={<AIAdvisory />} />
-            <Route path="/ho-so-tai-lieu" element={<DocumentChecklistPage />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/toi-uu-hoa-vay" element={<LoanOptimization />} />
             <Route path="*" element={<NotFound />} />
