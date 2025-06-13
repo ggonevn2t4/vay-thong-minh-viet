@@ -33,30 +33,49 @@ const LoanEligibility = () => {
           </div>
           
           <Tabs defaultValue="eligibility" className="max-w-6xl mx-auto">
-            <TabsList className="grid w-full grid-cols-6 mb-8">
-              <TabsTrigger value="eligibility" className="flex items-center text-xs">
-                <Calculator className="mr-1 h-4 w-4" />
-                Đánh giá khả năng
+            {/* Mobile-friendly tab layout */}
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 mb-8 h-auto gap-1 bg-white p-1 rounded-lg shadow-sm">
+              <TabsTrigger 
+                value="eligibility" 
+                className="flex flex-col items-center text-xs p-2 h-auto gap-1 data-[state=active]:bg-brand-100"
+              >
+                <Calculator className="h-4 w-4 flex-shrink-0" />
+                <span className="text-center leading-tight">Đánh giá khả năng</span>
               </TabsTrigger>
-              <TabsTrigger value="optimizer" className="flex items-center text-xs">
-                <TrendingUp className="mr-1 h-4 w-4" />
-                Tối ưu hồ sơ
+              <TabsTrigger 
+                value="optimizer" 
+                className="flex flex-col items-center text-xs p-2 h-auto gap-1 data-[state=active]:bg-brand-100"
+              >
+                <TrendingUp className="h-4 w-4 flex-shrink-0" />
+                <span className="text-center leading-tight">Tối ưu hồ sơ</span>
               </TabsTrigger>
-              <TabsTrigger value="negotiator" className="flex items-center text-xs">
-                <Target className="mr-1 h-4 w-4" />
-                Đàm phán lãi suất
+              <TabsTrigger 
+                value="negotiator" 
+                className="flex flex-col items-center text-xs p-2 h-auto gap-1 data-[state=active]:bg-brand-100"
+              >
+                <Target className="h-4 w-4 flex-shrink-0" />
+                <span className="text-center leading-tight">Đàm phán lãi suất</span>
               </TabsTrigger>
-              <TabsTrigger value="tracker" className="flex items-center text-xs">
-                <BarChart className="mr-1 h-4 w-4" />
-                Theo dõi vay
+              <TabsTrigger 
+                value="tracker" 
+                className="flex flex-col items-center text-xs p-2 h-auto gap-1 data-[state=active]:bg-brand-100"
+              >
+                <BarChart className="h-4 w-4 flex-shrink-0" />
+                <span className="text-center leading-tight">Theo dõi vay</span>
               </TabsTrigger>
-              <TabsTrigger value="consultant" className="flex items-center text-xs">
-                <User className="mr-1 h-4 w-4" />
-                Tư vấn chuyên sâu
+              <TabsTrigger 
+                value="consultant" 
+                className="flex flex-col items-center text-xs p-2 h-auto gap-1 data-[state=active]:bg-brand-100"
+              >
+                <User className="h-4 w-4 flex-shrink-0" />
+                <span className="text-center leading-tight">Tư vấn chuyên sâu</span>
               </TabsTrigger>
-              <TabsTrigger value="feedback" className="flex items-center text-xs">
-                <MessageSquare className="mr-1 h-4 w-4" />
-                Góp ý
+              <TabsTrigger 
+                value="feedback" 
+                className="flex flex-col items-center text-xs p-2 h-auto gap-1 data-[state=active]:bg-brand-100"
+              >
+                <MessageSquare className="h-4 w-4 flex-shrink-0" />
+                <span className="text-center leading-tight">Góp ý</span>
               </TabsTrigger>
             </TabsList>
             
