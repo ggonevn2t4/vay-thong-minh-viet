@@ -3,9 +3,12 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
+type UserRole = 'admin' | 'advisor' | 'customer' | null;
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
+  userRole: UserRole;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -27,7 +30,29 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [userRole, setUserRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user role:', error);
+        setUserRole('customer'); // Default to customer if role fetch fails
+        return;
+      }
+
+      setUserRole(data?.role || 'customer');
+    } catch (error) {
+      console.error('Error in fetchUserRole:', error);
+      setUserRole('customer');
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener
@@ -35,6 +60,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Defer role fetching to prevent deadlocks
+          setTimeout(() => {
+            fetchUserRole(session.user.id);
+          }, 0);
+        } else {
+          setUserRole(null);
+        }
+        
         setLoading(false);
       }
     );
@@ -43,6 +78,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        setTimeout(() => {
+          fetchUserRole(session.user.id);
+        }, 0);
+      } else {
+        setUserRole(null);
+      }
+      
       setLoading(false);
     });
 
@@ -51,11 +95,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setUserRole(null);
   };
 
   const value = {
     user,
     session,
+    userRole,
     loading,
     signOut
   };

@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
-  const { user, loading } = useAuth();
+  const { user, userRole, loading } = useAuth();
   
   // If auth is still loading, show enhanced loading state
   if (loading) {
@@ -23,18 +23,12 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   }
   
   // Check role-based access if requiredRole is specified
-  if (requiredRole) {
-    // For now, we'll default to customer role until we implement role management
-    // This will be updated when we add the user roles system
-    const userRole: 'admin' | 'advisor' | 'customer' = 'customer' as 'admin' | 'advisor' | 'customer';
-    
-    if (userRole !== requiredRole) {
-      // Redirect to appropriate dashboard based on user's actual role
-      const redirectPath = userRole === 'admin' ? '/admin-dashboard' : 
-                          userRole === 'advisor' ? '/advisor-dashboard' : 
-                          '/dashboard';
-      return <Navigate to={redirectPath} replace />;
-    }
+  if (requiredRole && userRole !== requiredRole) {
+    // Redirect to appropriate dashboard based on user's actual role
+    const redirectPath = userRole === 'admin' ? '/admin' : 
+                        userRole === 'advisor' ? '/advisor' : 
+                        '/dashboard';
+    return <Navigate to={redirectPath} replace />;
   }
   
   // User is authenticated and has required role, render the protected content

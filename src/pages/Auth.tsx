@@ -10,10 +10,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
+import RoleSelector from '@/components/auth/RoleSelector';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<'customer' | 'advisor'>('customer');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -41,7 +43,8 @@ const Auth = () => {
         options: {
           emailRedirectTo: redirectUrl,
           data: {
-            full_name: formData.fullName
+            full_name: formData.fullName,
+            role: selectedRole
           }
         }
       });
@@ -70,7 +73,22 @@ const Auth = () => {
 
       if (data.user) {
         toast.success('Đăng nhập thành công!');
-        navigate('/');
+        
+        // Get user role to redirect appropriately
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .single();
+
+        // Redirect based on role
+        if (roleData?.role === 'admin') {
+          navigate('/admin');
+        } else if (roleData?.role === 'advisor') {
+          navigate('/advisor');
+        } else {
+          navigate('/');
+        }
       }
     } catch (error: any) {
       toast.error(error.message || 'Đã xảy ra lỗi khi đăng nhập');
@@ -162,6 +180,11 @@ const Auth = () => {
 
                 <TabsContent value="signup" className="space-y-4">
                   <form onSubmit={handleSignUp} className="space-y-4">
+                    <RoleSelector 
+                      selectedRole={selectedRole}
+                      onRoleChange={setSelectedRole}
+                    />
+                    
                     <div className="space-y-2">
                       <Label htmlFor="signup-name">Họ và tên</Label>
                       <Input
@@ -224,7 +247,7 @@ const Auth = () => {
                           Đang tạo tài khoản...
                         </>
                       ) : (
-                        'Tạo tài khoản'
+                        `Tạo tài khoản ${selectedRole === 'advisor' ? 'Tư vấn viên' : 'Khách hàng'}`
                       )}
                     </Button>
                   </form>

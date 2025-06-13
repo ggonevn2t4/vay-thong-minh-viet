@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import UserDashboardHeader from '@/components/dashboard/UserDashboardHeader';
 import UserDashboardTabs from '@/components/dashboard/UserDashboardTabs';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 interface LoanApplication {
   id: string;
@@ -81,18 +82,20 @@ const UserDashboard = () => {
   };
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <UserDashboardHeader />
-        <UserDashboardTabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          applications={applications}
-          getStatusColor={getStatusColor}
-          getStatusText={getStatusText}
-        />
-      </div>
-    </Layout>
+    <ProtectedRoute requiredRole="customer">
+      <Layout>
+        <div className="container mx-auto px-4 py-8">
+          <UserDashboardHeader />
+          <UserDashboardTabs
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            applications={applications}
+            getStatusColor={getStatusColor}
+            getStatusText={getStatusText}
+          />
+        </div>
+      </Layout>
+    </ProtectedRoute>
   );
 };
 
