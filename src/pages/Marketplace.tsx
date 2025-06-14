@@ -54,8 +54,10 @@ interface BankOffer {
 }
 
 const Marketplace = () => {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const isSignedIn = !!user;
+  const canCreateLoanRequest = isSignedIn && userRole === 'customer';
+  
   const [activeTab, setActiveTab] = useState('requests');
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('all');
@@ -271,7 +273,7 @@ const Marketplace = () => {
                 </div>
               </div>
 
-              {isSignedIn && (
+              {canCreateLoanRequest && (
                 <div className="mt-8">
                   <Button
                     onClick={() => setIsCreateModalOpen(true)}
@@ -372,7 +374,7 @@ const Marketplace = () => {
                   <p className="text-gray-500 mb-4">
                     Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
                   </p>
-                  {isSignedIn && (
+                  {canCreateLoanRequest && (
                     <Button 
                       onClick={() => setIsCreateModalOpen(true)}
                       className="bg-brand-600 hover:bg-brand-700"
@@ -407,14 +409,16 @@ const Marketplace = () => {
             </TabsContent>
           </Tabs>
 
-          <CreateLoanRequestModal
-            isOpen={isCreateModalOpen}
-            onClose={() => setIsCreateModalOpen(false)}
-            onSubmit={(newRequest) => {
-              setLoanRequests(prev => [newRequest, ...prev]);
-              setIsCreateModalOpen(false);
-            }}
-          />
+          {canCreateLoanRequest && (
+            <CreateLoanRequestModal
+              isOpen={isCreateModalOpen}
+              onClose={() => setIsCreateModalOpen(false)}
+              onSubmit={(newRequest) => {
+                setLoanRequests(prev => [newRequest, ...prev]);
+                setIsCreateModalOpen(false);
+              }}
+            />
+          )}
         </div>
       </div>
     </Layout>
