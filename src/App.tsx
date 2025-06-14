@@ -1,66 +1,73 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { ClerkProvider } from '@clerk/clerk-react';
+import { AuthProvider } from '@/contexts/AuthContext';
 import Index from "./pages/Index";
-import LoanEligibility from "./pages/LoanEligibility";
-import SoSanh from "./pages/SoSanh";
-import Marketplace from "./pages/Marketplace";
+import Auth from "./pages/Auth";
 import UserDashboard from "./pages/UserDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
 import AdvisorDashboard from "./pages/AdvisorDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import Marketplace from "./pages/Marketplace";
+import AdvisorDirectoryPage from "./pages/AdvisorDirectory";
 import Messages from "./pages/Messages";
+import LoanComparison from "./pages/LoanComparison";
+import LoanOptimization from "./pages/LoanOptimization";
+import LoanEligibility from "./pages/LoanEligibility";
+import AIAdvisory from "./pages/AIAdvisory";
+import AboutUs from "./pages/AboutUs";
+import FAQ from "./pages/FAQ";
+import NotFound from "./pages/NotFound";
+import DocumentChecklistPage from "./pages/DocumentChecklistPage";
 import KhaoSat from "./pages/KhaoSat";
 import KetQua from "./pages/KetQua";
-import NotFound from "./pages/NotFound";
-import FAQ from "./pages/FAQ";
-import AboutUs from "./pages/AboutUs";
-import LoanComparison from "./pages/LoanComparison";
-import AIAdvisory from "./pages/AIAdvisory";
-import DocumentChecklistPage from "./pages/DocumentChecklistPage";
-import Auth from "./pages/Auth";
-import LoanOptimization from "./pages/LoanOptimization";
+import SoSanh from "./pages/SoSanh";
 
 const queryClient = new QueryClient();
 
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing Publishable Key");
+}
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            {/* Vietnamese routes */}
-            <Route path="/kiem-tra-dieu-kien" element={<LoanEligibility />} />
-            <Route path="/ho-so-tai-lieu" element={<DocumentChecklistPage />} />
-            {/* English routes for backward compatibility */}
-            <Route path="/loan-eligibility" element={<LoanEligibility />} />
-            <Route path="/document-checklist" element={<DocumentChecklistPage />} />
-            {/* Other routes */}
-            <Route path="/so-sanh" element={<SoSanh />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/dashboard" element={<UserDashboard />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/advisor" element={<AdvisorDashboard />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/khao-sat" element={<KhaoSat />} />
-            <Route path="/ket-qua" element={<KetQua />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/gioi-thieu" element={<AboutUs />} />
-            <Route path="/so-sanh-vay" element={<LoanComparison />} />
-            <Route path="/tu-van-ai" element={<AIAdvisory />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/toi-uu-hoa-vay" element={<LoanOptimization />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/user-dashboard" element={<UserDashboard />} />
+              <Route path="/advisor-dashboard" element={<AdvisorDashboard />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/advisor-directory" element={<AdvisorDirectoryPage />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/loan-comparison" element={<LoanComparison />} />
+              <Route path="/loan-optimization" element={<LoanOptimization />} />
+              <Route path="/loan-eligibility" element={<LoanEligibility />} />
+              <Route path="/ai-advisory" element={<AIAdvisory />} />
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/document-checklist" element={<DocumentChecklistPage />} />
+              <Route path="/khao-sat" element={<KhaoSat />} />
+              <Route path="/ket-qua" element={<KetQua />} />
+              <Route path="/so-sanh" element={<SoSanh />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
     </AuthProvider>
-  </QueryClientProvider>
+  </ClerkProvider>
 );
 
 export default App;
