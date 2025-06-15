@@ -4,14 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import type { Notification } from '@/types/notification';
 import * as notificationService from '@/services/notificationService';
-import { useNotificationSubscription } from './useNotificationSubscription';
 
 export const useNotifications = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   
-  useNotificationSubscription();
-
   const queryKey = ['notifications', user?.id];
 
   const { data: notifications = [], isLoading } = useQuery<Notification[], Error>({

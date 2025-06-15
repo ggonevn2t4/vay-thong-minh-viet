@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -124,7 +123,7 @@ const NotificationSystem = () => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  onClick={markAllAsRead}
+                  onClick={() => markAllAsRead()}
                   className="text-blue-600 hover:text-blue-800"
                 >
                   Đánh dấu đã đọc

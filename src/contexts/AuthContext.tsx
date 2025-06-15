@@ -3,6 +3,10 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { robustSignOut } from '@/utils/authUtils';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { handleRealtimeInsert, handleRealtimeUpdate } from '@/utils/notificationUtils';
+import type { Notification } from '@/types/notification';
 
 type UserRole = 'admin' | 'advisor' | 'customer' | 'bank_employee' | null;
 
@@ -37,6 +41,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
   const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+  const queryClient = useQueryClient();
 
   const fetchUserRole = async (userId: string) => {
     try {
@@ -104,6 +109,70 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => subscription.unsubscribe();
   }, [isPasswordRecovery]);
 
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const queryKey = ['notifications', user.id];
+
+    const handleInsert = (payload: any) => {
+      handleRealtimeInsert(payload, (updater) => {
+        queryClient.setQueryData<Notification[]>(queryKey, (oldData) => {
+            if (typeof updater === 'function') {
+                return updater(oldData || []);
+            }
+            return oldData;
+        });
+      });
+    };
+
+    const handleUpdate = (payload: any) => {
+      handleRealtimeUpdate(payload, (updater) => {
+        queryClient.setQueryData<Notification[]>(queryKey, (oldData) => {
+            if (typeof updater === 'function') {
+                return updater(oldData || []);
+            }
+            return oldData;
+        });
+      });
+    };
+    
+    const channelName = `notifications-user-${user.id}`;
+    const channel = supabase.channel(channelName);
+
+    // This is to prevent re-subscribing on fast re-renders.
+    if (channel.state === 'joined' || channel.state === 'joining') {
+      return;
+    }
+
+    channel
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+        handleInsert
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+        handleUpdate
+      )
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
+          console.log(`Successfully subscribed to notifications channel: ${channelName}`);
+        } else if (status === 'CHANNEL_ERROR' || err) {
+          console.error('Notifications subscription error:', err);
+          toast.error('Lỗi kết nối thời gian thực cho thông báo.');
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel).then(status => {
+        console.log(`Unsubscribed from notifications channel: ${channelName}`, status);
+      });
+    };
+  }, [user, queryClient]);
+
   const signOut = async () => {
     await robustSignOut();
   };
@@ -129,4 +198,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     </AuthContext.Provider>
   );
 };
-
