@@ -1,50 +1,10 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  timestamp: Date;
-  read: boolean;
-  userId: string;
-  actionUrl?: string;
-  data?: Record<string, any>;
-}
-
-const formatNotification = (notification: any): Notification => ({
-  id: notification.id,
-  title: notification.title,
-  message: notification.message,
-  type: notification.type as 'info' | 'success' | 'warning' | 'error',
-  timestamp: new Date(notification.created_at),
-  read: notification.read,
-  userId: notification.user_id,
-  actionUrl: notification.action_url,
-  data: notification.data && typeof notification.data === 'object' && !Array.isArray(notification.data) 
-    ? notification.data as Record<string, any> 
-    : {}
-});
-
-const handleRealtimeInsert = (payload: any, setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>) => {
-  const newNotification = formatNotification(payload.new);
-  setNotifications(prev => [newNotification, ...prev]);
-  toast[newNotification.type](newNotification.title, {
-    description: newNotification.message,
-  });
-};
-
-const handleRealtimeUpdate = (payload: any, setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>) => {
-  const updatedNotification = formatNotification(payload.new);
-  setNotifications(prev =>
-    prev.map(notification =>
-      notification.id === updatedNotification.id ? updatedNotification : notification
-    )
-  );
-};
+import { Notification } from '@/types/notification';
+import { formatNotification, handleRealtimeInsert, handleRealtimeUpdate } from '@/utils/notificationUtils';
 
 export const useNotifications = () => {
   const { user } = useAuth();
@@ -65,19 +25,7 @@ export const useNotifications = () => {
 
       if (error) throw error;
 
-      const formattedNotifications: Notification[] = data.map(notification => ({
-        id: notification.id,
-        title: notification.title,
-        message: notification.message,
-        type: notification.type as 'info' | 'success' | 'warning' | 'error',
-        timestamp: new Date(notification.created_at),
-        read: notification.read,
-        userId: notification.user_id,
-        actionUrl: notification.action_url,
-        data: notification.data && typeof notification.data === 'object' && !Array.isArray(notification.data) 
-          ? notification.data as Record<string, any> 
-          : {}
-      }));
+      const formattedNotifications: Notification[] = data.map(formatNotification);
 
       setNotifications(formattedNotifications);
     } catch (error) {
