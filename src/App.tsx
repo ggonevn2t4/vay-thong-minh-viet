@@ -26,6 +26,11 @@ import DocumentChecklistPage from "./pages/DocumentChecklistPage";
 import KhaoSat from "./pages/KhaoSat";
 import KetQua from "./pages/KetQua";
 import SoSanh from "./pages/SoSanh";
+import Settings from "./pages/Settings";
+import KnowledgeManagement from "./pages/KnowledgeManagement";
+import UserManagement from "./pages/UserManagement";
+import SystemAnalytics from "./pages/SystemAnalytics";
+import RoleBasedDashboard from "@/components/dashboard/RoleBasedDashboard";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +44,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={<RoleBasedDashboard />} />
             <Route path="/user-dashboard" element={<UserDashboard />} />
             <Route path="/advisor-dashboard" element={<AdvisorDashboard />} />
             <Route path="/advisor-profile" element={<AdvisorProfile />} />
@@ -57,6 +63,10 @@ const App = () => (
             <Route path="/khao-sat" element={<KhaoSat />} />
             <Route path="/ket-qua" element={<KetQua />} />
             <Route path="/so-sanh" element={<SoSanh />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/knowledge-management" element={<KnowledgeManagement />} />
+            <Route path="/user-management" element={<UserManagement />} />
+            <Route path="/system-analytics" element={<SystemAnalytics />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
