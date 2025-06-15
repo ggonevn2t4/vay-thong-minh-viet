@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +10,7 @@ import { toast } from 'sonner';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import RoleSelector from '@/components/auth/RoleSelector';
+import { cleanupAuthState } from '@/utils/authUtils';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -64,6 +64,11 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
+      // Clean up any lingering auth state before attempting to sign in.
+      cleanupAuthState();
+      // Also attempt a global sign out to clear any server-side sessions.
+      await supabase.auth.signOut({ scope: 'global' });
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
@@ -74,24 +79,14 @@ const Auth = () => {
       if (data.user) {
         toast.success('Đăng nhập thành công!');
         
-        // Get user role to redirect appropriately
-        const { data: roleData } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', data.user.id)
-          .single();
-
-        // Redirect based on role
-        if (roleData?.role === 'admin') {
-          navigate('/admin');
-        } else if (roleData?.role === 'advisor') {
-          navigate('/advisor');
-        } else {
-          navigate('/');
-        }
+        // Force a full page reload to the dashboard.
+        // This ensures a clean state and lets the RoleBasedDashboard handle redirection.
+        window.location.href = '/dashboard';
       }
     } catch (error: any) {
-      toast.error(error.message || 'Đã xảy ra lỗi khi đăng nhập');
+      // Display a more generic error message for security.
+      toast.error('Email hoặc mật khẩu không đúng. Vui lòng thử lại.');
+      console.error('Sign in error:', error);
     } finally {
       setIsLoading(false);
     }

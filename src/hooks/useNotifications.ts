@@ -15,12 +15,42 @@ export interface Notification {
   data?: Record<string, any>;
 }
 
+const formatNotification = (notification: any): Notification => ({
+  id: notification.id,
+  title: notification.title,
+  message: notification.message,
+  type: notification.type as 'info' | 'success' | 'warning' | 'error',
+  timestamp: new Date(notification.created_at),
+  read: notification.read,
+  userId: notification.user_id,
+  actionUrl: notification.action_url,
+  data: notification.data && typeof notification.data === 'object' && !Array.isArray(notification.data) 
+    ? notification.data as Record<string, any> 
+    : {}
+});
+
+const handleRealtimeInsert = (payload: any, setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>) => {
+  const newNotification = formatNotification(payload.new);
+  setNotifications(prev => [newNotification, ...prev]);
+  toast[newNotification.type](newNotification.title, {
+    description: newNotification.message,
+  });
+};
+
+const handleRealtimeUpdate = (payload: any, setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>) => {
+  const updatedNotification = formatNotification(payload.new);
+  setNotifications(prev =>
+    prev.map(notification =>
+      notification.id === updatedNotification.id ? updatedNotification : notification
+    )
+  );
+};
+
 export const useNotifications = () => {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const channelRef = useRef<any>(null);
-  const isSubscribedRef = useRef(false);
 
   const loadNotifications = async () => {
     if (!user) return;
@@ -156,97 +186,53 @@ export const useNotifications = () => {
 
   // Set up real-time subscription for notifications
   useEffect(() => {
-    if (!user || isSubscribedRef.current) return;
+    if (!user) {
+      return;
+    }
 
-    const setupSubscription = async () => {
-      // Clean up existing channel if it exists
-      if (channelRef.current) {
-        try {
-          await supabase.removeChannel(channelRef.current);
-        } catch (error) {
-          console.log('Error removing existing channel:', error);
-        }
-        channelRef.current = null;
-        isSubscribedRef.current = false;
-      }
+    // Use a consistent channel name for the user
+    const channelName = `notifications-user-${user.id}`;
+    const channel = supabase.channel(channelName);
 
-      // Create new channel with unique name
-      const channelName = `notifications-${user.id}-${Date.now()}`;
-      console.log('Creating notifications channel:', channelName);
-      
-      channelRef.current = supabase
-        .channel(channelName)
-        .on('postgres_changes', {
+    channel
+      .on(
+        'postgres_changes',
+        {
           event: 'INSERT',
           schema: 'public',
           table: 'notifications',
-          filter: `user_id=eq.${user.id}`
-        }, (payload) => {
-          const newNotification = payload.new as any;
-          const formattedNotification: Notification = {
-            id: newNotification.id,
-            title: newNotification.title,
-            message: newNotification.message,
-            type: newNotification.type as 'info' | 'success' | 'warning' | 'error',
-            timestamp: new Date(newNotification.created_at),
-            read: newNotification.read,
-            userId: newNotification.user_id,
-            actionUrl: newNotification.action_url,
-            data: newNotification.data && typeof newNotification.data === 'object' && !Array.isArray(newNotification.data) 
-              ? newNotification.data as Record<string, any> 
-              : {}
-          };
-
-          setNotifications(prev => [formattedNotification, ...prev]);
-          toast[newNotification.type as 'info' | 'success' | 'warning' | 'error'](newNotification.title);
-        })
-        .on('postgres_changes', {
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => handleRealtimeInsert(payload, setNotifications)
+      )
+      .on(
+        'postgres_changes',
+        {
           event: 'UPDATE',
           schema: 'public',
           table: 'notifications',
-          filter: `user_id=eq.${user.id}`
-        }, (payload) => {
-          const updatedNotification = payload.new as any;
-          setNotifications(prev =>
-            prev.map(notification =>
-              notification.id === updatedNotification.id
-                ? {
-                    ...notification,
-                    read: updatedNotification.read,
-                    title: updatedNotification.title,
-                    message: updatedNotification.message,
-                    type: updatedNotification.type as 'info' | 'success' | 'warning' | 'error',
-                    actionUrl: updatedNotification.action_url,
-                    data: updatedNotification.data && typeof updatedNotification.data === 'object' && !Array.isArray(updatedNotification.data) 
-                      ? updatedNotification.data as Record<string, any> 
-                      : {}
-                  }
-                : notification
-            )
-          );
-        });
-
-      try {
-        const subscriptionStatus = await channelRef.current.subscribe();
-        if (subscriptionStatus === 'SUBSCRIBED') {
-          isSubscribedRef.current = true;
-          console.log('Notifications subscription successful');
-        } else {
-          console.log('Notifications subscription failed:', subscriptionStatus);
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => handleRealtimeUpdate(payload, setNotifications)
+      )
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
+          console.log(`Successfully subscribed to notifications channel: ${channelName}`);
+        } else if (status === 'CHANNEL_ERROR' || err) {
+          console.error('Notifications subscription error:', err);
+          toast.error('Lỗi kết nối thời gian thực cho thông báo.');
         }
-      } catch (error) {
-        console.error('Error subscribing to notifications channel:', error);
-      }
-    };
+      });
 
-    setupSubscription();
+    channelRef.current = channel;
 
+    // Cleanup subscription on component unmount or user change
     return () => {
       if (channelRef.current) {
-        console.log('Cleaning up notifications channel');
-        supabase.removeChannel(channelRef.current);
+        supabase.removeChannel(channelRef.current).then(status => {
+           console.log(`Unsubscribed from notifications channel: ${channelName}`, status);
+        });
         channelRef.current = null;
-        isSubscribedRef.current = false;
       }
     };
   }, [user]);

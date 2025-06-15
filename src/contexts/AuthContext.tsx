@@ -1,7 +1,7 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { robustSignOut } from '@/utils/authUtils';
 
 type UserRole = 'admin' | 'advisor' | 'customer' | null;
 
@@ -95,8 +95,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUserRole(null);
+    await robustSignOut();
   };
 
   const value = {
