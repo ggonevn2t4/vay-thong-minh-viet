@@ -42,7 +42,9 @@ export const useNotifications = () => {
         read: notification.read,
         userId: notification.user_id,
         actionUrl: notification.action_url,
-        data: notification.data
+        data: notification.data && typeof notification.data === 'object' && !Array.isArray(notification.data) 
+          ? notification.data as Record<string, any> 
+          : {}
       }));
 
       setNotifications(formattedNotifications);
@@ -173,7 +175,9 @@ export const useNotifications = () => {
           read: newNotification.read,
           userId: newNotification.user_id,
           actionUrl: newNotification.action_url,
-          data: newNotification.data
+          data: newNotification.data && typeof newNotification.data === 'object' && !Array.isArray(newNotification.data) 
+            ? newNotification.data as Record<string, any> 
+            : {}
         };
 
         setNotifications(prev => [formattedNotification, ...prev]);
@@ -196,7 +200,9 @@ export const useNotifications = () => {
                   message: updatedNotification.message,
                   type: updatedNotification.type as 'info' | 'success' | 'warning' | 'error',
                   actionUrl: updatedNotification.action_url,
-                  data: updatedNotification.data
+                  data: updatedNotification.data && typeof updatedNotification.data === 'object' && !Array.isArray(updatedNotification.data) 
+                    ? updatedNotification.data as Record<string, any> 
+                    : {}
                 }
               : notification
           )
