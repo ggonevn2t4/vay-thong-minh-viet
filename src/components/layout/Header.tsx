@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, Menu, User, LogOut, Settings } from 'lucide-react';
+import { Menu, User, LogOut, Settings } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -28,10 +28,11 @@ const Header = () => {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex">
           <Link to="/" className="mr-6 flex items-center space-x-2">
-            <Building2 className="h-6 w-6" />
-            <span className="hidden font-bold sm:inline-block">
-              LoanConnect
-            </span>
+            <img 
+              src="/lovable-uploads/2af3d2c3-5b39-4048-bc35-e7d8d899f021.png" 
+              alt="Finzy Logo" 
+              className="h-8 w-auto"
+            />
           </Link>
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
             {navigationItems.map((item) => (
@@ -60,8 +61,11 @@ const Header = () => {
               className="flex items-center"
               onClick={() => setIsOpen(false)}
             >
-              <Building2 className="mr-2 h-4 w-4" />
-              <span className="font-bold">LoanConnect</span>
+              <img 
+                src="/lovable-uploads/2af3d2c3-5b39-4048-bc35-e7d8d899f021.png" 
+                alt="Finzy Logo" 
+                className="h-6 w-auto"
+              />
             </Link>
             <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
               <div className="flex flex-col space-y-3">
