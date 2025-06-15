@@ -140,11 +140,12 @@ export const useDocuments = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: documents = [], isLoading, isError, error } = useQuery<Document[], Error>({
+  const { data: documents, isLoading, isError, error } = useQuery({
     queryKey: ['documents', user?.id],
     queryFn: () => fetchDocuments(user!.id),
     enabled: !!user,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    initialData: []
   });
 
   useEffect(() => {
