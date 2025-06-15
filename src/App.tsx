@@ -67,6 +67,13 @@ const App = () => (
             <Route path="/knowledge-management" element={<KnowledgeManagement />} />
             <Route path="/user-management" element={<UserManagement />} />
             <Route path="/system-analytics" element={<SystemAnalytics />} />
+            
+            {/* Vietnamese routes - redirect to English equivalents */}
+            <Route path="/kiem-tra-dieu-kien" element={<LoanEligibility />} />
+            <Route path="/toi-uu-hoa-vay" element={<LoanOptimization />} />
+            <Route path="/tu-van-ai" element={<AIAdvisory />} />
+            <Route path="/ho-so-tai-lieu" element={<DocumentChecklistPage />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
