@@ -23,16 +23,24 @@ export type Database = {
           certifications: string[] | null
           client_testimonials: Json | null
           created_at: string
+          current_bank_experience_years: number | null
+          date_of_birth: string | null
           department: string | null
           email: string | null
           full_name: string
           id: string
+          interest_rate_details: Json | null
           is_verified: boolean | null
           job_title: string | null
           languages: string[] | null
           last_rate_update: string | null
           loan_types: Json | null
+          operating_areas: string[] | null
+          permanent_address: string | null
+          personal_kyc_documents: Json | null
           phone: string | null
+          position: string | null
+          processing_priority: string[] | null
           rate_update_frequency: string | null
           specializations: string[] | null
           success_rate: number | null
@@ -40,7 +48,7 @@ export type Database = {
           total_reviews: number | null
           updated_at: string
           user_id: string
-          verification_documents: Json | null
+          work_kyc_documents: Json | null
           working_hours: Json | null
           years_experience: number | null
         }
@@ -57,16 +65,24 @@ export type Database = {
           certifications?: string[] | null
           client_testimonials?: Json | null
           created_at?: string
+          current_bank_experience_years?: number | null
+          date_of_birth?: string | null
           department?: string | null
           email?: string | null
           full_name: string
           id?: string
+          interest_rate_details?: Json | null
           is_verified?: boolean | null
           job_title?: string | null
           languages?: string[] | null
           last_rate_update?: string | null
           loan_types?: Json | null
+          operating_areas?: string[] | null
+          permanent_address?: string | null
+          personal_kyc_documents?: Json | null
           phone?: string | null
+          position?: string | null
+          processing_priority?: string[] | null
           rate_update_frequency?: string | null
           specializations?: string[] | null
           success_rate?: number | null
@@ -74,7 +90,7 @@ export type Database = {
           total_reviews?: number | null
           updated_at?: string
           user_id: string
-          verification_documents?: Json | null
+          work_kyc_documents?: Json | null
           working_hours?: Json | null
           years_experience?: number | null
         }
@@ -91,16 +107,24 @@ export type Database = {
           certifications?: string[] | null
           client_testimonials?: Json | null
           created_at?: string
+          current_bank_experience_years?: number | null
+          date_of_birth?: string | null
           department?: string | null
           email?: string | null
           full_name?: string
           id?: string
+          interest_rate_details?: Json | null
           is_verified?: boolean | null
           job_title?: string | null
           languages?: string[] | null
           last_rate_update?: string | null
           loan_types?: Json | null
+          operating_areas?: string[] | null
+          permanent_address?: string | null
+          personal_kyc_documents?: Json | null
           phone?: string | null
+          position?: string | null
+          processing_priority?: string[] | null
           rate_update_frequency?: string | null
           specializations?: string[] | null
           success_rate?: number | null
@@ -108,7 +132,7 @@ export type Database = {
           total_reviews?: number | null
           updated_at?: string
           user_id?: string
-          verification_documents?: Json | null
+          work_kyc_documents?: Json | null
           working_hours?: Json | null
           years_experience?: number | null
         }
