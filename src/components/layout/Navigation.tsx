@@ -3,7 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
-const Navigation = () => {
+interface NavigationProps {
+  className?: string;
+}
+
+const Navigation = ({ className }: NavigationProps = {}) => {
   const location = useLocation();
   const { userRole } = useAuth();
 
@@ -29,7 +33,7 @@ const Navigation = () => {
   const allItems = [...navigationItems, ...roleSpecificItems];
 
   return (
-    <nav className="flex space-x-8">
+    <nav className={cn('flex space-x-8', className)}>
       {allItems.map((item) => {
         if (item.requireAuth && !userRole) return null;
         

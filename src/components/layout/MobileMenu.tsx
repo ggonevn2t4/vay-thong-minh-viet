@@ -10,8 +10,7 @@ import NotificationSystem from '@/components/NotificationSystem';
 import Navigation from './Navigation';
 
 interface MobileMenuProps {
-  /** Array of navigation links */
-  navLinks: Array<{ name: string; href: string; isActive?: boolean }>;
+  onClose: () => void;
 }
 
 /**
@@ -34,73 +33,56 @@ const ROLE_CONFIG = {
  * @param {MobileMenuProps} props - The component props
  * @returns {JSX.Element} The mobile menu component
  */
-const MobileMenu = ({ navLinks }: MobileMenuProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
-  // For now, default to customer role - will be updated with role management
-  const userRole: UserRole = 'customer';
+const MobileMenu = ({ onClose }: MobileMenuProps) => {
+  const { user, userRole } = useAuth();
+  // Default to customer role if userRole is not defined
+  const currentRole: UserRole = (userRole as UserRole) || 'customer';
 
   /**
    * Get role badge configuration based on user role
    * @returns {Object} Role badge configuration
    */
-  const getRoleBadge = () => ROLE_CONFIG[userRole];
-
-  /**
-   * Close the mobile menu sheet
-   */
-  const closeSheet = () => {
-    setIsOpen(false);
-  };
+  const getRoleBadge = () => ROLE_CONFIG[currentRole];
 
   return (
-    <div className="md:hidden">
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
-            <Menu className="h-6 w-6" />
-            <span className="sr-only">Toggle menu</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="right" className="w-[80%] pt-10">
-          <div className="flex flex-col gap-6 py-6">
-            {user && (
-              <div className="pb-4 border-b flex items-center justify-between">
-                <Badge className={getRoleBadge().color}>
-                  {getRoleBadge().label}
-                </Badge>
-                <NotificationSystem />
-              </div>
-            )}
-            
-            <Navigation 
-              navLinks={navLinks}
-              className="flex flex-col space-y-6"
-            />
-            
-            <div className="mt-4 space-y-4">
-              {!user ? (
-                <>
-                  <Link to="/khao-sat" onClick={closeSheet}>
-                    <Button className="w-full bg-brand-600 hover:bg-brand-700">
-                      Bắt đầu khảo sát
-                    </Button>
-                  </Link>
-                  <Link to="/auth" onClick={closeSheet}>
-                    <Button variant="outline" className="w-full mt-2">Đăng nhập</Button>
-                  </Link>
-                </>
-              ) : (
-                <Link to="/khao-sat" onClick={closeSheet}>
+    <div className="lg:hidden bg-white border-t">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex flex-col space-y-4">
+          {user && (
+            <div className="pb-4 border-b flex items-center justify-between">
+              <Badge className={getRoleBadge().color}>
+                {getRoleBadge().label}
+              </Badge>
+              <NotificationSystem />
+            </div>
+          )}
+          
+          <div className="flex flex-col space-y-3">
+            <Navigation />
+          </div>
+          
+          <div className="mt-4 space-y-4">
+            {!user ? (
+              <>
+                <Link to="/khao-sat" onClick={onClose}>
                   <Button className="w-full bg-brand-600 hover:bg-brand-700">
                     Bắt đầu khảo sát
                   </Button>
                 </Link>
-              )}
-            </div>
+                <Link to="/auth" onClick={onClose}>
+                  <Button variant="outline" className="w-full mt-2">Đăng nhập</Button>
+                </Link>
+              </>
+            ) : (
+              <Link to="/khao-sat" onClick={onClose}>
+                <Button className="w-full bg-brand-600 hover:bg-brand-700">
+                  Bắt đầu khảo sát
+                </Button>
+              </Link>
+            )}
           </div>
-        </SheetContent>
-      </Sheet>
+        </div>
+      </div>
     </div>
   );
 };
