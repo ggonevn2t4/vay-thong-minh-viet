@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -10,7 +9,6 @@ export const useNotifications = () => {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const channelRef = useRef<any>(null);
 
   const loadNotifications = async () => {
     if (!user) return;
@@ -138,7 +136,6 @@ export const useNotifications = () => {
       return;
     }
 
-    // Use a consistent channel name for the user
     const channelName = `notifications-user-${user.id}`;
     const channel = supabase.channel(channelName);
 
@@ -172,16 +169,11 @@ export const useNotifications = () => {
         }
       });
 
-    channelRef.current = channel;
-
     // Cleanup subscription on component unmount or user change
     return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current).then(status => {
-           console.log(`Unsubscribed from notifications channel: ${channelName}`, status);
-        });
-        channelRef.current = null;
-      }
+      supabase.removeChannel(channel).then(status => {
+         console.log(`Unsubscribed from notifications channel: ${channelName}`, status);
+      });
     };
   }, [user]);
 
