@@ -93,6 +93,9 @@ const DocumentChecklist = () => {
   const completedRequired = documentItems.filter(doc => 
     doc.required && getDocumentCompletion(doc.name)
   ).length;
+
+  // Add the missing completedCount variable
+  const completedCount = documentItems.filter(doc => getDocumentCompletion(doc.name)).length;
   
   const progress = (completedRequired / requiredCount) * 100;
 
@@ -254,7 +257,7 @@ const DocumentChecklist = () => {
                       <Checkbox
                         id={documentItem.id}
                         checked={isCompleted}
-                        readOnly
+                        disabled
                         className="mt-1"
                       />
                       

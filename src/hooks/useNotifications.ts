@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,7 +37,7 @@ export const useNotifications = () => {
         id: notification.id,
         title: notification.title,
         message: notification.message,
-        type: notification.type,
+        type: notification.type as 'info' | 'success' | 'warning' | 'error',
         timestamp: new Date(notification.created_at),
         read: notification.read,
         userId: notification.user_id,
@@ -169,7 +168,7 @@ export const useNotifications = () => {
           id: newNotification.id,
           title: newNotification.title,
           message: newNotification.message,
-          type: newNotification.type,
+          type: newNotification.type as 'info' | 'success' | 'warning' | 'error',
           timestamp: new Date(newNotification.created_at),
           read: newNotification.read,
           userId: newNotification.user_id,
@@ -178,7 +177,7 @@ export const useNotifications = () => {
         };
 
         setNotifications(prev => [formattedNotification, ...prev]);
-        toast[newNotification.type](newNotification.title);
+        toast[newNotification.type as 'info' | 'success' | 'warning' | 'error'](newNotification.title);
       })
       .on('postgres_changes', {
         event: 'UPDATE',
@@ -195,7 +194,7 @@ export const useNotifications = () => {
                   read: updatedNotification.read,
                   title: updatedNotification.title,
                   message: updatedNotification.message,
-                  type: updatedNotification.type,
+                  type: updatedNotification.type as 'info' | 'success' | 'warning' | 'error',
                   actionUrl: updatedNotification.action_url,
                   data: updatedNotification.data
                 }

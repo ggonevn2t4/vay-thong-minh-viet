@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,7 +45,7 @@ export const useDocuments = () => {
         fileSize: doc.file_size,
         contentType: doc.content_type,
         category: doc.category,
-        status: doc.status,
+        status: doc.status as 'pending' | 'approved' | 'rejected',
         uploadedAt: new Date(doc.uploaded_at),
         reviewedAt: doc.reviewed_at ? new Date(doc.reviewed_at) : undefined,
         reviewedBy: doc.reviewed_by,
@@ -105,7 +104,7 @@ export const useDocuments = () => {
         fileSize: data.file_size,
         contentType: data.content_type,
         category: data.category,
-        status: data.status,
+        status: data.status as 'pending' | 'approved' | 'rejected',
         uploadedAt: new Date(data.uploaded_at),
         reviewedAt: data.reviewed_at ? new Date(data.reviewed_at) : undefined,
         reviewedBy: data.reviewed_by,
@@ -189,7 +188,7 @@ export const useDocuments = () => {
             doc.id === updatedDocument.id
               ? {
                   ...doc,
-                  status: updatedDocument.status,
+                  status: updatedDocument.status as 'pending' | 'approved' | 'rejected',
                   reviewedAt: updatedDocument.reviewed_at ? new Date(updatedDocument.reviewed_at) : undefined,
                   reviewedBy: updatedDocument.reviewed_by
                 }
