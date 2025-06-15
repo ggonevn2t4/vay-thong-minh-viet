@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,6 +24,7 @@ export const useDocuments = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const channelRef = useRef<any>(null);
+  const isSubscribedRef = useRef(false);
 
   const loadDocuments = async () => {
     if (!user) return;
@@ -174,51 +174,75 @@ export const useDocuments = () => {
 
   // Set up real-time subscription for documents
   useEffect(() => {
-    if (!user) return;
+    if (!user || isSubscribedRef.current) return;
 
-    // Clean up existing channel if it exists
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
-
-    // Create new channel with unique name
-    const channelName = `documents-${user.id}-${Date.now()}`;
-    channelRef.current = supabase
-      .channel(channelName)
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'documents',
-        filter: `user_id=eq.${user.id}`
-      }, (payload) => {
-        const updatedDocument = payload.new as any;
-        setDocuments(prev =>
-          prev.map(doc =>
-            doc.id === updatedDocument.id
-              ? {
-                  ...doc,
-                  status: updatedDocument.status as 'pending' | 'approved' | 'rejected',
-                  reviewedAt: updatedDocument.reviewed_at ? new Date(updatedDocument.reviewed_at) : undefined,
-                  reviewedBy: updatedDocument.reviewed_by
-                }
-              : doc
-          )
-        );
-
-        // Show notification for status changes
-        if (updatedDocument.status === 'approved') {
-          toast.success(`Tài liệu "${updatedDocument.name}" đã được phê duyệt`);
-        } else if (updatedDocument.status === 'rejected') {
-          toast.error(`Tài liệu "${updatedDocument.name}" đã bị từ chối`);
+    const setupSubscription = async () => {
+      // Clean up existing channel if it exists
+      if (channelRef.current) {
+        try {
+          await supabase.removeChannel(channelRef.current);
+        } catch (error) {
+          console.log('Error removing existing channel:', error);
         }
-      })
-      .subscribe();
+        channelRef.current = null;
+        isSubscribedRef.current = false;
+      }
+
+      // Create new channel with unique name
+      const channelName = `documents-${user.id}-${Date.now()}`;
+      console.log('Creating documents channel:', channelName);
+      
+      channelRef.current = supabase
+        .channel(channelName)
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'documents',
+          filter: `user_id=eq.${user.id}`
+        }, (payload) => {
+          const updatedDocument = payload.new as any;
+          setDocuments(prev =>
+            prev.map(doc =>
+              doc.id === updatedDocument.id
+                ? {
+                    ...doc,
+                    status: updatedDocument.status as 'pending' | 'approved' | 'rejected',
+                    reviewedAt: updatedDocument.reviewed_at ? new Date(updatedDocument.reviewed_at) : undefined,
+                    reviewedBy: updatedDocument.reviewed_by
+                  }
+                : doc
+            )
+          );
+
+          // Show notification for status changes
+          if (updatedDocument.status === 'approved') {
+            toast.success(`Tài liệu "${updatedDocument.name}" đã được phê duyệt`);
+          } else if (updatedDocument.status === 'rejected') {
+            toast.error(`Tài liệu "${updatedDocument.name}" đã bị từ chối`);
+          }
+        });
+
+      try {
+        const subscriptionStatus = await channelRef.current.subscribe();
+        if (subscriptionStatus === 'SUBSCRIBED') {
+          isSubscribedRef.current = true;
+          console.log('Documents subscription successful');
+        } else {
+          console.log('Documents subscription failed:', subscriptionStatus);
+        }
+      } catch (error) {
+        console.error('Error subscribing to documents channel:', error);
+      }
+    };
+
+    setupSubscription();
 
     return () => {
       if (channelRef.current) {
+        console.log('Cleaning up documents channel');
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
+        isSubscribedRef.current = false;
       }
     };
   }, [user]);

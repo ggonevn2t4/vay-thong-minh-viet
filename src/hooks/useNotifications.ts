@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,6 +20,7 @@ export const useNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const channelRef = useRef<any>(null);
+  const isSubscribedRef = useRef(false);
 
   const loadNotifications = async () => {
     if (!user) return;
@@ -156,73 +156,97 @@ export const useNotifications = () => {
 
   // Set up real-time subscription for notifications
   useEffect(() => {
-    if (!user) return;
+    if (!user || isSubscribedRef.current) return;
 
-    // Clean up existing channel if it exists
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
+    const setupSubscription = async () => {
+      // Clean up existing channel if it exists
+      if (channelRef.current) {
+        try {
+          await supabase.removeChannel(channelRef.current);
+        } catch (error) {
+          console.log('Error removing existing channel:', error);
+        }
+        channelRef.current = null;
+        isSubscribedRef.current = false;
+      }
 
-    // Create new channel with unique name
-    const channelName = `notifications-${user.id}-${Date.now()}`;
-    channelRef.current = supabase
-      .channel(channelName)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${user.id}`
-      }, (payload) => {
-        const newNotification = payload.new as any;
-        const formattedNotification: Notification = {
-          id: newNotification.id,
-          title: newNotification.title,
-          message: newNotification.message,
-          type: newNotification.type as 'info' | 'success' | 'warning' | 'error',
-          timestamp: new Date(newNotification.created_at),
-          read: newNotification.read,
-          userId: newNotification.user_id,
-          actionUrl: newNotification.action_url,
-          data: newNotification.data && typeof newNotification.data === 'object' && !Array.isArray(newNotification.data) 
-            ? newNotification.data as Record<string, any> 
-            : {}
-        };
+      // Create new channel with unique name
+      const channelName = `notifications-${user.id}-${Date.now()}`;
+      console.log('Creating notifications channel:', channelName);
+      
+      channelRef.current = supabase
+        .channel(channelName)
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        }, (payload) => {
+          const newNotification = payload.new as any;
+          const formattedNotification: Notification = {
+            id: newNotification.id,
+            title: newNotification.title,
+            message: newNotification.message,
+            type: newNotification.type as 'info' | 'success' | 'warning' | 'error',
+            timestamp: new Date(newNotification.created_at),
+            read: newNotification.read,
+            userId: newNotification.user_id,
+            actionUrl: newNotification.action_url,
+            data: newNotification.data && typeof newNotification.data === 'object' && !Array.isArray(newNotification.data) 
+              ? newNotification.data as Record<string, any> 
+              : {}
+          };
 
-        setNotifications(prev => [formattedNotification, ...prev]);
-        toast[newNotification.type as 'info' | 'success' | 'warning' | 'error'](newNotification.title);
-      })
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${user.id}`
-      }, (payload) => {
-        const updatedNotification = payload.new as any;
-        setNotifications(prev =>
-          prev.map(notification =>
-            notification.id === updatedNotification.id
-              ? {
-                  ...notification,
-                  read: updatedNotification.read,
-                  title: updatedNotification.title,
-                  message: updatedNotification.message,
-                  type: updatedNotification.type as 'info' | 'success' | 'warning' | 'error',
-                  actionUrl: updatedNotification.action_url,
-                  data: updatedNotification.data && typeof updatedNotification.data === 'object' && !Array.isArray(updatedNotification.data) 
-                    ? updatedNotification.data as Record<string, any> 
-                    : {}
-                }
-              : notification
-          )
-        );
-      })
-      .subscribe();
+          setNotifications(prev => [formattedNotification, ...prev]);
+          toast[newNotification.type as 'info' | 'success' | 'warning' | 'error'](newNotification.title);
+        })
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        }, (payload) => {
+          const updatedNotification = payload.new as any;
+          setNotifications(prev =>
+            prev.map(notification =>
+              notification.id === updatedNotification.id
+                ? {
+                    ...notification,
+                    read: updatedNotification.read,
+                    title: updatedNotification.title,
+                    message: updatedNotification.message,
+                    type: updatedNotification.type as 'info' | 'success' | 'warning' | 'error',
+                    actionUrl: updatedNotification.action_url,
+                    data: updatedNotification.data && typeof updatedNotification.data === 'object' && !Array.isArray(updatedNotification.data) 
+                      ? updatedNotification.data as Record<string, any> 
+                      : {}
+                  }
+                : notification
+            )
+          );
+        });
+
+      try {
+        const subscriptionStatus = await channelRef.current.subscribe();
+        if (subscriptionStatus === 'SUBSCRIBED') {
+          isSubscribedRef.current = true;
+          console.log('Notifications subscription successful');
+        } else {
+          console.log('Notifications subscription failed:', subscriptionStatus);
+        }
+      } catch (error) {
+        console.error('Error subscribing to notifications channel:', error);
+      }
+    };
+
+    setupSubscription();
 
     return () => {
       if (channelRef.current) {
+        console.log('Cleaning up notifications channel');
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
+        isSubscribedRef.current = false;
       }
     };
   }, [user]);
