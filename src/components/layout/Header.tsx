@@ -4,7 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Bell, Menu, X } from 'lucide-react';
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import Navigation from './Navigation';
 import MobileMenu from './MobileMenu';
 import UserProfile from './UserProfile';
@@ -13,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { userRole } = useAuth();
+  const { user, userRole } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
@@ -42,7 +41,7 @@ const Header = () => {
             {/* Right Section */}
             <div className="flex items-center space-x-4">
               {/* Notifications */}
-              <SignedIn>
+              {user && (
                 <div className="relative">
                   <Button
                     variant="ghost"
@@ -58,31 +57,10 @@ const Header = () => {
                     )}
                   </Button>
                 </div>
-              </SignedIn>
+              )}
 
-              {/* User Authentication */}
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <Button variant="outline" size="sm">
-                    Đăng nhập
-                  </Button>
-                </SignInButton>
-              </SignedOut>
-
-              <SignedIn>
-                <div className="hidden lg:block">
-                  <UserProfile />
-                </div>
-                <div className="lg:hidden">
-                  <UserButton 
-                    appearance={{
-                      elements: {
-                        avatarBox: "h-8 w-8"
-                      }
-                    }}
-                  />
-                </div>
-              </SignedIn>
+              {/* User Profile - handles both authenticated and non-authenticated states */}
+              <UserProfile />
 
               {/* Mobile Menu Button */}
               <div className="lg:hidden">

@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ClerkProvider } from '@clerk/clerk-react';
 import { AuthProvider } from '@/contexts/AuthContext';
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -28,46 +27,38 @@ import SoSanh from "./pages/SoSanh";
 
 const queryClient = new QueryClient();
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key");
-}
-
 const App = () => (
-  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/user-dashboard" element={<UserDashboard />} />
-              <Route path="/advisor-dashboard" element={<AdvisorDashboard />} />
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/advisor-directory" element={<AdvisorDirectoryPage />} />
-              <Route path="/messages" element={<Messages />} />
-              <Route path="/loan-comparison" element={<LoanComparison />} />
-              <Route path="/loan-optimization" element={<LoanOptimization />} />
-              <Route path="/loan-eligibility" element={<LoanEligibility />} />
-              <Route path="/ai-advisory" element={<AIAdvisory />} />
-              <Route path="/about-us" element={<AboutUs />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/document-checklist" element={<DocumentChecklistPage />} />
-              <Route path="/khao-sat" element={<KhaoSat />} />
-              <Route path="/ket-qua" element={<KetQua />} />
-              <Route path="/so-sanh" element={<SoSanh />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </AuthProvider>
-  </ClerkProvider>
+  <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/user-dashboard" element={<UserDashboard />} />
+            <Route path="/advisor-dashboard" element={<AdvisorDashboard />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/advisor-directory" element={<AdvisorDirectoryPage />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/loan-comparison" element={<LoanComparison />} />
+            <Route path="/loan-optimization" element={<LoanOptimization />} />
+            <Route path="/loan-eligibility" element={<LoanEligibility />} />
+            <Route path="/ai-advisory" element={<AIAdvisory />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/document-checklist" element={<DocumentChecklistPage />} />
+            <Route path="/khao-sat" element={<KhaoSat />} />
+            <Route path="/ket-qua" element={<KetQua />} />
+            <Route path="/so-sanh" element={<SoSanh />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </AuthProvider>
 );
 
 export default App;

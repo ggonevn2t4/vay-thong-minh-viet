@@ -28,15 +28,14 @@ const ROLE_CONFIG = {
  * @returns {JSX.Element} The user profile section
  */
 const UserProfile = () => {
-  const { user, loading, signOut } = useAuth();
-  // For now, default to customer role - this will be updated when we implement role management
-  const userRole: UserRole = 'customer';
+  const { user, userRole, loading, signOut } = useAuth();
+  const currentRole: UserRole = (userRole as UserRole) || 'customer';
 
   /**
    * Get role badge configuration based on user role
    * @returns {Object} Role badge configuration
    */
-  const getRoleBadge = () => ROLE_CONFIG[userRole];
+  const getRoleBadge = () => ROLE_CONFIG[currentRole];
 
   /**
    * Get user's initials for avatar fallback
@@ -114,7 +113,7 @@ const UserProfile = () => {
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link to="/dashboard" className="flex items-center space-x-2">
+            <Link to="/user-dashboard" className="flex items-center space-x-2">
               <User className="h-4 w-4" />
               <span>Khu vực cá nhân</span>
             </Link>
