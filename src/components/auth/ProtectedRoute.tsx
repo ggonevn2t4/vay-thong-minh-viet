@@ -6,7 +6,7 @@ import AuthLoadingScreen from "./AuthLoadingScreen";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: 'admin' | 'advisor' | 'customer';
+  requiredRole?: 'admin' | 'advisor' | 'customer' | 'bank_employee';
 }
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {

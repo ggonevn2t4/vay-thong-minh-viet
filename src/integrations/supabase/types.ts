@@ -750,6 +750,36 @@ export type Database = {
         }
         Relationships: []
       }
+      points_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          reference_id: string | null
+          type: Database["public"]["Enums"]["points_transaction_type"]
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type: Database["public"]["Enums"]["points_transaction_type"]
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type?: Database["public"]["Enums"]["points_transaction_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company_name: string | null
@@ -885,6 +915,7 @@ export type Database = {
           created_at: string
           currency: string
           id: string
+          points_balance: number
           updated_at: string
           user_id: string
         }
@@ -893,6 +924,7 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          points_balance?: number
           updated_at?: string
           user_id: string
         }
@@ -901,6 +933,7 @@ export type Database = {
           created_at?: string
           currency?: string
           id?: string
+          points_balance?: number
           updated_at?: string
           user_id?: string
         }
@@ -972,7 +1005,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "customer" | "advisor" | "admin"
+      app_role: "customer" | "advisor" | "admin" | "bank_employee"
       employment_type:
         | "employee"
         | "self_employed"
@@ -982,6 +1015,12 @@ export type Database = {
         | "unemployed"
       loan_status: "draft" | "pending" | "approved" | "rejected" | "reviewing"
       loan_type: "personal" | "mortgage" | "business" | "auto" | "education"
+      points_transaction_type:
+        | "purchase"
+        | "spend"
+        | "reward"
+        | "refund"
+        | "adjustment"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1097,7 +1136,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["customer", "advisor", "admin"],
+      app_role: ["customer", "advisor", "admin", "bank_employee"],
       employment_type: [
         "employee",
         "self_employed",
@@ -1108,6 +1147,13 @@ export const Constants = {
       ],
       loan_status: ["draft", "pending", "approved", "rejected", "reviewing"],
       loan_type: ["personal", "mortgage", "business", "auto", "education"],
+      points_transaction_type: [
+        "purchase",
+        "spend",
+        "reward",
+        "refund",
+        "adjustment",
+      ],
     },
   },
 } as const

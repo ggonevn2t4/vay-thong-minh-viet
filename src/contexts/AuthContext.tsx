@@ -4,7 +4,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { robustSignOut } from '@/utils/authUtils';
 
-type UserRole = 'admin' | 'advisor' | 'customer' | null;
+type UserRole = 'admin' | 'advisor' | 'customer' | 'bank_employee' | null;
 
 interface AuthContextType {
   user: User | null;

@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import UserDashboard from '@/pages/UserDashboard';
 import AdvisorDashboard from '@/pages/AdvisorDashboard';
 import AdminDashboard from '@/pages/AdminDashboard';
+import BankEmployeeDashboard from '@/pages/BankEmployeeDashboard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -35,6 +36,8 @@ const RoleBasedDashboard = () => {
       return <AdvisorDashboard />;
     case 'admin':
       return <AdminDashboard />;
+    case 'bank_employee':
+      return <BankEmployeeDashboard />;
     default:
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
