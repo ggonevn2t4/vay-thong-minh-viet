@@ -7,9 +7,14 @@ import BankEmployeeDashboard from '@/pages/BankEmployeeDashboard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import AuthLoadingScreen from '@/components/auth/AuthLoadingScreen';
 
 const RoleBasedDashboard = () => {
-  const { userRole, user } = useAuth();
+  const { userRole, user, loading } = useAuth();
+
+  if (loading) {
+    return <AuthLoadingScreen />;
+  }
 
   if (!user) {
     return (

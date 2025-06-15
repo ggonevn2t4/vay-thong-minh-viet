@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,13 +53,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (error) {
         console.error('Error fetching user role:', error);
         setUserRole('customer'); // Default to customer if role fetch fails
-        return;
+      } else {
+        setUserRole(data?.role || 'customer');
       }
-
-      setUserRole(data?.role || 'customer');
     } catch (error) {
       console.error('Error in fetchUserRole:', error);
       setUserRole('customer');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,9 +84,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           }, 0);
         } else {
           setUserRole(null);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
@@ -101,9 +100,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }, 0);
       } else {
         setUserRole(null);
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
