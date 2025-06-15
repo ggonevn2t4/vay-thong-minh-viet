@@ -1,12 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { FileText, CheckCircle, AlertCircle, Upload } from 'lucide-react';
+import { FileText, CheckCircle, AlertCircle, Upload, File, Trash2, Eye } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useDocuments } from '@/hooks/useDocuments';
+import { useNotifications } from '@/hooks/useNotifications';
 import { toast } from 'sonner';
 
 interface DocumentItem {
@@ -21,7 +23,12 @@ interface DocumentItem {
 
 const DocumentChecklist = () => {
   const { user } = useAuth();
-  const [documents, setDocuments] = useState<DocumentItem[]>([
+  const { documents, isUploading, uploadDocument, deleteDocument, getDocumentUrl } = useDocuments();
+  const { createNotification } = useNotifications();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
+
+  const [documentItems] = useState<DocumentItem[]>([
     {
       id: '1',
       name: 'CMND/CCCD',
@@ -72,44 +79,114 @@ const DocumentChecklist = () => {
     }
   ]);
 
-  const categories = Array.from(new Set(documents.map(doc => doc.category)));
-  const completedCount = documents.filter(doc => doc.completed).length;
-  const requiredCount = documents.filter(doc => doc.required).length;
-  const completedRequired = documents.filter(doc => doc.required && doc.completed).length;
+  const categories = Array.from(new Set(documentItems.map(doc => doc.category)));
+  const requiredCount = documentItems.filter(doc => doc.required).length;
+  
+  // Check completion based on uploaded documents
+  const getDocumentCompletion = (documentName: string) => {
+    return documents.some(doc => 
+      doc.name.toLowerCase().includes(documentName.toLowerCase()) && 
+      doc.status !== 'rejected'
+    );
+  };
+
+  const completedRequired = documentItems.filter(doc => 
+    doc.required && getDocumentCompletion(doc.name)
+  ).length;
+  
   const progress = (completedRequired / requiredCount) * 100;
 
-  const handleDocumentToggle = (documentId: string) => {
-    setDocuments(prev => 
-      prev.map(doc => 
-        doc.id === documentId 
-          ? { ...doc, completed: !doc.completed, uploadedAt: !doc.completed ? new Date() : undefined }
-          : doc
-      )
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !selectedDocument) return;
+
+    const documentItem = documentItems.find(doc => doc.id === selectedDocument);
+    if (!documentItem) return;
+
+    const uploadedDoc = await uploadDocument(
+      file,
+      documentItem.name,
+      documentItem.description,
+      documentItem.category
     );
-    
-    const document = documents.find(doc => doc.id === documentId);
-    if (document && !document.completed) {
-      toast.success(`Đã đánh dấu hoàn thành: ${document.name}`);
+
+    if (uploadedDoc) {
+      // Create notification for successful upload
+      await createNotification({
+        title: 'Tài liệu đã được tải lên',
+        message: `Tài liệu "${documentItem.name}" đã được tải lên thành công và đang chờ xem xét`,
+        type: 'success',
+        actionUrl: '/ho-so-tai-lieu'
+      });
+    }
+
+    setSelectedDocument(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
-  const handleUpload = (documentId: string) => {
-    // Simulate file upload
-    toast.success('Tính năng upload sẽ được triển khai với Supabase Storage');
+  const handleUploadClick = (documentId: string) => {
+    setSelectedDocument(documentId);
+    fileInputRef.current?.click();
+  };
+
+  const handleViewDocument = async (document: any) => {
+    const url = await getDocumentUrl(document.filePath);
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      toast.error('Không thể mở tài liệu');
+    }
+  };
+
+  const handleDeleteDocument = async (documentId: string) => {
+    await deleteDocument(documentId);
   };
 
   const getDocumentsByCategory = (category: string) => {
-    return documents.filter(doc => doc.category === category);
+    return documentItems.filter(doc => doc.category === category);
   };
 
   const getCategoryProgress = (category: string) => {
     const categoryDocs = getDocumentsByCategory(category);
-    const completedDocs = categoryDocs.filter(doc => doc.completed);
+    const completedDocs = categoryDocs.filter(doc => getDocumentCompletion(doc.name));
     return categoryDocs.length > 0 ? (completedDocs.length / categoryDocs.length) * 100 : 0;
+  };
+
+  const getUploadedDocuments = (documentName: string) => {
+    return documents.filter(doc => 
+      doc.name.toLowerCase().includes(documentName.toLowerCase())
+    );
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'approved': return 'text-green-600 bg-green-100';
+      case 'rejected': return 'text-red-600 bg-red-100';
+      default: return 'text-yellow-600 bg-yellow-100';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'approved': return 'Đã phê duyệt';
+      case 'rejected': return 'Bị từ chối';
+      default: return 'Đang xem xét';
+    }
   };
 
   return (
     <div className="space-y-6">
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        onChange={handleFileUpload}
+        style={{ display: 'none' }}
+        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+      />
+
       {/* Overview Card */}
       <Card>
         <CardHeader>
@@ -167,60 +244,104 @@ const DocumentChecklist = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {getDocumentsByCategory(category).map(document => (
-                <div key={document.id} className="flex items-start space-x-3 p-4 border rounded-lg">
-                  <Checkbox
-                    id={document.id}
-                    checked={document.completed}
-                    onCheckedChange={() => handleDocumentToggle(document.id)}
-                    className="mt-1"
-                  />
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <label
-                        htmlFor={document.id}
-                        className={`font-medium cursor-pointer ${
-                          document.completed ? 'line-through text-gray-500' : ''
-                        }`}
+              {getDocumentsByCategory(category).map(documentItem => {
+                const uploadedDocs = getUploadedDocuments(documentItem.name);
+                const isCompleted = getDocumentCompletion(documentItem.name);
+                
+                return (
+                  <div key={documentItem.id} className="space-y-3">
+                    <div className="flex items-start space-x-3 p-4 border rounded-lg">
+                      <Checkbox
+                        id={documentItem.id}
+                        checked={isCompleted}
+                        readOnly
+                        className="mt-1"
+                      />
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <label
+                            htmlFor={documentItem.id}
+                            className={`font-medium ${
+                              isCompleted ? 'line-through text-gray-500' : ''
+                            }`}
+                          >
+                            {documentItem.name}
+                          </label>
+                          {documentItem.required && (
+                            <Badge variant="destructive" className="text-xs">
+                              Bắt buộc
+                            </Badge>
+                          )}
+                          {isCompleted && (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          )}
+                          {documentItem.required && !isCompleted && (
+                            <AlertCircle className="h-4 w-4 text-orange-500" />
+                          )}
+                        </div>
+                        
+                        <p className="text-sm text-gray-600 mb-2">
+                          {documentItem.description}
+                        </p>
+                      </div>
+                      
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUploadClick(documentItem.id)}
+                        disabled={isUploading}
+                        className="flex items-center gap-1"
                       >
-                        {document.name}
-                      </label>
-                      {document.required && (
-                        <Badge variant="destructive" className="text-xs">
-                          Bắt buộc
-                        </Badge>
-                      )}
-                      {document.completed && (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      )}
-                      {document.required && !document.completed && (
-                        <AlertCircle className="h-4 w-4 text-orange-500" />
-                      )}
+                        <Upload className="h-3 w-3" />
+                        {isUploading ? 'Đang tải...' : 'Tải lên'}
+                      </Button>
                     </div>
-                    
-                    <p className="text-sm text-gray-600 mb-2">
-                      {document.description}
-                    </p>
-                    
-                    {document.completed && document.uploadedAt && (
-                      <p className="text-xs text-green-600">
-                        Hoàn thành lúc: {document.uploadedAt.toLocaleDateString('vi-VN')}
-                      </p>
+
+                    {/* Show uploaded documents for this category */}
+                    {uploadedDocs.length > 0 && (
+                      <div className="ml-8 space-y-2">
+                        {uploadedDocs.map(doc => (
+                          <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <File className="h-4 w-4 text-blue-500" />
+                              <div>
+                                <p className="text-sm font-medium">{doc.name}</p>
+                                <div className="flex items-center gap-2">
+                                  <Badge className={`text-xs ${getStatusColor(doc.status)}`}>
+                                    {getStatusText(doc.status)}
+                                  </Badge>
+                                  <span className="text-xs text-gray-500">
+                                    {doc.uploadedAt.toLocaleDateString('vi-VN')}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleViewDocument(doc)}
+                                className="h-8 w-8 p-0"
+                              >
+                                <Eye className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteDocument(doc.id)}
+                                className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleUpload(document.id)}
-                    className="flex items-center gap-1"
-                  >
-                    <Upload className="h-3 w-3" />
-                    Upload
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>

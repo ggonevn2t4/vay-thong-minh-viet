@@ -239,6 +239,51 @@ export type Database = {
           },
         ]
       }
+      documents: {
+        Row: {
+          category: string | null
+          content_type: string | null
+          description: string | null
+          file_path: string
+          file_size: number | null
+          id: string
+          name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          uploaded_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          content_type?: string | null
+          description?: string | null
+          file_path: string
+          file_size?: number | null
+          id?: string
+          name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          uploaded_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          content_type?: string | null
+          description?: string | null
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          uploaded_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       existing_loans: {
         Row: {
           additional_info: Json | null
@@ -629,6 +674,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string
+          data: Json | null
+          id: string
+          message: string
+          read: boolean
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message: string
+          read?: boolean
+          read_at?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message?: string
+          read?: boolean
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       offer_comparisons: {
         Row: {

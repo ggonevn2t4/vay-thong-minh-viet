@@ -21,79 +21,37 @@ export const useNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Mock notifications for demo - will be replaced with Supabase data
-  const mockNotifications: Notification[] = [
-    {
-      id: '1',
-      title: 'Khoản vay được phê duyệt',
-      message: 'Khoản vay #12345 đã được ngân hàng ABC phê duyệt với lãi suất 8.5%/năm',
-      type: 'success',
-      timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-      read: false,
-      userId: user?.id || '',
-      actionUrl: '/loan-applications'
-    },
-    {
-      id: '2',
-      title: 'Tài liệu cần bổ sung',
-      message: 'Vui lòng bổ sung bảng lương 3 tháng gần nhất cho hồ sơ vay #12346',
-      type: 'warning',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-      read: false,
-      userId: user?.id || '',
-      actionUrl: '/document-checklist'
-    },
-    {
-      id: '3',
-      title: 'Lãi suất giảm',
-      message: 'Ngân hàng DEF vừa giảm lãi suất vay mua nhà xuống 7.8%/năm',
-      type: 'info',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5), // 5 hours ago
-      read: true,
-      userId: user?.id || '',
-      actionUrl: '/loan-comparison'
-    },
-    {
-      id: '4',
-      title: 'Kết thúc khuyến mãi',
-      message: 'Lãi suất khuyến mãi của khoản vay #12344 sẽ kết thúc sau 7 ngày',
-      type: 'warning',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12), // 12 hours ago
-      read: false,
-      userId: user?.id || '',
-      actionUrl: '/loan-optimization'
-    },
-    {
-      id: '5',
-      title: 'Tin nhắn mới',
-      message: 'Bạn có tin nhắn mới từ tư vấn viên Nguyễn Văn A',
-      type: 'info',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-      read: true,
-      userId: user?.id || '',
-      actionUrl: '/messages'
-    }
-  ];
-
   const loadNotifications = async () => {
     if (!user) return;
 
     setIsLoading(true);
     try {
-      // TODO: Replace with actual Supabase query
-      // const { data, error } = await supabase
-      //   .from('notifications')
-      //   .select('*')
-      //   .eq('user_id', user.id)
-      //   .order('created_at', { ascending: false });
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
-      // if (error) throw error;
+      if (error) throw error;
 
-      // For now, use mock data
-      setNotifications(mockNotifications);
+      const formattedNotifications: Notification[] = data.map(notification => ({
+        id: notification.id,
+        title: notification.title,
+        message: notification.message,
+        type: notification.type,
+        timestamp: new Date(notification.created_at),
+        read: notification.read,
+        userId: notification.user_id,
+        actionUrl: notification.action_url,
+        data: notification.data
+      }));
+
+      setNotifications(formattedNotifications);
     } catch (error) {
       console.error('Error loading notifications:', error);
       toast.error('Không thể tải thông báo');
+      // Fallback to mock data for demo
+      setNotifications([]);
     } finally {
       setIsLoading(false);
     }
@@ -101,13 +59,12 @@ export const useNotifications = () => {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      // TODO: Update in Supabase
-      // const { error } = await supabase
-      //   .from('notifications')
-      //   .update({ read: true, read_at: new Date().toISOString() })
-      //   .eq('id', notificationId);
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true, read_at: new Date().toISOString() })
+        .eq('id', notificationId);
 
-      // if (error) throw error;
+      if (error) throw error;
 
       setNotifications(prev =>
         prev.map(notification =>
@@ -123,15 +80,16 @@ export const useNotifications = () => {
   };
 
   const markAllAsRead = async () => {
-    try {
-      // TODO: Update all in Supabase
-      // const { error } = await supabase
-      //   .from('notifications')
-      //   .update({ read: true, read_at: new Date().toISOString() })
-      //   .eq('user_id', user?.id)
-      //   .eq('read', false);
+    if (!user) return;
 
-      // if (error) throw error;
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true, read_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .eq('read', false);
+
+      if (error) throw error;
 
       setNotifications(prev =>
         prev.map(notification => ({ ...notification, read: true }))
@@ -146,13 +104,12 @@ export const useNotifications = () => {
 
   const removeNotification = async (notificationId: string) => {
     try {
-      // TODO: Delete from Supabase
-      // const { error } = await supabase
-      //   .from('notifications')
-      //   .delete()
-      //   .eq('id', notificationId);
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId);
 
-      // if (error) throw error;
+      if (error) throw error;
 
       setNotifications(prev =>
         prev.filter(notification => notification.id !== notificationId)
@@ -169,27 +126,19 @@ export const useNotifications = () => {
     if (!user) return;
 
     try {
-      const newNotification: Notification = {
-        ...notification,
-        id: Date.now().toString(),
-        timestamp: new Date(),
-        read: false,
-        userId: user.id
-      };
+      const { error } = await supabase
+        .from('notifications')
+        .insert([{
+          user_id: user.id,
+          title: notification.title,
+          message: notification.message,
+          type: notification.type,
+          action_url: notification.actionUrl,
+          data: notification.data || {}
+        }]);
 
-      // TODO: Insert into Supabase
-      // const { error } = await supabase
-      //   .from('notifications')
-      //   .insert([{
-      //     ...newNotification,
-      //     user_id: user.id,
-      //     created_at: newNotification.timestamp.toISOString()
-      //   }]);
+      if (error) throw error;
 
-      // if (error) throw error;
-
-      setNotifications(prev => [newNotification, ...prev]);
-      
       // Show toast for new notification
       toast[notification.type](notification.title);
     } catch (error) {
@@ -203,31 +152,62 @@ export const useNotifications = () => {
     }
   }, [user]);
 
-  // Subscribe to real-time notifications (when Supabase is implemented)
+  // Set up real-time subscription for notifications
   useEffect(() => {
     if (!user) return;
 
-    // TODO: Set up real-time subscription
-    // const subscription = supabase
-    //   .channel('notifications')
-    //   .on('postgres_changes', 
-    //     {
-    //       event: 'INSERT',
-    //       schema: 'public',
-    //       table: 'notifications',
-    //       filter: `user_id=eq.${user.id}`
-    //     },
-    //     (payload) => {
-    //       const newNotification = payload.new as any;
-    //       setNotifications(prev => [newNotification, ...prev]);
-    //       toast[newNotification.type](newNotification.title);
-    //     }
-    //   )
-    //   .subscribe();
+    const channel = supabase
+      .channel('notifications-changes')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`
+      }, (payload) => {
+        const newNotification = payload.new as any;
+        const formattedNotification: Notification = {
+          id: newNotification.id,
+          title: newNotification.title,
+          message: newNotification.message,
+          type: newNotification.type,
+          timestamp: new Date(newNotification.created_at),
+          read: newNotification.read,
+          userId: newNotification.user_id,
+          actionUrl: newNotification.action_url,
+          data: newNotification.data
+        };
 
-    // return () => {
-    //   subscription.unsubscribe();
-    // };
+        setNotifications(prev => [formattedNotification, ...prev]);
+        toast[newNotification.type](newNotification.title);
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'notifications',
+        filter: `user_id=eq.${user.id}`
+      }, (payload) => {
+        const updatedNotification = payload.new as any;
+        setNotifications(prev =>
+          prev.map(notification =>
+            notification.id === updatedNotification.id
+              ? {
+                  ...notification,
+                  read: updatedNotification.read,
+                  title: updatedNotification.title,
+                  message: updatedNotification.message,
+                  type: updatedNotification.type,
+                  actionUrl: updatedNotification.action_url,
+                  data: updatedNotification.data
+                }
+              : notification
+          )
+        );
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
