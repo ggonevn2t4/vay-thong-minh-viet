@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,6 +8,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MapPin, Search, Filter, Clock, Star, Users, TrendingUp, Award, Phone, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { Tables } from '@/integrations/supabase/types';
+
+type AdvisorProfileRow = Tables<'advisor_profiles'>;
 
 interface AdvisorProfile {
   id: string;
@@ -60,7 +62,22 @@ const EnhancedAdvisorDirectory = () => {
 
       if (error) throw error;
 
-      setAdvisors(data || []);
+      const transformedData: AdvisorProfile[] = (data || []).map((row: AdvisorProfileRow) => ({
+        ...row,
+        certifications: row.certifications || [],
+        languages: row.languages || [],
+        specializations: row.specializations || [],
+        achievements: row.achievements || [],
+        loan_types: (row.loan_types as Record<string, number>) || {},
+        working_hours: (row.working_hours as Record<string, any>) || {},
+        total_clients_helped: row.total_clients_helped || 0,
+        success_rate: Number(row.success_rate) || 0,
+        average_rating: Number(row.average_rating) || 0,
+        total_reviews: row.total_reviews || 0,
+        is_verified: row.is_verified || false
+      }));
+
+      setAdvisors(transformedData);
     } catch (error) {
       console.error('Error fetching advisors:', error);
       toast({

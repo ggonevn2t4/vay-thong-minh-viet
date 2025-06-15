@@ -104,16 +104,18 @@ const AdvisorProfileForm = () => {
       }
 
       if (data) {
-        setExistingProfile(data);
-        setFormData({
+        const profileData: AdvisorProfile = {
           ...data,
           certifications: data.certifications || [],
           languages: data.languages || [],
           specializations: data.specializations || [],
           achievements: data.achievements || [],
-          loan_types: data.loan_types || {},
-          working_hours: data.working_hours || formData.working_hours
-        });
+          loan_types: (data.loan_types as Record<string, number>) || {},
+          working_hours: (data.working_hours as Record<string, any>) || formData.working_hours
+        };
+        
+        setExistingProfile(profileData);
+        setFormData(profileData);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
