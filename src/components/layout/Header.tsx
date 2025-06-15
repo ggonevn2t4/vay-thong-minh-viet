@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, User, LogOut, Settings } from 'lucide-react';
+import { Menu, User, LogOut, Settings, MessageSquare, Wallet } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,7 +12,7 @@ import { useState } from 'react';
 import NotificationSystem from '@/components/NotificationSystem';
 
 const Header = () => {
-  const { user, isLoaded, signOut } = useAuth();
+  const { user, userRole, isLoaded, signOut } = useAuth();
   const { navigationItems } = useNavigation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -126,6 +126,22 @@ const Header = () => {
                             <span>Khu vực cá nhân</span>
                           </Link>
                         </DropdownMenuItem>
+                        {userRole === 'customer' && (
+                          <>
+                            <DropdownMenuItem asChild>
+                              <Link to="/messages" className="flex items-center space-x-2">
+                                <MessageSquare className="h-4 w-4" />
+                                <span>Tin nhắn</span>
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link to="/wallet" className="flex items-center space-x-2">
+                                <Wallet className="h-4 w-4" />
+                                <span>Ví của tôi</span>
+                              </Link>
+                            </DropdownMenuItem>
+                          </>
+                        )}
                         <DropdownMenuItem asChild>
                           <Link to="/settings" className="flex items-center space-x-2">
                             <Settings className="h-4 w-4" />

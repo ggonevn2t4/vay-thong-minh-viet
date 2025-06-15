@@ -31,6 +31,8 @@ import KnowledgeManagement from "./pages/KnowledgeManagement";
 import UserManagement from "./pages/UserManagement";
 import SystemAnalytics from "./pages/SystemAnalytics";
 import RoleBasedDashboard from "@/components/dashboard/RoleBasedDashboard";
+import FinancialGuidesPage from "./pages/FinancialGuides";
+import WalletPage from "./pages/Wallet";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +69,8 @@ const App = () => (
             <Route path="/knowledge-management" element={<KnowledgeManagement />} />
             <Route path="/user-management" element={<UserManagement />} />
             <Route path="/system-analytics" element={<SystemAnalytics />} />
+            <Route path="/financial-guides" element={<FinancialGuidesPage />} />
+            <Route path="/wallet" element={<WalletPage />} />
             
             {/* Vietnamese routes - redirect to English equivalents */}
             <Route path="/kiem-tra-dieu-kien" element={<LoanEligibility />} />
