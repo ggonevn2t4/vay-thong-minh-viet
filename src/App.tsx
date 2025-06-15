@@ -12,6 +12,7 @@ import AdvisorDashboard from "./pages/AdvisorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Marketplace from "./pages/Marketplace";
 import AdvisorDirectoryPage from "./pages/AdvisorDirectory";
+import AdvisorProfile from "./pages/AdvisorProfile";
 import Messages from "./pages/Messages";
 import LoanComparison from "./pages/LoanComparison";
 import LoanOptimization from "./pages/LoanOptimization";
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/user-dashboard" element={<UserDashboard />} />
             <Route path="/advisor-dashboard" element={<AdvisorDashboard />} />
+            <Route path="/advisor-profile" element={<AdvisorProfile />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/advisor-directory" element={<AdvisorDirectoryPage />} />

@@ -9,6 +9,111 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      advisor_profiles: {
+        Row: {
+          achievements: string[] | null
+          availability_status: string | null
+          avatar_url: string | null
+          average_rating: number | null
+          bank_employee_id: string | null
+          bank_name: string
+          bio: string | null
+          branch_address: string | null
+          branch_name: string | null
+          certifications: string[] | null
+          client_testimonials: Json | null
+          created_at: string
+          department: string | null
+          email: string | null
+          full_name: string
+          id: string
+          is_verified: boolean | null
+          job_title: string | null
+          languages: string[] | null
+          last_rate_update: string | null
+          loan_types: Json | null
+          phone: string | null
+          rate_update_frequency: string | null
+          specializations: string[] | null
+          success_rate: number | null
+          total_clients_helped: number | null
+          total_reviews: number | null
+          updated_at: string
+          user_id: string
+          verification_documents: Json | null
+          working_hours: Json | null
+          years_experience: number | null
+        }
+        Insert: {
+          achievements?: string[] | null
+          availability_status?: string | null
+          avatar_url?: string | null
+          average_rating?: number | null
+          bank_employee_id?: string | null
+          bank_name: string
+          bio?: string | null
+          branch_address?: string | null
+          branch_name?: string | null
+          certifications?: string[] | null
+          client_testimonials?: Json | null
+          created_at?: string
+          department?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          is_verified?: boolean | null
+          job_title?: string | null
+          languages?: string[] | null
+          last_rate_update?: string | null
+          loan_types?: Json | null
+          phone?: string | null
+          rate_update_frequency?: string | null
+          specializations?: string[] | null
+          success_rate?: number | null
+          total_clients_helped?: number | null
+          total_reviews?: number | null
+          updated_at?: string
+          user_id: string
+          verification_documents?: Json | null
+          working_hours?: Json | null
+          years_experience?: number | null
+        }
+        Update: {
+          achievements?: string[] | null
+          availability_status?: string | null
+          avatar_url?: string | null
+          average_rating?: number | null
+          bank_employee_id?: string | null
+          bank_name?: string
+          bio?: string | null
+          branch_address?: string | null
+          branch_name?: string | null
+          certifications?: string[] | null
+          client_testimonials?: Json | null
+          created_at?: string
+          department?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_verified?: boolean | null
+          job_title?: string | null
+          languages?: string[] | null
+          last_rate_update?: string | null
+          loan_types?: Json | null
+          phone?: string | null
+          rate_update_frequency?: string | null
+          specializations?: string[] | null
+          success_rate?: number | null
+          total_clients_helped?: number | null
+          total_reviews?: number | null
+          updated_at?: string
+          user_id?: string
+          verification_documents?: Json | null
+          working_hours?: Json | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       ai_consultation_sessions: {
         Row: {
           ai_analysis: Json | null

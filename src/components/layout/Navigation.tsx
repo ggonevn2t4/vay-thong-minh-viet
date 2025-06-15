@@ -25,7 +25,10 @@ const Navigation = ({ className }: NavigationProps = {}) => {
   if (userRole === 'customer') {
     roleSpecificItems.push({ href: '/user-dashboard', label: 'Dashboard' });
   } else if (userRole === 'advisor') {
-    roleSpecificItems.push({ href: '/advisor-dashboard', label: 'Dashboard' });
+    roleSpecificItems.push(
+      { href: '/advisor-dashboard', label: 'Dashboard' },
+      { href: '/advisor-profile', label: 'Hồ sơ' }
+    );
   } else if (userRole === 'admin') {
     roleSpecificItems.push({ href: '/admin-dashboard', label: 'Admin' });
   }
