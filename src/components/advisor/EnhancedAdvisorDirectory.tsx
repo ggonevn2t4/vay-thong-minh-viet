@@ -1,11 +1,13 @@
+
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MapPin, Search, Filter, Clock, Star, Users, TrendingUp, Award, Phone, Mail } from 'lucide-react';
+import { MapPin, Search, Star, Users, TrendingUp, Award, Phone, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Tables } from '@/integrations/supabase/types';
@@ -371,12 +373,14 @@ const EnhancedAdvisorDirectory = () => {
                 >
                   Liên hệ tư vấn
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full border-brand-200 text-brand-600 hover:bg-brand-50"
-                >
-                  Xem hồ sơ chi tiết
-                </Button>
+                <Link to={`/advisor/${advisor.id}`}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-brand-200 text-brand-600 hover:bg-brand-50"
+                  >
+                    Xem hồ sơ chi tiết
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

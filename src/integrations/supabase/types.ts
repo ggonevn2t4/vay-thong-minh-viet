@@ -183,6 +183,62 @@ export type Database = {
         }
         Relationships: []
       }
+      document_requests: {
+        Row: {
+          advisor_id: string | null
+          customer_id: string
+          description: string | null
+          document_name: string
+          document_type: string
+          file_url: string | null
+          id: string
+          loan_application_id: string | null
+          notes: string | null
+          requested_at: string
+          reviewed_at: string | null
+          status: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          advisor_id?: string | null
+          customer_id: string
+          description?: string | null
+          document_name: string
+          document_type: string
+          file_url?: string | null
+          id?: string
+          loan_application_id?: string | null
+          notes?: string | null
+          requested_at?: string
+          reviewed_at?: string | null
+          status?: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          advisor_id?: string | null
+          customer_id?: string
+          description?: string | null
+          document_name?: string
+          document_type?: string
+          file_url?: string | null
+          id?: string
+          loan_application_id?: string | null
+          notes?: string | null
+          requested_at?: string
+          reviewed_at?: string | null
+          status?: string
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_requests_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       existing_loans: {
         Row: {
           additional_info: Json | null
@@ -382,6 +438,45 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_articles: {
+        Row: {
+          author_id: string | null
+          category: string
+          content: string
+          created_at: string
+          id: string
+          is_published: boolean | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          view_count: number | null
+        }
+        Insert: {
+          author_id?: string | null
+          category: string
+          content: string
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Update: {
+          author_id?: string | null
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
       loan_applications: {
         Row: {
           amount: number
@@ -535,6 +630,42 @@ export type Database = {
           },
         ]
       }
+      offer_comparisons: {
+        Row: {
+          comparison_name: string
+          created_at: string
+          id: string
+          loan_amount: number
+          loan_purpose: string | null
+          loan_term_months: number
+          offers: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comparison_name: string
+          created_at?: string
+          id?: string
+          loan_amount: number
+          loan_purpose?: string | null
+          loan_term_months: number
+          offers?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comparison_name?: string
+          created_at?: string
+          id?: string
+          loan_amount?: number
+          loan_purpose?: string | null
+          loan_term_months?: number
+          offers?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company_name: string | null
@@ -663,6 +794,77 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      wallet: {
+        Row: {
+          balance: number
+          created_at: string
+          currency: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          reference_id: string | null
+          status: string
+          transaction_type: string
+          updated_at: string
+          wallet_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          status?: string
+          transaction_type: string
+          updated_at?: string
+          wallet_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          status?: string
+          transaction_type?: string
+          updated_at?: string
+          wallet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallet"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
