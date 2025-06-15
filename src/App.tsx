@@ -35,8 +35,8 @@ import RoleBasedDashboard from "@/components/dashboard/RoleBasedDashboard";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <AuthProvider>
-    <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -78,8 +78,8 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
-    </QueryClientProvider>
-  </AuthProvider>
+    </AuthProvider>
+  </QueryClientProvider>
 );
 
 export default App;
