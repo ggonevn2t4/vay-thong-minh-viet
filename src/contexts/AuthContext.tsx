@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,7 +12,9 @@ interface AuthContextType {
   userRole: UserRole;
   loading: boolean;
   isLoaded: boolean;
+  isPasswordRecovery: boolean;
   signOut: () => Promise<void>;
+  clearPasswordRecovery: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,6 +36,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [session, setSession] = useState<Session | null>(null);
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   const fetchUserRole = async (userId: string) => {
     try {
@@ -59,6 +63,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setIsPasswordRecovery(true);
+        } else if (isPasswordRecovery && event !== 'USER_UPDATED') {
+          setIsPasswordRecovery(false);
+        }
+
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -92,10 +102,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [isPasswordRecovery]);
 
   const signOut = async () => {
     await robustSignOut();
+  };
+
+  const clearPasswordRecovery = () => {
+    setIsPasswordRecovery(false);
   };
 
   const value = {
@@ -104,7 +118,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     userRole,
     loading,
     isLoaded: !loading,
-    signOut
+    isPasswordRecovery,
+    signOut,
+    clearPasswordRecovery,
   };
 
   return (
@@ -113,3 +129,4 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     </AuthContext.Provider>
   );
 };
+

@@ -4,8 +4,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Layout from '@/components/layout/Layout';
 import { SignInForm } from '@/components/auth/SignInForm';
 import { SignUpForm } from '@/components/auth/SignUpForm';
+import { useAuth } from '@/contexts/AuthContext';
+import { UpdatePasswordForm } from '@/components/auth/UpdatePasswordForm';
 
 const Auth = () => {
+  const { isPasswordRecovery } = useAuth();
+
   return (
     <Layout>
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-50 to-white py-12 px-4 sm:px-6 lg:px-8">
@@ -19,30 +23,44 @@ const Auth = () => {
             </p>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Xác thực tài khoản</CardTitle>
-              <CardDescription>
-                Đăng nhập hoặc tạo tài khoản mới để bắt đầu
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="signin" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="signin">Đăng nhập</TabsTrigger>
-                  <TabsTrigger value="signup">Đăng ký</TabsTrigger>
-                </TabsList>
+          {isPasswordRecovery ? (
+             <Card>
+              <CardHeader>
+                <CardTitle>Cập nhật mật khẩu</CardTitle>
+                <CardDescription>
+                  Vui lòng nhập mật khẩu mới của bạn.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <UpdatePasswordForm />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Xác thực tài khoản</CardTitle>
+                <CardDescription>
+                  Đăng nhập hoặc tạo tài khoản mới để bắt đầu
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="signin" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="signin">Đăng nhập</TabsTrigger>
+                    <TabsTrigger value="signup">Đăng ký</TabsTrigger>
+                  </TabsList>
 
-                <TabsContent value="signin" className="pt-4">
-                  <SignInForm />
-                </TabsContent>
+                  <TabsContent value="signin" className="pt-4">
+                    <SignInForm />
+                  </TabsContent>
 
-                <TabsContent value="signup" className="pt-4">
-                  <SignUpForm />
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+                  <TabsContent value="signup" className="pt-4">
+                    <SignUpForm />
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </Layout>
