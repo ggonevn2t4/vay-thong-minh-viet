@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import type { User } from '@supabase/supabase-js';
 
 export interface Document {
   id: string;
@@ -18,242 +20,210 @@ export interface Document {
   userId: string;
 }
 
+// --- Data Fetching and Mutation Functions ---
+
+const fetchDocuments = async (userId: string): Promise<Document[]> => {
+  const { data, error } = await supabase
+    .from('documents')
+    .select('*')
+    .eq('user_id', userId)
+    .order('uploaded_at', { ascending: false });
+
+  if (error) {
+    console.error('Error loading documents:', error);
+    throw new Error('Không thể tải danh sách tài liệu');
+  }
+
+  return data.map(doc => ({
+    id: doc.id,
+    name: doc.name,
+    description: doc.description,
+    filePath: doc.file_path,
+    fileSize: doc.file_size,
+    contentType: doc.content_type,
+    category: doc.category,
+    status: doc.status as 'pending' | 'approved' | 'rejected',
+    uploadedAt: new Date(doc.uploaded_at),
+    reviewedAt: doc.reviewed_at ? new Date(doc.reviewed_at) : undefined,
+    reviewedBy: doc.reviewed_by,
+    userId: doc.user_id
+  }));
+};
+
+const uploadDocumentFn = async (variables: { file: File; name: string; description?: string; category: string; user: User; }): Promise<Document> => {
+  const { file, name, description, category, user } = variables;
+  const filePath = `${user.id}/${Date.now()}-${file.name}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('documents')
+    .upload(filePath, file);
+
+  if (uploadError) throw uploadError;
+
+  const { data, error: dbError } = await supabase
+    .from('documents')
+    .insert([{
+      user_id: user.id,
+      name,
+      description,
+      file_path: filePath,
+      file_size: file.size,
+      content_type: file.type,
+      category
+    }])
+    .select()
+    .single();
+
+  if (dbError) throw dbError;
+
+  return {
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    filePath: data.file_path,
+    fileSize: data.file_size,
+    contentType: data.content_type,
+    category: data.category,
+    status: data.status as 'pending' | 'approved' | 'rejected',
+    uploadedAt: new Date(data.uploaded_at),
+    reviewedAt: data.reviewed_at ? new Date(data.reviewed_at) : undefined,
+    reviewedBy: data.reviewed_by,
+    userId: data.user_id
+  };
+};
+
+const deleteDocumentFn = async (filePath: string, documentId: string) => {
+  const { error: storageError } = await supabase.storage
+    .from('documents')
+    .remove([filePath]);
+  if (storageError) throw storageError;
+
+  const { error: dbError } = await supabase
+    .from('documents')
+    .delete()
+    .eq('id', documentId);
+  if (dbError) throw dbError;
+};
+
+const getDocumentUrlFn = async (filePath: string) => {
+  const { data, error } = await supabase.storage
+    .from('documents')
+    .createSignedUrl(filePath, 3600); // 1 hour expiry
+  if (error) {
+    console.error('Error getting document URL:', error);
+    return null;
+  }
+  return data?.signedUrl;
+};
+
+// --- Real-time Subscription Handler ---
+
+const handleRealtimeUpdate = (payload: any, queryClient: QueryClient, userId: string) => {
+  console.log('Real-time change received!', payload);
+  queryClient.invalidateQueries({ queryKey: ['documents', userId] });
+
+  if (payload.eventType === 'UPDATE') {
+    const updatedDocument = payload.new as any;
+    const oldDocument = payload.old as any;
+    if (updatedDocument.status !== oldDocument.status) {
+      if (updatedDocument.status === 'approved') {
+        toast.success(`Tài liệu "${updatedDocument.name}" đã được phê duyệt`);
+      } else if (updatedDocument.status === 'rejected') {
+        toast.error(`Tài liệu "${updatedDocument.name}" đã bị từ chối`);
+      }
+    }
+  }
+};
+
+
 export const useDocuments = () => {
   const { user } = useAuth();
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
-  const channelRef = useRef<any>(null);
-  const isSubscribedRef = useRef(false);
+  const queryClient = useQueryClient();
 
-  const loadDocuments = async () => {
-    if (!user) return;
+  const { data: documents = [], isLoading } = useQuery<Document[]>({
+    queryKey: ['documents', user?.id],
+    queryFn: () => fetchDocuments(user!.id),
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    onError: (error: any) => {
+      toast.error(error.message || 'Không thể tải danh sách tài liệu');
+    },
+  });
 
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('documents')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('uploaded_at', { ascending: false });
-
-      if (error) throw error;
-
-      const formattedDocuments: Document[] = data.map(doc => ({
-        id: doc.id,
-        name: doc.name,
-        description: doc.description,
-        filePath: doc.file_path,
-        fileSize: doc.file_size,
-        contentType: doc.content_type,
-        category: doc.category,
-        status: doc.status as 'pending' | 'approved' | 'rejected',
-        uploadedAt: new Date(doc.uploaded_at),
-        reviewedAt: doc.reviewed_at ? new Date(doc.reviewed_at) : undefined,
-        reviewedBy: doc.reviewed_by,
-        userId: doc.user_id
-      }));
-
-      setDocuments(formattedDocuments);
-    } catch (error) {
-      console.error('Error loading documents:', error);
-      toast.error('Không thể tải danh sách tài liệu');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const uploadDocument = async (
-    file: File,
-    name: string,
-    description?: string,
-    category: string = 'general'
-  ) => {
-    if (!user) return null;
-
-    setIsUploading(true);
-    try {
-      // Upload file to storage
-      const filePath = `${user.id}/${Date.now()}-${file.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      // Create document record
-      const { data, error: dbError } = await supabase
-        .from('documents')
-        .insert([{
-          user_id: user.id,
-          name,
-          description,
-          file_path: filePath,
-          file_size: file.size,
-          content_type: file.type,
-          category
-        }])
-        .select()
-        .single();
-
-      if (dbError) throw dbError;
-
-      const newDocument: Document = {
-        id: data.id,
-        name: data.name,
-        description: data.description,
-        filePath: data.file_path,
-        fileSize: data.file_size,
-        contentType: data.content_type,
-        category: data.category,
-        status: data.status as 'pending' | 'approved' | 'rejected',
-        uploadedAt: new Date(data.uploaded_at),
-        reviewedAt: data.reviewed_at ? new Date(data.reviewed_at) : undefined,
-        reviewedBy: data.reviewed_by,
-        userId: data.user_id
-      };
-
-      setDocuments(prev => [newDocument, ...prev]);
+  const { mutateAsync: uploadMutation, isPending: isUploading } = useMutation({
+    mutationFn: (variables: { file: File; name: string; description?: string; category: string; }) => {
+      if (!user) throw new Error("User not authenticated");
+      return uploadDocumentFn({ ...variables, user });
+    },
+    onSuccess: (newDocument) => {
+      // The query invalidation is now handled by the real-time subscription,
+      // but we can keep it for immediate feedback.
+      queryClient.invalidateQueries({ queryKey: ['documents', user?.id] });
       toast.success('Tài liệu đã được tải lên thành công');
       return newDocument;
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error('Error uploading document:', error);
       toast.error('Không thể tải lên tài liệu');
-      return null;
-    } finally {
-      setIsUploading(false);
-    }
-  };
+    },
+  });
 
-  const deleteDocument = async (documentId: string) => {
-    try {
+  const { mutateAsync: deleteMutation } = useMutation({
+    mutationFn: (documentId: string) => {
       const document = documents.find(doc => doc.id === documentId);
-      if (!document) return;
-
-      // Delete from storage
-      const { error: storageError } = await supabase.storage
-        .from('documents')
-        .remove([document.filePath]);
-
-      if (storageError) throw storageError;
-
-      // Delete from database
-      const { error: dbError } = await supabase
-        .from('documents')
-        .delete()
-        .eq('id', documentId);
-
-      if (dbError) throw dbError;
-
-      setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+      if (!document) throw new Error("Document not found to delete");
+      return deleteDocumentFn(document.filePath, document.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documents', user?.id] });
       toast.success('Đã xóa tài liệu');
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error('Error deleting document:', error);
       toast.error('Không thể xóa tài liệu');
     }
+  });
+  
+  const uploadDocument = (file: File, name: string, description?: string, category: string = 'general') => {
+    return uploadMutation({ file, name, description, category });
   };
 
   const getDocumentUrl = async (filePath: string) => {
-    try {
-      const { data } = await supabase.storage
-        .from('documents')
-        .createSignedUrl(filePath, 3600); // 1 hour expiry
-
-      return data?.signedUrl;
-    } catch (error) {
-      console.error('Error getting document URL:', error);
-      return null;
-    }
+    return getDocumentUrlFn(filePath);
   };
 
   useEffect(() => {
-    if (user) {
-      loadDocuments();
-    }
-  }, [user]);
+    if (!user) return;
 
-  // Set up real-time subscription for documents
-  useEffect(() => {
-    if (!user || isSubscribedRef.current) return;
-
-    const setupSubscription = async () => {
-      // Clean up existing channel if it exists
-      if (channelRef.current) {
-        try {
-          await supabase.removeChannel(channelRef.current);
-        } catch (error) {
-          console.log('Error removing existing channel:', error);
-        }
-        channelRef.current = null;
-        isSubscribedRef.current = false;
-      }
-
-      // Create new channel with unique name
-      const channelName = `documents-${user.id}-${Date.now()}`;
-      console.log('Creating documents channel:', channelName);
-      
-      channelRef.current = supabase
-        .channel(channelName)
-        .on('postgres_changes', {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'documents',
-          filter: `user_id=eq.${user.id}`
-        }, (payload) => {
-          const updatedDocument = payload.new as any;
-          setDocuments(prev =>
-            prev.map(doc =>
-              doc.id === updatedDocument.id
-                ? {
-                    ...doc,
-                    status: updatedDocument.status as 'pending' | 'approved' | 'rejected',
-                    reviewedAt: updatedDocument.reviewed_at ? new Date(updatedDocument.reviewed_at) : undefined,
-                    reviewedBy: updatedDocument.reviewed_by
-                  }
-                : doc
-            )
-          );
-
-          // Show notification for status changes
-          if (updatedDocument.status === 'approved') {
-            toast.success(`Tài liệu "${updatedDocument.name}" đã được phê duyệt`);
-          } else if (updatedDocument.status === 'rejected') {
-            toast.error(`Tài liệu "${updatedDocument.name}" đã bị từ chối`);
-          }
-        });
-
-      try {
-        const subscriptionStatus = await channelRef.current.subscribe();
-        if (subscriptionStatus === 'SUBSCRIBED') {
-          isSubscribedRef.current = true;
+    const channel = supabase
+      .channel(`documents-user-${user.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'documents',
+        filter: `user_id=eq.${user.id}`
+      }, (payload) => handleRealtimeUpdate(payload, queryClient, user.id))
+      .subscribe((status, err) => {
+        if (status === 'SUBSCRIBED') {
           console.log('Documents subscription successful');
-        } else {
-          console.log('Documents subscription failed:', subscriptionStatus);
         }
-      } catch (error) {
-        console.error('Error subscribing to documents channel:', error);
-      }
-    };
-
-    setupSubscription();
+        if (status === 'CHANNEL_ERROR' || err) {
+          console.error('Documents subscription error:', err);
+        }
+      });
 
     return () => {
-      if (channelRef.current) {
-        console.log('Cleaning up documents channel');
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-        isSubscribedRef.current = false;
-      }
+      supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, queryClient]);
 
   return {
     documents,
     isLoading,
     isUploading,
     uploadDocument,
-    deleteDocument,
+    deleteDocument: deleteMutation,
     getDocumentUrl,
-    loadDocuments
+    loadDocuments: () => queryClient.invalidateQueries({ queryKey: ['documents', user?.id] })
   };
 };
