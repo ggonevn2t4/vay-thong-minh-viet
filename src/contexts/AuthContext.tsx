@@ -10,6 +10,7 @@ interface AuthContextType {
   session: Session | null;
   userRole: UserRole;
   loading: boolean;
+  isLoaded: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -103,6 +104,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     session,
     userRole,
     loading,
+    isLoaded: !loading,
     signOut
   };
 
