@@ -1,19 +1,27 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, Menu } from 'lucide-react';
+import { Building2, Menu, User, LogOut, Settings } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useNavigation } from '@/hooks/useNavigation';
 import { useState } from 'react';
 import NotificationSystem from '@/components/NotificationSystem';
 
 const Header = () => {
-  const { user, isLoaded } = useAuth();
+  const { user, isLoaded, signOut } = useAuth();
   const { navigationItems } = useNavigation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  const getUserInitials = () => {
+    if (!user?.user_metadata?.full_name) return 'U';
+    const names = user.user_metadata.full_name.split(' ');
+    return names.map((name: string) => name[0]).join('').toUpperCase().slice(0, 2);
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -81,26 +89,65 @@ const Header = () => {
                 {user ? (
                   <div className="flex items-center space-x-2">
                     <NotificationSystem />
-                    <UserButton
-                      appearance={{
-                        elements: {
-                          avatarBox: "h-8 w-8"
-                        }
-                      }}
-                    />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="flex items-center space-x-2 p-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={user.user_metadata?.avatar_url} />
+                            <AvatarFallback className="bg-brand-100 text-brand-700">
+                              {getUserInitials()}
+                            </AvatarFallback>
+                          </Avatar>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <div className="flex items-center space-x-2 p-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={user.user_metadata?.avatar_url} />
+                            <AvatarFallback className="bg-brand-100 text-brand-700">
+                              {getUserInitials()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col space-y-1">
+                            <p className="text-sm font-medium">
+                              {user.user_metadata?.full_name || 'Người dùng'}
+                            </p>
+                            <p className="text-xs text-gray-500">{user.email}</p>
+                          </div>
+                        </div>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to="/dashboard" className="flex items-center space-x-2">
+                            <User className="h-4 w-4" />
+                            <span>Khu vực cá nhân</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/settings" className="flex items-center space-x-2">
+                            <Settings className="h-4 w-4" />
+                            <span>Cài đặt</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={signOut} className="flex items-center space-x-2 text-red-600">
+                          <LogOut className="h-4 w-4" />
+                          <span>Đăng xuất</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <SignInButton mode="modal">
+                    <Link to="/auth">
                       <Button variant="ghost" size="sm">
                         Đăng nhập
                       </Button>
-                    </SignInButton>
-                    <SignUpButton mode="modal">
+                    </Link>
+                    <Link to="/auth">
                       <Button size="sm">
                         Đăng ký
                       </Button>
-                    </SignUpButton>
+                    </Link>
                   </div>
                 )}
               </>
