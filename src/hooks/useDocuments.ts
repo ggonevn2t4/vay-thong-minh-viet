@@ -140,15 +140,18 @@ export const useDocuments = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: documents = [], isLoading } = useQuery<Document[]>({
+  const { data: documents = [], isLoading, isError, error } = useQuery<Document[], Error>({
     queryKey: ['documents', user?.id],
     queryFn: () => fetchDocuments(user!.id),
     enabled: !!user,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    onError: (error: any) => {
-      toast.error(error.message || 'Không thể tải danh sách tài liệu');
-    },
   });
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(error.message || 'Không thể tải danh sách tài liệu');
+    }
+  }, [isError, error]);
 
   const { mutateAsync: uploadMutation, isPending: isUploading } = useMutation({
     mutationFn: (variables: { file: File; name: string; description?: string; category: string; }) => {
