@@ -25,12 +25,11 @@ const Header = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
-              <div className="bg-gradient-to-r from-brand-600 to-brand-700 text-white p-2 rounded-lg">
-                <span className="text-xl font-bold">VV</span>
-              </div>
-              <span className="text-xl font-bold text-gray-800 hidden sm:block">
-                Vay Vốn Hub
-              </span>
+              <img 
+                src="/lovable-uploads/bacd1e11-f5c6-45b2-9fdc-cbc95020cecd.png" 
+                alt="Finzy Logo" 
+                className="h-10 w-auto"
+              />
             </Link>
 
             {/* Desktop Navigation */}
