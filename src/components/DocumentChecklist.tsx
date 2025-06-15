@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useDocuments } from '@/hooks/useDocuments';
 import { useNotifications } from '@/hooks/useNotifications';
 import { toast } from 'sonner';
+import type { Document } from '@/types/document';
 
 interface DocumentItem {
   id: string;
@@ -134,7 +135,7 @@ const DocumentChecklist = () => {
     fileInputRef.current?.click();
   };
 
-  const handleViewDocument = async (document: any) => {
+  const handleViewDocument = async (document: Document) => {
     const url = await getDocumentUrl(document.filePath);
     if (url) {
       window.open(url, '_blank');
