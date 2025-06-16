@@ -183,6 +183,71 @@ export type Database = {
         }
         Relationships: []
       }
+      bank_employee_profiles: {
+        Row: {
+          branch_code: string
+          branch_name: string
+          created_at: string | null
+          department: string
+          email: string | null
+          employee_id: string
+          full_name: string
+          hire_date: string | null
+          id: string
+          is_active: boolean | null
+          permissions: Json | null
+          phone: string | null
+          position: string
+          supervisor_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          branch_code: string
+          branch_name: string
+          created_at?: string | null
+          department: string
+          email?: string | null
+          employee_id: string
+          full_name: string
+          hire_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          permissions?: Json | null
+          phone?: string | null
+          position: string
+          supervisor_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          branch_code?: string
+          branch_name?: string
+          created_at?: string | null
+          department?: string
+          email?: string | null
+          employee_id?: string
+          full_name?: string
+          hire_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          permissions?: Json | null
+          phone?: string | null
+          position?: string
+          supervisor_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_employee_profiles_supervisor_id_fkey"
+            columns: ["supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "bank_employee_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_sessions: {
         Row: {
           created_at: string | null
@@ -204,6 +269,57 @@ export type Database = {
           last_activity?: string | null
           session_data?: Json | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      customer_credit_assessments: {
+        Row: {
+          assessment_date: string | null
+          assessment_notes: string | null
+          assessor_id: string
+          created_at: string | null
+          credit_score: number | null
+          customer_id: string
+          debt_to_income_ratio: number | null
+          employment_verification_status: string | null
+          id: string
+          income_verification_status: string | null
+          recommended_interest_rate: number | null
+          recommended_loan_amount: number | null
+          risk_level: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assessment_date?: string | null
+          assessment_notes?: string | null
+          assessor_id: string
+          created_at?: string | null
+          credit_score?: number | null
+          customer_id: string
+          debt_to_income_ratio?: number | null
+          employment_verification_status?: string | null
+          id?: string
+          income_verification_status?: string | null
+          recommended_interest_rate?: number | null
+          recommended_loan_amount?: number | null
+          risk_level?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assessment_date?: string | null
+          assessment_notes?: string | null
+          assessor_id?: string
+          created_at?: string | null
+          credit_score?: number | null
+          customer_id?: string
+          debt_to_income_ratio?: number | null
+          employment_verification_status?: string | null
+          id?: string
+          income_verification_status?: string | null
+          recommended_interest_rate?: number | null
+          recommended_loan_amount?: number | null
+          risk_level?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -545,6 +661,62 @@ export type Database = {
           view_count?: number | null
         }
         Relationships: []
+      }
+      loan_application_reviews: {
+        Row: {
+          approval_amount: number | null
+          approved_interest_rate: number | null
+          approved_term_months: number | null
+          conditions: string | null
+          created_at: string | null
+          documents_requested: Json | null
+          id: string
+          loan_application_id: string
+          review_notes: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewer_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          approval_amount?: number | null
+          approved_interest_rate?: number | null
+          approved_term_months?: number | null
+          conditions?: string | null
+          created_at?: string | null
+          documents_requested?: Json | null
+          id?: string
+          loan_application_id: string
+          review_notes?: string | null
+          review_status: string
+          reviewed_at?: string | null
+          reviewer_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          approval_amount?: number | null
+          approved_interest_rate?: number | null
+          approved_term_months?: number | null
+          conditions?: string | null
+          created_at?: string | null
+          documents_requested?: Json | null
+          id?: string
+          loan_application_id?: string
+          review_notes?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewer_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_application_reviews_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       loan_applications: {
         Row: {

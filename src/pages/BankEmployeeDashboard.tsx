@@ -1,44 +1,85 @@
 
+import { useState } from 'react';
 import Layout from '@/components/layout/Layout';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import LoanApplicationsTab from '@/components/dashboard/bank-employee/LoanApplicationsTab';
+import CustomerManagementTab from '@/components/dashboard/bank-employee/CustomerManagementTab';
+import ReportsTab from '@/components/dashboard/bank-employee/ReportsTab';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { FileText, Users, BarChart3, Settings } from 'lucide-react';
 
 const BankEmployeeDashboard = () => {
-  return (
-    <Layout>
-      <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Trang dành cho nhân viên ngân hàng</h1>
-          <p className="text-lg text-gray-600 mt-2">Quản lý các hoạt động liên quan đến khoản vay.</p>
-        </header>
+  const [activeTab, setActiveTab] = useState('applications');
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Duyệt đơn vay</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Xem và xử lý các đơn xin vay mới.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Quản lý khách hàng</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Tra cứu thông tin và lịch sử vay của khách hàng.</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Báo cáo & Thống kê</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Theo dõi hiệu suất và các chỉ số quan trọng.</p>
-            </CardContent>
-          </Card>
+  return (
+    <ProtectedRoute requiredRole="bank_employee">
+      <Layout>
+        <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard Nhân viên Ngân hàng</h1>
+            <p className="text-lg text-gray-600 mt-2">Quản lý đơn vay và khách hàng</p>
+          </header>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="applications" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Đơn vay
+              </TabsTrigger>
+              <TabsTrigger value="customers" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Khách hàng
+              </TabsTrigger>
+              <TabsTrigger value="reports" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Báo cáo
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Cài đặt
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="applications">
+              <LoanApplicationsTab />
+            </TabsContent>
+
+            <TabsContent value="customers">
+              <CustomerManagementTab />
+            </TabsContent>
+
+            <TabsContent value="reports">
+              <ReportsTab />
+            </TabsContent>
+
+            <TabsContent value="settings">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Cài đặt hệ thống</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-medium mb-2">Thông báo</h4>
+                      <p className="text-sm text-gray-600">Cấu hình thông báo và cảnh báo hệ thống</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-2">Quy trình duyệt</h4>
+                      <p className="text-sm text-gray-600">Thiết lập quy trình duyệt đơn vay tự động</p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-2">Báo cáo tùy chỉnh</h4>
+                      <p className="text-sm text-gray-600">Tạo và lên lịch báo cáo định kỳ</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
-      </div>
-    </Layout>
+      </Layout>
+    </ProtectedRoute>
   );
 };
 
