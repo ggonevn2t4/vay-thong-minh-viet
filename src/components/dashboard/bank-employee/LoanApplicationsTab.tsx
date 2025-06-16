@@ -10,15 +10,32 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { FileText, Clock, CheckCircle, XCircle } from 'lucide-react';
-import { SupabaseLoanApplicationWithProfile } from '@/types/bank-employee';
 
 type LoanStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'reviewing';
 
+// Define a more flexible type for the raw Supabase response
+interface RawLoanApplicationWithProfile {
+  id: string;
+  amount: number;
+  term_months: number;
+  loan_type: string;
+  status: string;
+  monthly_income: number | null;
+  employment_type: string | null;
+  purpose: string | null;
+  created_at: string;
+  user_id: string;
+  profiles?: {
+    full_name: string;
+    phone: string;
+  } | null;
+}
+
 const LoanApplicationsTab = () => {
   const { user } = useAuth();
-  const [applications, setApplications] = useState<SupabaseLoanApplicationWithProfile[]>([]);
+  const [applications, setApplications] = useState<RawLoanApplicationWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedApp, setSelectedApp] = useState<SupabaseLoanApplicationWithProfile | null>(null);
+  const [selectedApp, setSelectedApp] = useState<RawLoanApplicationWithProfile | null>(null);
   const [reviewData, setReviewData] = useState({
     review_status: 'pending' as LoanStatus,
     review_notes: '',
@@ -47,15 +64,16 @@ const LoanApplicationsTab = () => {
 
       if (error) throw error;
       
-      // Filter out any data with errors and ensure proper typing
-      const validApplications = (data || []).filter(app => 
-        app && 
-        typeof app === 'object' && 
-        !('error' in app) &&
-        (!app.profiles || (typeof app.profiles === 'object' && 'full_name' in app.profiles))
-      ) as SupabaseLoanApplicationWithProfile[];
+      // Process and filter the data to handle errors and null values
+      const processedApplications = (data || []).filter(app => {
+        // Filter out applications with invalid data
+        return app && 
+               typeof app === 'object' && 
+               app.id &&
+               app.amount;
+      });
       
-      setApplications(validApplications);
+      setApplications(processedApplications);
     } catch (error) {
       console.error('Error fetching loan applications:', error);
       toast.error('Lỗi khi tải danh sách đơn vay');
@@ -141,6 +159,14 @@ const LoanApplicationsTab = () => {
     }).format(amount);
   };
 
+  const getCustomerName = (app: RawLoanApplicationWithProfile) => {
+    return app.profiles?.full_name || 'Khách hàng';
+  };
+
+  const getCustomerPhone = (app: RawLoanApplicationWithProfile) => {
+    return app.profiles?.phone || 'Không có số điện thoại';
+  };
+
   if (loading) {
     return <div className="flex justify-center p-8">Đang tải...</div>;
   }
@@ -157,8 +183,8 @@ const LoanApplicationsTab = () => {
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <p className="font-medium">{app.profiles?.full_name || 'Khách hàng'}</p>
-                    <p className="text-sm text-gray-600">{app.profiles?.phone}</p>
+                    <p className="font-medium">{getCustomerName(app)}</p>
+                    <p className="text-sm text-gray-600">{getCustomerPhone(app)}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     {getStatusIcon(app.status)}
@@ -180,7 +206,9 @@ const LoanApplicationsTab = () => {
                   </div>
                   <div>
                     <span className="text-gray-500">Thu nhập:</span>
-                    <p className="font-medium">{formatCurrency(app.monthly_income || 0)}/tháng</p>
+                    <p className="font-medium">
+                      {app.monthly_income ? `${formatCurrency(app.monthly_income)}/tháng` : 'Chưa cung cấp'}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -198,10 +226,10 @@ const LoanApplicationsTab = () => {
               <div>
                 <h4 className="font-medium mb-2">Thông tin đơn vay</h4>
                 <div className="bg-gray-50 p-3 rounded-lg space-y-2 text-sm">
-                  <p><strong>Khách hàng:</strong> {selectedApp.profiles?.full_name}</p>
+                  <p><strong>Khách hàng:</strong> {getCustomerName(selectedApp)}</p>
                   <p><strong>Số tiền:</strong> {formatCurrency(selectedApp.amount)}</p>
                   <p><strong>Thời hạn:</strong> {selectedApp.term_months} tháng</p>
-                  <p><strong>Mục đích:</strong> {selectedApp.purpose}</p>
+                  <p><strong>Mục đích:</strong> {selectedApp.purpose || 'Chưa cung cấp'}</p>
                 </div>
               </div>
 

@@ -10,12 +10,25 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { User, Phone, Mail, Building, TrendingUp } from 'lucide-react';
-import { SupabaseCustomer, CreditAssessment } from '@/types/bank-employee';
+import { CreditAssessment } from '@/types/bank-employee';
+
+// Define a more flexible type for the raw Supabase response
+interface RawSupabaseCustomer {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  employment_type: string | null;
+  monthly_income: number | null;
+  company_name: string | null;
+  created_at: string;
+  loan_applications?: any;
+  customer_credit_assessments?: any;
+}
 
 const CustomerManagementTab = () => {
   const { user } = useAuth();
-  const [customers, setCustomers] = useState<SupabaseCustomer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<SupabaseCustomer | null>(null);
+  const [customers, setCustomers] = useState<RawSupabaseCustomer[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<RawSupabaseCustomer | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [assessmentData, setAssessmentData] = useState<CreditAssessment>({
@@ -57,16 +70,21 @@ const CustomerManagementTab = () => {
 
       if (error) throw error;
       
-      // Filter out any data with errors and ensure proper typing
-      const validCustomers = (data || []).filter(customer => 
-        customer && 
-        typeof customer === 'object' && 
-        !('error' in customer) &&
-        (!customer.loan_applications || Array.isArray(customer.loan_applications)) &&
-        (!customer.customer_credit_assessments || Array.isArray(customer.customer_credit_assessments))
-      ) as SupabaseCustomer[];
+      // Process and filter the data to handle errors and null values
+      const processedCustomers = (data || []).filter(customer => {
+        // Filter out customers with invalid data
+        return customer && 
+               typeof customer === 'object' && 
+               customer.id &&
+               customer.full_name;
+      }).map(customer => ({
+        ...customer,
+        // Ensure arrays are properly handled
+        loan_applications: Array.isArray(customer.loan_applications) ? customer.loan_applications : [],
+        customer_credit_assessments: Array.isArray(customer.customer_credit_assessments) ? customer.customer_credit_assessments : []
+      }));
       
-      setCustomers(validCustomers);
+      setCustomers(processedCustomers);
     } catch (error) {
       console.error('Error fetching customers:', error);
       toast.error('Lỗi khi tải danh sách khách hàng');
@@ -183,10 +201,12 @@ const CustomerManagementTab = () => {
                   </div>
                   
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-3 w-3 text-gray-400" />
-                      <span>{customer.phone}</span>
-                    </div>
+                    {customer.phone && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-3 w-3 text-gray-400" />
+                        <span>{customer.phone}</span>
+                      </div>
+                    )}
                     
                     {customer.company_name && (
                       <div className="flex items-center gap-2">
@@ -225,12 +245,16 @@ const CustomerManagementTab = () => {
                 <div>
                   <span className="font-medium">Họ tên:</span> {selectedCustomer.full_name}
                 </div>
-                <div>
-                  <span className="font-medium">Điện thoại:</span> {selectedCustomer.phone}
-                </div>
-                <div>
-                  <span className="font-medium">Loại công việc:</span> {selectedCustomer.employment_type}
-                </div>
+                {selectedCustomer.phone && (
+                  <div>
+                    <span className="font-medium">Điện thoại:</span> {selectedCustomer.phone}
+                  </div>
+                )}
+                {selectedCustomer.employment_type && (
+                  <div>
+                    <span className="font-medium">Loại công việc:</span> {selectedCustomer.employment_type}
+                  </div>
+                )}
                 {selectedCustomer.company_name && (
                   <div>
                     <span className="font-medium">Công ty:</span> {selectedCustomer.company_name}

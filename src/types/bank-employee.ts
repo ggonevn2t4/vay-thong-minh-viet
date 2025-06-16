@@ -13,6 +13,7 @@ export interface SupabaseCreditAssessment {
   assessment_date: string;
 }
 
+// Updated to handle the actual Supabase response structure
 export interface SupabaseCustomer {
   id: string;
   full_name: string;
@@ -21,10 +22,11 @@ export interface SupabaseCustomer {
   monthly_income: number;
   company_name: string;
   created_at: string;
-  loan_applications?: SupabaseLoanApplication[];
-  customer_credit_assessments?: SupabaseCreditAssessment[];
+  loan_applications?: SupabaseLoanApplication[] | null;
+  customer_credit_assessments?: SupabaseCreditAssessment[] | null;
 }
 
+// Updated to handle nullable profiles
 export interface SupabaseLoanApplicationWithProfile {
   id: string;
   amount: number;
@@ -39,7 +41,7 @@ export interface SupabaseLoanApplicationWithProfile {
   profiles?: {
     full_name: string;
     phone: string;
-  };
+  } | null;
 }
 
 export interface CreditAssessment {
