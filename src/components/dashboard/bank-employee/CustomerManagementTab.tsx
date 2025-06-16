@@ -10,34 +10,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { User, Phone, Mail, Building, TrendingUp } from 'lucide-react';
-
-interface Customer {
-  id: string;
-  full_name: string;
-  phone: string;
-  employment_type: string;
-  monthly_income: number;
-  company_name: string;
-  created_at: string;
-  loan_applications?: any[];
-  credit_assessments?: any[];
-}
-
-interface CreditAssessment {
-  credit_score: number;
-  income_verification_status: string;
-  employment_verification_status: string;
-  debt_to_income_ratio: number;
-  risk_level: string;
-  assessment_notes: string;
-  recommended_loan_amount: number;
-  recommended_interest_rate: number;
-}
+import { SupabaseCustomer, CreditAssessment } from '@/types/bank-employee';
 
 const CustomerManagementTab = () => {
   const { user } = useAuth();
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [customers, setCustomers] = useState<SupabaseCustomer[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<SupabaseCustomer | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [assessmentData, setAssessmentData] = useState<CreditAssessment>({
@@ -78,7 +56,17 @@ const CustomerManagementTab = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCustomers(data || []);
+      
+      // Filter out any data with errors and ensure proper typing
+      const validCustomers = (data || []).filter(customer => 
+        customer && 
+        typeof customer === 'object' && 
+        !('error' in customer) &&
+        (!customer.loan_applications || Array.isArray(customer.loan_applications)) &&
+        (!customer.customer_credit_assessments || Array.isArray(customer.customer_credit_assessments))
+      ) as SupabaseCustomer[];
+      
+      setCustomers(validCustomers);
     } catch (error) {
       console.error('Error fetching customers:', error);
       toast.error('Lỗi khi tải danh sách khách hàng');
@@ -187,9 +175,9 @@ const CustomerManagementTab = () => {
                       <User className="h-4 w-4 text-gray-500" />
                       <span className="font-medium">{customer.full_name}</span>
                     </div>
-                    {customer.credit_assessments && customer.credit_assessments.length > 0 && (
-                      <Badge className={getRiskLevelColor(customer.credit_assessments[0].risk_level)}>
-                        {getRiskLevelText(customer.credit_assessments[0].risk_level)}
+                    {customer.customer_credit_assessments && customer.customer_credit_assessments.length > 0 && (
+                      <Badge className={getRiskLevelColor(customer.customer_credit_assessments[0].risk_level)}>
+                        {getRiskLevelText(customer.customer_credit_assessments[0].risk_level)}
                       </Badge>
                     )}
                   </div>

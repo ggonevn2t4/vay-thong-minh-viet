@@ -10,31 +10,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { FileText, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { SupabaseLoanApplicationWithProfile } from '@/types/bank-employee';
 
-interface LoanApplication {
-  id: string;
-  amount: number;
-  term_months: number;
-  loan_type: string;
-  status: string;
-  monthly_income: number;
-  employment_type: string;
-  purpose: string;
-  created_at: string;
-  user_id: string;
-  profiles?: {
-    full_name: string;
-    phone: string;
-  };
-}
+type LoanStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'reviewing';
 
 const LoanApplicationsTab = () => {
   const { user } = useAuth();
-  const [applications, setApplications] = useState<LoanApplication[]>([]);
+  const [applications, setApplications] = useState<SupabaseLoanApplicationWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedApp, setSelectedApp] = useState<LoanApplication | null>(null);
+  const [selectedApp, setSelectedApp] = useState<SupabaseLoanApplicationWithProfile | null>(null);
   const [reviewData, setReviewData] = useState({
-    review_status: 'pending',
+    review_status: 'pending' as LoanStatus,
     review_notes: '',
     approval_amount: '',
     approved_interest_rate: '',
@@ -60,7 +46,16 @@ const LoanApplicationsTab = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setApplications(data || []);
+      
+      // Filter out any data with errors and ensure proper typing
+      const validApplications = (data || []).filter(app => 
+        app && 
+        typeof app === 'object' && 
+        !('error' in app) &&
+        (!app.profiles || (typeof app.profiles === 'object' && 'full_name' in app.profiles))
+      ) as SupabaseLoanApplicationWithProfile[];
+      
+      setApplications(validApplications);
     } catch (error) {
       console.error('Error fetching loan applications:', error);
       toast.error('Lỗi khi tải danh sách đơn vay');
@@ -91,7 +86,7 @@ const LoanApplicationsTab = () => {
       // Update loan application status
       await supabase
         .from('loan_applications')
-        .update({ status: reviewData.review_status })
+        .update({ status: reviewData.review_status as any })
         .eq('id', selectedApp.id);
 
       toast.success('Đánh giá đã được lưu thành công');
@@ -212,7 +207,7 @@ const LoanApplicationsTab = () => {
 
               <div>
                 <label className="block text-sm font-medium mb-2">Kết quả đánh giá</label>
-                <Select value={reviewData.review_status} onValueChange={(value) => 
+                <Select value={reviewData.review_status} onValueChange={(value: LoanStatus) => 
                   setReviewData(prev => ({ ...prev, review_status: value }))}>
                   <SelectTrigger>
                     <SelectValue />
@@ -221,7 +216,7 @@ const LoanApplicationsTab = () => {
                     <SelectItem value="pending">Chờ xử lý</SelectItem>
                     <SelectItem value="approved">Phê duyệt</SelectItem>
                     <SelectItem value="rejected">Từ chối</SelectItem>
-                    <SelectItem value="requires_documents">Cần bổ sung hồ sơ</SelectItem>
+                    <SelectItem value="reviewing">Cần bổ sung hồ sơ</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
