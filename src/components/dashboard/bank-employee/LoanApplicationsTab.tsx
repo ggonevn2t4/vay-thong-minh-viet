@@ -13,7 +13,25 @@ import { FileText, Clock, CheckCircle, XCircle } from 'lucide-react';
 
 type LoanStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'reviewing';
 
-// Define a more flexible type for the raw Supabase response
+// Define a type that handles both successful profile data and potential errors
+interface SupabaseRawLoanApplication {
+  id: string;
+  amount: number;
+  term_months: number;
+  loan_type: string;
+  status: string;
+  monthly_income: number | null;
+  employment_type: string | null;
+  purpose: string | null;
+  created_at: string;
+  user_id: string;
+  profiles?: {
+    full_name: string;
+    phone: string;
+  } | null | any; // Using 'any' to handle SelectQueryError objects
+}
+
+// Processed type after filtering and validation
 interface RawLoanApplicationWithProfile {
   id: string;
   amount: number;
@@ -65,13 +83,34 @@ const LoanApplicationsTab = () => {
       if (error) throw error;
       
       // Process and filter the data to handle errors and null values
-      const processedApplications = (data || []).filter(app => {
-        // Filter out applications with invalid data
-        return app && 
-               typeof app === 'object' && 
-               app.id &&
-               app.amount;
-      });
+      const processedApplications: RawLoanApplicationWithProfile[] = (data || [])
+        .filter((app: SupabaseRawLoanApplication) => {
+          // Filter out applications with invalid data
+          return app && 
+                 typeof app === 'object' && 
+                 app.id &&
+                 app.amount;
+        })
+        .map((app: SupabaseRawLoanApplication): RawLoanApplicationWithProfile => {
+          // Handle profiles that might be error objects
+          let processedProfiles: { full_name: string; phone: string; } | null = null;
+          
+          if (app.profiles && 
+              typeof app.profiles === 'object' && 
+              !('error' in app.profiles) && 
+              'full_name' in app.profiles && 
+              'phone' in app.profiles) {
+            processedProfiles = {
+              full_name: app.profiles.full_name,
+              phone: app.profiles.phone
+            };
+          }
+          
+          return {
+            ...app,
+            profiles: processedProfiles
+          };
+        });
       
       setApplications(processedApplications);
     } catch (error) {
