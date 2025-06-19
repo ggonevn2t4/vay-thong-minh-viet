@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { CICCheckRequest, CustomerCICHistory, BankLoanOffer, CustomerWarning, CICImpactResult } from '@/types/cic';
 
@@ -10,7 +9,7 @@ export const cicService = {
     });
 
     if (error) throw error;
-    return data as CICImpactResult;
+    return data as unknown as CICImpactResult;
   },
 
   // Create a CIC check request
