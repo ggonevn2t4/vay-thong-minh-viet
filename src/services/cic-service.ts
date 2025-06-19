@@ -10,7 +10,7 @@ export const cicService = {
     });
 
     if (error) throw error;
-    return data;
+    return data as CICImpactResult;
   },
 
   // Create a CIC check request
@@ -22,7 +22,11 @@ export const cicService = {
       .single();
 
     if (error) throw error;
-    return data;
+    return {
+      ...data,
+      status: data.status as CICCheckRequest['status'],
+      cic_report_data: data.cic_report_data as Record<string, any>
+    };
   },
 
   // Get customer's CIC check requests
@@ -34,7 +38,11 @@ export const cicService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(item => ({
+      ...item,
+      status: item.status as CICCheckRequest['status'],
+      cic_report_data: item.cic_report_data as Record<string, any>
+    }));
   },
 
   // Get customer's CIC history
@@ -59,7 +67,11 @@ export const cicService = {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(item => ({
+      ...item,
+      warning_type: item.warning_type as CustomerWarning['warning_type'],
+      severity: item.severity as CustomerWarning['severity']
+    }));
   },
 
   // Acknowledge a warning
@@ -94,7 +106,10 @@ export const cicService = {
       .order('interest_rate', { ascending: true });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(item => ({
+      ...item,
+      status: item.status as BankLoanOffer['status']
+    }));
   },
 
   // Update bank offer status
