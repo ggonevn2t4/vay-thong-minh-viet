@@ -1,17 +1,17 @@
 
 import Layout from '@/components/layout/Layout';
 import MessagingInterface from '@/components/messaging/MessagingInterface';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { SignInButton } from '@clerk/clerk-react';
 import { MessageCircle, Users, Shield } from 'lucide-react';
 import PageSkeleton from '@/components/ui/page-skeleton';
+import { Link } from 'react-router-dom';
 
 const Messages = () => {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (!isLoaded) {
+  if (loading) {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-8">
@@ -23,7 +23,7 @@ const Messages = () => {
     );
   }
 
-  if (!isSignedIn) {
+  if (!user) {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-8">
@@ -63,11 +63,11 @@ const Messages = () => {
                 </Card>
               </div>
               
-              <SignInButton mode="modal">
+              <Link to="/auth">
                 <Button size="lg" className="bg-brand-600 hover:bg-brand-700 px-8 py-3">
                   Đăng nhập ngay
                 </Button>
-              </SignInButton>
+              </Link>
             </div>
           </div>
         </div>
