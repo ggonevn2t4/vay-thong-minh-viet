@@ -10,12 +10,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useNavigation } from '@/hooks/useNavigation';
 import { useState } from 'react';
 import NotificationSystem from '@/components/NotificationSystem';
+import { HoveredLink, Menu as NavMenu, MenuItem } from '@/components/ui/navbar-menu';
 
 const Header = () => {
   const { user, userRole, isLoaded, signOut } = useAuth();
   const { navigationItems } = useNavigation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
 
   const getUserInitials = () => {
     if (!user?.user_metadata?.full_name) return 'U';
@@ -34,17 +36,44 @@ const Header = () => {
               className="h-8 w-auto"
             />
           </Link>
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className="transition-colors hover:text-foreground/80 text-foreground/60"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          
+          {/* New Navbar Menu for desktop */}
+          <div className="hidden md:flex items-center">
+            <NavMenu setActive={setActive}>
+              <MenuItem setActive={setActive} active={active} item="Dịch vụ">
+                <div className="flex flex-col space-y-4 text-sm">
+                  <HoveredLink to="/khao-sat">Khảo sát vay vốn</HoveredLink>
+                  <HoveredLink to="/kiem-tra-dieu-kien">Kiểm tra điều kiện</HoveredLink>
+                  <HoveredLink to="/so-sanh">So sánh lãi suất</HoveredLink>
+                  <HoveredLink to="/loan-optimization">Tối ưu hóa vay</HoveredLink>
+                </div>
+              </MenuItem>
+              
+              <MenuItem setActive={setActive} active={active} item="Sản phẩm">
+                <div className="flex flex-col space-y-4 text-sm">
+                  <HoveredLink to="/marketplace">Marketplace</HoveredLink>
+                  <HoveredLink to="/tu-van-ai">Tư vấn AI</HoveredLink>
+                  <HoveredLink to="/ho-so-tai-lieu">Hồ sơ tài liệu</HoveredLink>
+                  <HoveredLink to="/financial-guides">Kiến thức tài chính</HoveredLink>
+                </div>
+              </MenuItem>
+              
+              {user && (
+                <MenuItem setActive={setActive} active={active} item="Tài khoản">
+                  <div className="flex flex-col space-y-4 text-sm">
+                    <HoveredLink to="/dashboard">Dashboard</HoveredLink>
+                    {userRole === 'customer' && (
+                      <>
+                        <HoveredLink to="/messages">Tin nhắn</HoveredLink>
+                        <HoveredLink to="/wallet">Ví của tôi</HoveredLink>
+                      </>
+                    )}
+                    <HoveredLink to="/settings">Cài đặt</HoveredLink>
+                  </div>
+                </MenuItem>
+              )}
+            </NavMenu>
+          </div>
         </div>
         
         {/* Mobile Navigation */}
