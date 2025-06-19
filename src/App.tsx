@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from '@/contexts/AuthContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import UserDashboard from "./pages/UserDashboard";
@@ -38,51 +39,53 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<RoleBasedDashboard />} />
-            <Route path="/user-dashboard" element={<UserDashboard />} />
-            <Route path="/advisor-dashboard" element={<AdvisorDashboard />} />
-            <Route path="/advisor-profile" element={<AdvisorProfile />} />
-            <Route path="/advisor/:id" element={<AdvisorProfileDetailPage />} />
-            <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/advisor-directory" element={<AdvisorDirectoryPage />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/loan-comparison" element={<LoanComparison />} />
-            <Route path="/loan-optimization" element={<LoanOptimization />} />
-            <Route path="/loan-eligibility" element={<LoanEligibility />} />
-            <Route path="/ai-advisory" element={<AIAdvisory />} />
-            <Route path="/about-us" element={<AboutUs />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/document-checklist" element={<DocumentChecklistPage />} />
-            <Route path="/khao-sat" element={<KhaoSat />} />
-            <Route path="/ket-qua" element={<KetQua />} />
-            <Route path="/so-sanh" element={<SoSanh />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/knowledge-management" element={<KnowledgeManagement />} />
-            <Route path="/user-management" element={<UserManagement />} />
-            <Route path="/system-analytics" element={<SystemAnalytics />} />
-            <Route path="/financial-guides" element={<FinancialGuidesPage />} />
-            <Route path="/wallet" element={<WalletPage />} />
-            
-            {/* Vietnamese routes - redirect to English equivalents */}
-            <Route path="/kiem-tra-dieu-kien" element={<LoanEligibility />} />
-            <Route path="/toi-uu-hoa-vay" element={<LoanOptimization />} />
-            <Route path="/tu-van-ai" element={<AIAdvisory />} />
-            <Route path="/ho-so-tai-lieu" element={<DocumentChecklistPage />} />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<RoleBasedDashboard />} />
+              <Route path="/user-dashboard" element={<UserDashboard />} />
+              <Route path="/advisor-dashboard" element={<AdvisorDashboard />} />
+              <Route path="/advisor-profile" element={<AdvisorProfile />} />
+              <Route path="/advisor/:id" element={<AdvisorProfileDetailPage />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/advisor-directory" element={<AdvisorDirectoryPage />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/loan-comparison" element={<LoanComparison />} />
+              <Route path="/loan-optimization" element={<LoanOptimization />} />
+              <Route path="/loan-eligibility" element={<LoanEligibility />} />
+              <Route path="/ai-advisory" element={<AIAdvisory />} />
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/document-checklist" element={<DocumentChecklistPage />} />
+              <Route path="/khao-sat" element={<KhaoSat />} />
+              <Route path="/ket-qua" element={<KetQua />} />
+              <Route path="/so-sanh" element={<SoSanh />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/knowledge-management" element={<KnowledgeManagement />} />
+              <Route path="/user-management" element={<UserManagement />} />
+              <Route path="/system-analytics" element={<SystemAnalytics />} />
+              <Route path="/financial-guides" element={<FinancialGuidesPage />} />
+              <Route path="/wallet" element={<WalletPage />} />
+              
+              {/* Vietnamese routes - redirect to English equivalents */}
+              <Route path="/kiem-tra-dieu-kien" element={<LoanEligibility />} />
+              <Route path="/toi-uu-hoa-vay" element={<LoanOptimization />} />
+              <Route path="/tu-van-ai" element={<AIAdvisory />} />
+              <Route path="/ho-so-tai-lieu" element={<DocumentChecklistPage />} />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
