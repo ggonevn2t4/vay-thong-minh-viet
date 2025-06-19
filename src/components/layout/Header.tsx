@@ -11,7 +11,6 @@ import { useNavigation } from '@/hooks/useNavigation';
 import { useState } from 'react';
 import NotificationSystem from '@/components/NotificationSystem';
 import { HoveredLink, Menu as NavMenu, MenuItem } from '@/components/ui/navbar-menu';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 const Header = () => {
   const { user, userRole, isLoaded, signOut } = useAuth();
@@ -117,8 +116,7 @@ const Header = () => {
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none">
           </div>
-          <nav className="flex items-center space-x-2">
-            <ThemeToggle />
+          <nav className="flex items-center">
             {isLoaded && (
               <>
                 {user ? (
