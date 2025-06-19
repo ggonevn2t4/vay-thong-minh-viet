@@ -42,6 +42,9 @@ export const fetchLoanApplications = async (): Promise<RawLoanApplicationWithPro
       
       return {
         ...app,
+        offers_generated_at: app.offers_generated_at || null,
+        total_offers_count: app.total_offers_count || 0,
+        customer_education_completed: app.customer_education_completed || false,
         profiles: processedProfiles
       };
     });

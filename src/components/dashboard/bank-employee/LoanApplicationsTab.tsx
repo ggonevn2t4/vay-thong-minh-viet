@@ -6,6 +6,9 @@ import { RawLoanApplicationWithProfile, ReviewData } from '@/types/loan-applicat
 import { fetchLoanApplications, submitLoanReview } from '@/services/loan-application-service';
 import LoanApplicationCard from './LoanApplicationCard';
 import LoanReviewForm from './LoanReviewForm';
+import BankOffers from '@/components/cic/BankOffers';
+import CustomerWarnings from '@/components/cic/CustomerWarnings';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const LoanApplicationsTab = () => {
   const { user } = useAuth();
@@ -65,6 +68,8 @@ const LoanApplicationsTab = () => {
 
   return (
     <div className="space-y-6">
+      <CustomerWarnings />
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Applications List */}
         <div className="space-y-4">
@@ -78,15 +83,30 @@ const LoanApplicationsTab = () => {
           ))}
         </div>
 
-        {/* Review Form */}
+        {/* Application Details */}
         {selectedApp && (
-          <LoanReviewForm
-            selectedApp={selectedApp}
-            reviewData={reviewData}
-            onReviewDataChange={setReviewData}
-            onSubmit={handleReview}
-            onCancel={() => setSelectedApp(null)}
-          />
+          <div className="space-y-6">
+            <Tabs defaultValue="review" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="review">Đánh giá</TabsTrigger>
+                <TabsTrigger value="offers">Đề nghị ngân hàng</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="review">
+                <LoanReviewForm
+                  selectedApp={selectedApp}
+                  reviewData={reviewData}
+                  onReviewDataChange={setReviewData}
+                  onSubmit={handleReview}
+                  onCancel={() => setSelectedApp(null)}
+                />
+              </TabsContent>
+              
+              <TabsContent value="offers">
+                <BankOffers applicationId={selectedApp.id} />
+              </TabsContent>
+            </Tabs>
+          </div>
         )}
       </div>
     </div>

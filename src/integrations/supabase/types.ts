@@ -248,6 +248,62 @@ export type Database = {
           },
         ]
       }
+      bank_loan_offers: {
+        Row: {
+          advisor_id: string | null
+          bank_name: string
+          conditions: string | null
+          created_at: string
+          id: string
+          interest_rate: number
+          loan_application_id: string
+          offer_expires_at: string | null
+          offered_amount: number
+          requires_cic_check: boolean | null
+          status: string
+          term_months: number
+          updated_at: string
+        }
+        Insert: {
+          advisor_id?: string | null
+          bank_name: string
+          conditions?: string | null
+          created_at?: string
+          id?: string
+          interest_rate: number
+          loan_application_id: string
+          offer_expires_at?: string | null
+          offered_amount: number
+          requires_cic_check?: boolean | null
+          status?: string
+          term_months: number
+          updated_at?: string
+        }
+        Update: {
+          advisor_id?: string | null
+          bank_name?: string
+          conditions?: string | null
+          created_at?: string
+          id?: string
+          interest_rate?: number
+          loan_application_id?: string
+          offer_expires_at?: string | null
+          offered_amount?: number
+          requires_cic_check?: boolean | null
+          status?: string
+          term_months?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bank_loan_offers_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_sessions: {
         Row: {
           created_at: string | null
@@ -269,6 +325,89 @@ export type Database = {
           last_activity?: string | null
           session_data?: Json | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      cic_check_requests: {
+        Row: {
+          approved_at: string | null
+          bank_name: string
+          cic_report_data: Json | null
+          cic_score: number | null
+          completed_at: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          loan_application_id: string | null
+          requested_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          bank_name: string
+          cic_report_data?: Json | null
+          cic_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          loan_application_id?: string | null
+          requested_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          bank_name?: string
+          cic_report_data?: Json | null
+          cic_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          loan_application_id?: string | null
+          requested_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cic_check_requests_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_cic_history: {
+        Row: {
+          bank_name: string
+          check_date: string
+          created_at: string
+          customer_id: string
+          id: string
+          impact_score: number | null
+          purpose: string | null
+        }
+        Insert: {
+          bank_name: string
+          check_date?: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          impact_score?: number | null
+          purpose?: string | null
+        }
+        Update: {
+          bank_name?: string
+          check_date?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          impact_score?: number | null
+          purpose?: string | null
         }
         Relationships: []
       }
@@ -320,6 +459,39 @@ export type Database = {
           recommended_loan_amount?: number | null
           risk_level?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      customer_warnings: {
+        Row: {
+          acknowledged_at: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          is_acknowledged: boolean | null
+          message: string
+          severity: string
+          warning_type: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          is_acknowledged?: boolean | null
+          message: string
+          severity?: string
+          warning_type: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          is_acknowledged?: boolean | null
+          message?: string
+          severity?: string
+          warning_type?: string
         }
         Relationships: []
       }
@@ -723,13 +895,16 @@ export type Database = {
           amount: number
           bank_responses: Json | null
           created_at: string | null
+          customer_education_completed: boolean | null
           employment_type: Database["public"]["Enums"]["employment_type"] | null
           id: string
           loan_type: Database["public"]["Enums"]["loan_type"]
           monthly_income: number | null
+          offers_generated_at: string | null
           purpose: string | null
           status: Database["public"]["Enums"]["loan_status"] | null
           term_months: number
+          total_offers_count: number | null
           updated_at: string | null
           user_id: string
         }
@@ -737,15 +912,18 @@ export type Database = {
           amount: number
           bank_responses?: Json | null
           created_at?: string | null
+          customer_education_completed?: boolean | null
           employment_type?:
             | Database["public"]["Enums"]["employment_type"]
             | null
           id?: string
           loan_type: Database["public"]["Enums"]["loan_type"]
           monthly_income?: number | null
+          offers_generated_at?: string | null
           purpose?: string | null
           status?: Database["public"]["Enums"]["loan_status"] | null
           term_months: number
+          total_offers_count?: number | null
           updated_at?: string | null
           user_id: string
         }
@@ -753,15 +931,18 @@ export type Database = {
           amount?: number
           bank_responses?: Json | null
           created_at?: string | null
+          customer_education_completed?: boolean | null
           employment_type?:
             | Database["public"]["Enums"]["employment_type"]
             | null
           id?: string
           loan_type?: Database["public"]["Enums"]["loan_type"]
           monthly_income?: number | null
+          offers_generated_at?: string | null
           purpose?: string | null
           status?: Database["public"]["Enums"]["loan_status"] | null
           term_months?: number
+          total_offers_count?: number | null
           updated_at?: string | null
           user_id?: string
         }
@@ -1186,6 +1367,14 @@ export type Database = {
     Functions: {
       calculate_promotional_cost_increase: {
         Args: { loan_id: string }
+        Returns: Json
+      }
+      check_cic_impact_and_warn: {
+        Args: { customer_uuid: string }
+        Returns: Json
+      }
+      generate_bank_offers: {
+        Args: { application_id: string }
         Returns: Json
       }
       get_user_role: {

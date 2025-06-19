@@ -13,6 +13,9 @@ export interface SupabaseRawLoanApplication {
   purpose: string | null;
   created_at: string;
   user_id: string;
+  offers_generated_at: string | null;
+  total_offers_count: number;
+  customer_education_completed: boolean;
   profiles?: {
     full_name: string;
     phone: string;
@@ -31,6 +34,9 @@ export interface RawLoanApplicationWithProfile {
   purpose: string | null;
   created_at: string;
   user_id: string;
+  offers_generated_at: string | null;
+  total_offers_count: number;
+  customer_education_completed: boolean;
   profiles?: {
     full_name: string;
     phone: string;
