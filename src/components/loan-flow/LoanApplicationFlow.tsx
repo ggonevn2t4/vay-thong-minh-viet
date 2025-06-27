@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -42,8 +41,8 @@ const LoanApplicationFlow = () => {
     setLoading(true);
     try {
       // Map employment status to valid enum values
-      const mapEmploymentType = (status: string) => {
-        const mapping: Record<string, string> = {
+      const mapEmploymentType = (status: string): 'employee' | 'self_employed' | 'freelancer' | 'retired' | 'student' | 'unemployed' => {
+        const mapping: Record<string, 'employee' | 'self_employed' | 'freelancer' | 'retired' | 'student' | 'unemployed'> = {
           'Nhân viên công ty': 'employee',
           'Công chức': 'employee',
           'Kinh doanh tự do': 'self_employed',
@@ -52,31 +51,34 @@ const LoanApplicationFlow = () => {
         return mapping[status] || 'employee';
       };
 
-      // Create loan application
-      const loanApplicationData = {
+      // Create base loan application data
+      const baseLoanApplicationData = {
         user_id: user.id,
-        amount: formData.loan_amount || 100000000,
-        term_months: formData.loan_term || 12,
+        amount: Number(formData.loan_amount || 100000000),
+        term_months: Number(formData.loan_term || 12),
         purpose: formData.loan_purpose_detail || formData.loan_purpose || 'Nhu cầu cá nhân',
         product_type: selectedProduct,
         customer_questions: formData,
-        monthly_income: formData.monthly_income,
+        monthly_income: Number(formData.monthly_income || 0),
         employment_type: mapEmploymentType(formData.employment_status || ''),
-        loan_type: selectedProduct === 'credit_loan' ? 'tin_dung' : 'the_chap' as any,
+        loan_type: (selectedProduct === 'credit_loan' ? 'tin_dung' : 'the_chap') as 'tin_dung' | 'the_chap',
         advisor_id: advisorId,
-        status: 'draft' as any
+        status: 'draft' as 'draft' | 'pending' | 'approved' | 'rejected' | 'reviewing'
       };
 
-      // Add mortgage-specific data
-      if (selectedProduct === 'mortgage_loan') {
-        loanApplicationData.property_value = formData.property_value;
-        loanApplicationData.property_address = formData.property_address;
-        loanApplicationData.collateral_info = {
-          property_type: formData.property_type,
-          property_documents: formData.property_documents,
-          repayment_capacity: formData.repayment_capacity
-        };
-      }
+      // Add mortgage-specific data if needed
+      const loanApplicationData = selectedProduct === 'mortgage_loan' 
+        ? {
+            ...baseLoanApplicationData,
+            property_value: Number(formData.property_value || 0),
+            property_address: formData.property_address || '',
+            collateral_info: {
+              property_type: formData.property_type,
+              property_documents: formData.property_documents,
+              repayment_capacity: formData.repayment_capacity
+            }
+          }
+        : baseLoanApplicationData;
 
       const { data: loanApp, error: loanError } = await supabase
         .from('loan_applications')

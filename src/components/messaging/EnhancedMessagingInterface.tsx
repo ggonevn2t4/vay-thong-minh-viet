@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,7 +20,6 @@ interface Conversation {
   last_message_at: string;
   customer_profile?: {
     full_name: string;
-    avatar_url?: string;
   } | null;
   advisor_profile?: {
     full_name: string;
@@ -45,7 +43,6 @@ interface Message {
   created_at: string;
   sender_profile?: {
     full_name: string;
-    avatar_url?: string;
   } | null;
 }
 
@@ -89,7 +86,7 @@ const EnhancedMessagingInterface = () => {
         (conversationsData || []).map(async (conversation) => {
           const { data: customerProfile } = await supabase
             .from('profiles')
-            .select('full_name, avatar_url')
+            .select('full_name')
             .eq('id', conversation.customer_id)
             .maybeSingle();
 
@@ -141,7 +138,7 @@ const EnhancedMessagingInterface = () => {
         (messagesData || []).map(async (message) => {
           const { data: senderProfile } = await supabase
             .from('profiles')
-            .select('full_name, avatar_url')
+            .select('full_name')
             .eq('id', message.sender_id)
             .maybeSingle();
 
@@ -232,7 +229,7 @@ const EnhancedMessagingInterface = () => {
     } else {
       return {
         name: conversation.customer_profile?.full_name || 'Khách hàng',
-        avatar: conversation.customer_profile?.avatar_url,
+        avatar: undefined, // Remove avatar since profiles table doesn't have avatar_url
         role: 'customer'
       };
     }
@@ -373,7 +370,6 @@ const EnhancedMessagingInterface = () => {
                   >
                     {!isMyMessage && (
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={message.sender_profile?.avatar_url} alt={message.sender_profile?.full_name} />
                         <AvatarFallback className="bg-brand-600 text-white text-xs">
                           {message.sender_profile?.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
                         </AvatarFallback>
