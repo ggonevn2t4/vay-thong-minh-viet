@@ -834,6 +834,50 @@ export type Database = {
         }
         Relationships: []
       }
+      kyc_documents: {
+        Row: {
+          document_type: string
+          file_name: string
+          file_url: string
+          id: string
+          uploaded_at: string | null
+          user_id: string | null
+          verified: boolean | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          document_type: string
+          file_name: string
+          file_url: string
+          id?: string
+          uploaded_at?: string | null
+          user_id?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          document_type?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          uploaded_at?: string | null
+          user_id?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kyc_documents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loan_application_reviews: {
         Row: {
           approval_amount: number | null
@@ -1161,40 +1205,106 @@ export type Database = {
         Row: {
           company_name: string | null
           created_at: string | null
+          current_address_city: string | null
+          current_address_district: string | null
+          current_address_street: string | null
+          current_address_ward: string | null
           date_of_birth: string | null
+          email: string | null
           employment_type: Database["public"]["Enums"]["employment_type"] | null
           full_name: string | null
+          gender: Database["public"]["Enums"]["gender_type"] | null
           id: string
+          id_back_photo_url: string | null
+          id_expiry_date: string | null
+          id_front_photo_url: string | null
+          id_issue_date: string | null
+          id_issuing_authority: string | null
+          id_never_expires: boolean | null
+          id_number: string | null
+          id_type: Database["public"]["Enums"]["id_type"] | null
+          kyc_verified: boolean | null
+          kyc_verified_at: string | null
           monthly_income: number | null
+          old_id_number: string | null
+          permanent_address_city: string | null
+          permanent_address_district: string | null
+          permanent_address_street: string | null
+          permanent_address_ward: string | null
           phone: string | null
+          portrait_photo_url: string | null
           updated_at: string | null
           work_experience_years: number | null
         }
         Insert: {
           company_name?: string | null
           created_at?: string | null
+          current_address_city?: string | null
+          current_address_district?: string | null
+          current_address_street?: string | null
+          current_address_ward?: string | null
           date_of_birth?: string | null
+          email?: string | null
           employment_type?:
             | Database["public"]["Enums"]["employment_type"]
             | null
           full_name?: string | null
+          gender?: Database["public"]["Enums"]["gender_type"] | null
           id: string
+          id_back_photo_url?: string | null
+          id_expiry_date?: string | null
+          id_front_photo_url?: string | null
+          id_issue_date?: string | null
+          id_issuing_authority?: string | null
+          id_never_expires?: boolean | null
+          id_number?: string | null
+          id_type?: Database["public"]["Enums"]["id_type"] | null
+          kyc_verified?: boolean | null
+          kyc_verified_at?: string | null
           monthly_income?: number | null
+          old_id_number?: string | null
+          permanent_address_city?: string | null
+          permanent_address_district?: string | null
+          permanent_address_street?: string | null
+          permanent_address_ward?: string | null
           phone?: string | null
+          portrait_photo_url?: string | null
           updated_at?: string | null
           work_experience_years?: number | null
         }
         Update: {
           company_name?: string | null
           created_at?: string | null
+          current_address_city?: string | null
+          current_address_district?: string | null
+          current_address_street?: string | null
+          current_address_ward?: string | null
           date_of_birth?: string | null
+          email?: string | null
           employment_type?:
             | Database["public"]["Enums"]["employment_type"]
             | null
           full_name?: string | null
+          gender?: Database["public"]["Enums"]["gender_type"] | null
           id?: string
+          id_back_photo_url?: string | null
+          id_expiry_date?: string | null
+          id_front_photo_url?: string | null
+          id_issue_date?: string | null
+          id_issuing_authority?: string | null
+          id_never_expires?: boolean | null
+          id_number?: string | null
+          id_type?: Database["public"]["Enums"]["id_type"] | null
+          kyc_verified?: boolean | null
+          kyc_verified_at?: string | null
           monthly_income?: number | null
+          old_id_number?: string | null
+          permanent_address_city?: string | null
+          permanent_address_district?: string | null
+          permanent_address_street?: string | null
+          permanent_address_ward?: string | null
           phone?: string | null
+          portrait_photo_url?: string | null
           updated_at?: string | null
           work_experience_years?: number | null
         }
@@ -1398,6 +1508,8 @@ export type Database = {
         | "retired"
         | "student"
         | "unemployed"
+      gender_type: "nam" | "nu" | "khac"
+      id_type: "cccd" | "cmnd"
       loan_status: "draft" | "pending" | "approved" | "rejected" | "reviewing"
       loan_type: "personal" | "mortgage" | "business" | "auto" | "education"
       points_transaction_type:
@@ -1530,6 +1642,8 @@ export const Constants = {
         "student",
         "unemployed",
       ],
+      gender_type: ["nam", "nu", "khac"],
+      id_type: ["cccd", "cmnd"],
       loan_status: ["draft", "pending", "approved", "rejected", "reviewing"],
       loan_type: ["personal", "mortgage", "business", "auto", "education"],
       points_transaction_type: [
