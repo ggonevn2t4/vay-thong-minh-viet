@@ -12,6 +12,8 @@ const LoanApplicationProgress = ({ currentStep, totalSteps }: LoanApplicationPro
       case 1:
         return 'Chọn sản phẩm';
       case 2:
+        return 'Khảo sát thông tin';
+      case 3:
         return 'Chọn tư vấn viên';
       default:
         return '';
