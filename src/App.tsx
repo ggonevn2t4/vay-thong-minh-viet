@@ -10,6 +10,7 @@ import UserDashboard from "./pages/UserDashboard";
 import AdvisorDashboard from "./pages/AdvisorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import BankEmployeeDashboard from "./pages/BankEmployeeDashboard";
+import RoleBasedDashboard from "./components/dashboard/RoleBasedDashboard";
 import Messages from "./pages/Messages";
 import Marketplace from "./pages/Marketplace";
 import AdvisorDirectory from "./pages/AdvisorDirectory";
@@ -46,6 +47,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<RoleBasedDashboard />} />
               <Route path="/user-dashboard" element={<UserDashboard />} />
               <Route path="/advisor-dashboard" element={<AdvisorDashboard />} />
               <Route path="/admin-dashboard" element={<AdminDashboard />} />
