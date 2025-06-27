@@ -34,7 +34,7 @@ interface ProfileData {
   id_never_expires: boolean;
   id_issuing_authority: string;
   old_id_number: string;
-  employment_type: string;
+  employment_type: 'employee' | 'self_employed' | 'freelancer' | 'retired' | 'student' | 'unemployed' | null;
   monthly_income: number;
   company_name: string;
   work_experience_years: number;
@@ -64,7 +64,7 @@ const CustomerProfileForm = () => {
     id_never_expires: false,
     id_issuing_authority: '',
     old_id_number: '',
-    employment_type: '',
+    employment_type: null,
     monthly_income: 0,
     company_name: '',
     work_experience_years: 0,
@@ -116,7 +116,7 @@ const CustomerProfileForm = () => {
           id_never_expires: data.id_never_expires || false,
           id_issuing_authority: data.id_issuing_authority || '',
           old_id_number: data.old_id_number || '',
-          employment_type: data.employment_type || '',
+          employment_type: data.employment_type,
           monthly_income: data.monthly_income || 0,
           company_name: data.company_name || '',
           work_experience_years: data.work_experience_years || 0,
@@ -143,13 +143,38 @@ const CustomerProfileForm = () => {
     
     setSaving(true);
     try {
+      // Remove the updated_at field and ensure proper typing
+      const profileUpdate = {
+        id: user.id,
+        full_name: profileData.full_name,
+        phone: profileData.phone,
+        email: profileData.email,
+        date_of_birth: profileData.date_of_birth,
+        gender: profileData.gender,
+        permanent_address_city: profileData.permanent_address_city,
+        permanent_address_district: profileData.permanent_address_district,
+        permanent_address_ward: profileData.permanent_address_ward,
+        permanent_address_street: profileData.permanent_address_street,
+        current_address_city: profileData.current_address_city,
+        current_address_district: profileData.current_address_district,
+        current_address_ward: profileData.current_address_ward,
+        current_address_street: profileData.current_address_street,
+        id_number: profileData.id_number,
+        id_type: profileData.id_type,
+        id_issue_date: profileData.id_issue_date,
+        id_expiry_date: profileData.id_expiry_date,
+        id_never_expires: profileData.id_never_expires,
+        id_issuing_authority: profileData.id_issuing_authority,
+        old_id_number: profileData.old_id_number,
+        employment_type: profileData.employment_type,
+        monthly_income: profileData.monthly_income,
+        company_name: profileData.company_name,
+        work_experience_years: profileData.work_experience_years,
+      };
+
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
-          ...profileData,
-          updated_at: new Date().toISOString(),
-        });
+        .upsert(profileUpdate);
 
       if (error) throw error;
       
@@ -297,12 +322,19 @@ const CustomerProfileForm = () => {
                 </div>
                 <div>
                   <Label htmlFor="employment_type">Loại công việc</Label>
-                  <Input
-                    id="employment_type"
-                    value={profileData.employment_type}
-                    onChange={(e) => handleInputChange('employment_type', e.target.value)}
-                    placeholder="Ví dụ: Nhân viên văn phòng"
-                  />
+                  <Select value={profileData.employment_type || ''} onValueChange={(value) => handleInputChange('employment_type', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn loại công việc" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="employee">Nhân viên</SelectItem>
+                      <SelectItem value="self_employed">Tự kinh doanh</SelectItem>
+                      <SelectItem value="freelancer">Freelancer</SelectItem>
+                      <SelectItem value="retired">Đã nghỉ hưu</SelectItem>
+                      <SelectItem value="student">Sinh viên</SelectItem>
+                      <SelectItem value="unemployed">Thất nghiệp</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label htmlFor="monthly_income">Thu nhập hàng tháng (VND)</Label>
