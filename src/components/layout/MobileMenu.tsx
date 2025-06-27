@@ -80,11 +80,18 @@ const MobileMenu = ({ onClose }: MobileMenuProps) => {
                 </Link>
               </>
             ) : (
-              <Link to="/khao-sat" onClick={onClose}>
-                <Button className="w-full bg-brand-600 hover:bg-brand-700">
-                  Bắt đầu khảo sát
-                </Button>
-              </Link>
+              <>
+                <Link to="/loan-application" onClick={onClose}>
+                  <Button className="w-full bg-brand-600 hover:bg-brand-700">
+                    Đăng ký khoản vay mới
+                  </Button>
+                </Link>
+                <Link to="/khao-sat" onClick={onClose}>
+                  <Button variant="outline" className="w-full">
+                    Bắt đầu khảo sát
+                  </Button>
+                </Link>
+              </>
             )}
           </div>
         </div>
