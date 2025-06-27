@@ -51,6 +51,15 @@ const LoanApplicationFlow = () => {
         return mapping[status] || 'employee';
       };
 
+      // Map product type to database loan type enum
+      const mapLoanType = (productType: LoanProductType): 'personal' | 'mortgage' | 'business' | 'auto' | 'education' | 'credit_loan' | 'mortgage_loan' => {
+        const mapping: Record<LoanProductType, 'personal' | 'mortgage' | 'business' | 'auto' | 'education' | 'credit_loan' | 'mortgage_loan'> = {
+          'credit_loan': 'credit_loan',
+          'mortgage_loan': 'mortgage_loan'
+        };
+        return mapping[productType] || 'personal';
+      };
+
       // Create base loan application data
       const baseLoanApplicationData = {
         user_id: user.id,
@@ -61,7 +70,7 @@ const LoanApplicationFlow = () => {
         customer_questions: formData,
         monthly_income: Number(formData.monthly_income || 0),
         employment_type: mapEmploymentType(formData.employment_status || ''),
-        loan_type: (selectedProduct === 'credit_loan' ? 'tin_dung' : 'the_chap') as 'tin_dung' | 'the_chap',
+        loan_type: mapLoanType(selectedProduct),
         advisor_id: advisorId,
         status: 'draft' as 'draft' | 'pending' | 'approved' | 'rejected' | 'reviewing'
       };
