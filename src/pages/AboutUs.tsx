@@ -34,10 +34,10 @@ const TEAM_MEMBERS = [{
   description: "Nhà sáng lập và CEO của Finzy, với tầm nhìn kiến tạo nền tảng công nghệ tài chính hàng đầu Việt Nam",
   image: "/lovable-uploads/8767c56b-d1a5-49e2-ae33-dc8c6c27602c.png"
 }, {
-  name: "Nguyễn Văn A",
-  position: "CTO",
-  description: "Cựu Senior Engineer tại Grab, chuyên gia về AI và machine learning",
-  icon: <Target className="h-12 w-12 text-brand-600" />
+  name: "Cao Nhật Quang",
+  position: "Co-founder & CTO",
+  description: "Đồng sáng lập và CTO của Finzy, chuyên gia công nghệ với kinh nghiệm phát triển sản phẩm fintech",
+  image: "/lovable-uploads/48ab54bd-523b-426b-969f-e8344d2841fc.png"
 }, {
   name: "Trần Thị B",
   position: "Head of Business",
