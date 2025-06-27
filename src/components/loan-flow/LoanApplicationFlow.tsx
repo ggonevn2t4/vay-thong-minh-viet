@@ -41,16 +41,30 @@ const LoanApplicationFlow = () => {
 
     setLoading(true);
     try {
+      // Map employment status to valid enum values
+      const mapEmploymentType = (status: string) => {
+        const mapping: Record<string, string> = {
+          'Nhân viên công ty': 'employee',
+          'Công chức': 'employee',
+          'Kinh doanh tự do': 'self_employed',
+          'Freelancer': 'freelancer'
+        };
+        return mapping[status] || 'employee';
+      };
+
       // Create loan application
-      const loanApplicationData: Partial<LoanApplicationFormData> = {
+      const loanApplicationData = {
+        user_id: user.id,
         amount: formData.loan_amount || 100000000,
         term_months: formData.loan_term || 12,
         purpose: formData.loan_purpose_detail || formData.loan_purpose || 'Nhu cầu cá nhân',
         product_type: selectedProduct,
         customer_questions: formData,
         monthly_income: formData.monthly_income,
-        employment_type: formData.employment_status,
-        loan_type: selectedProduct === 'credit_loan' ? 'tin_dung' : 'the_chap'
+        employment_type: mapEmploymentType(formData.employment_status || ''),
+        loan_type: selectedProduct === 'credit_loan' ? 'tin_dung' : 'the_chap' as any,
+        advisor_id: advisorId,
+        status: 'draft' as any
       };
 
       // Add mortgage-specific data
@@ -66,22 +80,7 @@ const LoanApplicationFlow = () => {
 
       const { data: loanApp, error: loanError } = await supabase
         .from('loan_applications')
-        .insert({
-          user_id: user.id,
-          amount: loanApplicationData.amount,
-          term_months: loanApplicationData.term_months,
-          loan_type: loanApplicationData.loan_type,
-          purpose: loanApplicationData.purpose,
-          product_type: loanApplicationData.product_type,
-          customer_questions: loanApplicationData.customer_questions,
-          monthly_income: loanApplicationData.monthly_income,
-          employment_type: loanApplicationData.employment_type,
-          property_value: loanApplicationData.property_value,
-          property_address: loanApplicationData.property_address,
-          collateral_info: loanApplicationData.collateral_info,
-          advisor_id: advisorId,
-          status: 'draft'
-        })
+        .insert(loanApplicationData)
         .select()
         .single();
 

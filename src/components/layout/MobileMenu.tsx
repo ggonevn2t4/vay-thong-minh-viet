@@ -35,8 +35,14 @@ const ROLE_CONFIG = {
  */
 const MobileMenu = ({ onClose }: MobileMenuProps) => {
   const { user, userRole } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  
   // Default to customer role if userRole is not defined
   const currentRole: UserRole = (userRole as UserRole) || 'customer';
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
 
   /**
    * Get role badge configuration based on user role
@@ -58,7 +64,7 @@ const MobileMenu = ({ onClose }: MobileMenuProps) => {
           )}
           
           <div className="flex flex-col space-y-3">
-            <Navigation />
+            <Navigation isOpen={isOpen} toggleMenu={toggleMenu} />
           </div>
           
           <div className="mt-4 space-y-4">

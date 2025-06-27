@@ -22,16 +22,16 @@ interface Conversation {
   customer_profile?: {
     full_name: string;
     avatar_url?: string;
-  };
+  } | null;
   advisor_profile?: {
     full_name: string;
     bank_name: string;
     avatar_url?: string;
-  };
+  } | null;
   loan_application?: {
     amount: number;
     product_type: string;
-  };
+  } | null;
 }
 
 interface Message {
@@ -46,7 +46,7 @@ interface Message {
   sender_profile?: {
     full_name: string;
     avatar_url?: string;
-  };
+  } | null;
 }
 
 const EnhancedMessagingInterface = () => {
@@ -75,19 +75,48 @@ const EnhancedMessagingInterface = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // Fetch conversations first
+      const { data: conversationsData, error } = await supabase
         .from('conversations')
-        .select(`
-          *,
-          customer_profile:customer_id (full_name, avatar_url),
-          advisor_profile:advisor_id (full_name, bank_name, avatar_url),
-          loan_application:loan_application_id (amount, product_type)
-        `)
+        .select('*')
         .or(`customer_id.eq.${user.id},advisor_id.eq.${user.id}`)
         .order('last_message_at', { ascending: false });
 
       if (error) throw error;
-      setConversations(data || []);
+
+      // For each conversation, fetch the related profile data separately
+      const conversationsWithProfiles = await Promise.all(
+        (conversationsData || []).map(async (conversation) => {
+          const { data: customerProfile } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('id', conversation.customer_id)
+            .maybeSingle();
+
+          const { data: advisorProfile } = await supabase
+            .from('advisor_profiles')
+            .select('full_name, bank_name, avatar_url')
+            .eq('user_id', conversation.advisor_id)
+            .maybeSingle();
+
+          const { data: loanApplication } = conversation.loan_application_id
+            ? await supabase
+                .from('loan_applications')
+                .select('amount, product_type')
+                .eq('id', conversation.loan_application_id)
+                .maybeSingle()
+            : { data: null };
+
+          return {
+            ...conversation,
+            customer_profile: customerProfile,
+            advisor_profile: advisorProfile,
+            loan_application: loanApplication,
+          };
+        })
+      );
+
+      setConversations(conversationsWithProfiles);
     } catch (error) {
       console.error('Error fetching conversations:', error);
       toast.error('Lỗi khi tải danh sách cuộc trò chuyện');
@@ -98,17 +127,32 @@ const EnhancedMessagingInterface = () => {
 
   const fetchMessages = async (conversationId: string) => {
     try {
-      const { data, error } = await supabase
+      // Fetch messages first
+      const { data: messagesData, error } = await supabase
         .from('messages')
-        .select(`
-          *,
-          sender_profile:sender_id (full_name, avatar_url)
-        `)
+        .select('*')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+
+      // For each message, fetch the sender profile separately
+      const messagesWithProfiles = await Promise.all(
+        (messagesData || []).map(async (message) => {
+          const { data: senderProfile } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url')
+            .eq('id', message.sender_id)
+            .maybeSingle();
+
+          return {
+            ...message,
+            sender_profile: senderProfile,
+          };
+        })
+      );
+
+      setMessages(messagesWithProfiles);
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast.error('Lỗi khi tải tin nhắn');
