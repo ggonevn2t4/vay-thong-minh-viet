@@ -3,9 +3,7 @@ const PartnersSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-800 mb-4">Các ngân hàng hàng đầu tại Việt Nam</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-            Chúng tôi hợp tác với các ngân hàng hàng đầu Việt Nam để mang đến cho bạn nhiều lựa chọn vay vốn đa dạng
-          </p>
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg">Chúng tôi kết nối với các ngân hàng hàng đầu Việt Nam để mang đến cho bạn nhiều lựa chọn vay vốn đa dạng</p>
         </div>
         
         <div className="flex justify-center">
