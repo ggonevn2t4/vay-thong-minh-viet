@@ -32,7 +32,7 @@ const Header = () => {
         <div className="flex items-center">
           <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/lovable-uploads/2af3d2c3-5b39-4048-bc35-e7d8d899f021.png" 
+              src="/lovable-uploads/7d5ad308-e2e5-4b69-ad28-a3eae4b8ebca.png" 
               alt="Finzy Logo" 
               className="h-8 w-auto"
             />
@@ -92,7 +92,7 @@ const Header = () => {
               onClick={() => setIsOpen(false)}
             >
               <img 
-                src="/lovable-uploads/2af3d2c3-5b39-4048-bc35-e7d8d899f021.png" 
+                src="/lovable-uploads/7d5ad308-e2e5-4b69-ad28-a3eae4b8ebca.png" 
                 alt="Finzy Logo" 
                 className="h-6 w-auto"
               />

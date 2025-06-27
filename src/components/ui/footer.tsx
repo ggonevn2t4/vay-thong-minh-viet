@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Brain, 
@@ -27,7 +26,7 @@ const Footer: React.FC = () => {
           <div className="group">
             <div className="flex items-center mb-8">
               <img 
-                src="/lovable-uploads/92277533-8a64-40f2-b441-187e4701f7b1.png" 
+                src="/lovable-uploads/7d5ad308-e2e5-4b69-ad28-a3eae4b8ebca.png" 
                 alt="Finzy Logo" 
                 className="h-12 w-auto group-hover:scale-105 transition-transform duration-300"
               />
