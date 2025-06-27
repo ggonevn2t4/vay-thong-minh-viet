@@ -1,7 +1,6 @@
 
 import React from 'react';
 import Layout from '@/components/layout/Layout';
-import Testimonials from "@/components/Testimonials";
 import ContactForm from "@/components/ContactForm";
 import HeroSection from '@/components/home/HeroSection';
 import PartnersSection from '@/components/home/PartnersSection';
@@ -13,7 +12,7 @@ import LoanCalculatorSection from '@/components/home/LoanCalculatorSection';
 
 /**
  * Homepage component that displays the main landing page
- * Contains hero section, features, testimonials, and call-to-action sections
+ * Contains hero section, features, and call-to-action sections
  * @returns {JSX.Element} The complete homepage layout
  */
 const Index = () => {
@@ -24,7 +23,6 @@ const Index = () => {
       <ProcessStepsSection />
       <NewFeaturesSection />
       <BenefitsSection />
-      <Testimonials />
       <ContactForm />
       <CTASection />
       <LoanCalculatorSection />
