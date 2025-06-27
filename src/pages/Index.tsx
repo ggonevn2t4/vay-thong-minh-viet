@@ -7,6 +7,7 @@ import PartnersSection from '@/components/home/PartnersSection';
 import ProcessStepsSection from '@/components/home/ProcessStepsSection';
 import NewFeaturesSection from '@/components/home/NewFeaturesSection';
 import BenefitsSection from '@/components/home/BenefitsSection';
+import FounderSection from '@/components/home/FounderSection';
 import CTASection from '@/components/home/CTASection';
 import LoanCalculatorSection from '@/components/home/LoanCalculatorSection';
 
@@ -23,6 +24,7 @@ const Index = () => {
       <ProcessStepsSection />
       <NewFeaturesSection />
       <BenefitsSection />
+      <FounderSection />
       <ContactForm />
       <CTASection />
       <LoanCalculatorSection />
