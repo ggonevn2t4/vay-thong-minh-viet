@@ -4,21 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { User, MapPin, IdCard, Upload, CheckCircle, AlertCircle } from 'lucide-react';
+import { User, MapPin, IdCard, Upload, CheckCircle } from 'lucide-react';
 
 interface ProfileData {
   full_name: string;
   phone: string;
   email: string;
   date_of_birth: string;
-  gender: 'nam' | 'nu' | 'khac' | null;
   permanent_address_city: string;
   permanent_address_district: string;
   permanent_address_ward: string;
@@ -34,10 +32,6 @@ interface ProfileData {
   id_never_expires: boolean;
   id_issuing_authority: string;
   old_id_number: string;
-  employment_type: 'employee' | 'self_employed' | 'freelancer' | 'retired' | 'student' | 'unemployed' | null;
-  monthly_income: number;
-  company_name: string;
-  work_experience_years: number;
   kyc_verified: boolean;
 }
 
@@ -48,7 +42,6 @@ const CustomerProfileForm = () => {
     phone: '',
     email: '',
     date_of_birth: '',
-    gender: null,
     permanent_address_city: '',
     permanent_address_district: '',
     permanent_address_ward: '',
@@ -64,10 +57,6 @@ const CustomerProfileForm = () => {
     id_never_expires: false,
     id_issuing_authority: '',
     old_id_number: '',
-    employment_type: null,
-    monthly_income: 0,
-    company_name: '',
-    work_experience_years: 0,
     kyc_verified: false,
   });
   
@@ -100,7 +89,6 @@ const CustomerProfileForm = () => {
           phone: data.phone || '',
           email: data.email || user.email || '',
           date_of_birth: data.date_of_birth || '',
-          gender: data.gender,
           permanent_address_city: data.permanent_address_city || '',
           permanent_address_district: data.permanent_address_district || '',
           permanent_address_ward: data.permanent_address_ward || '',
@@ -116,10 +104,6 @@ const CustomerProfileForm = () => {
           id_never_expires: data.id_never_expires || false,
           id_issuing_authority: data.id_issuing_authority || '',
           old_id_number: data.old_id_number || '',
-          employment_type: data.employment_type,
-          monthly_income: data.monthly_income || 0,
-          company_name: data.company_name || '',
-          work_experience_years: data.work_experience_years || 0,
           kyc_verified: data.kyc_verified || false,
         });
       }
@@ -143,14 +127,12 @@ const CustomerProfileForm = () => {
     
     setSaving(true);
     try {
-      // Remove the updated_at field and ensure proper typing
       const profileUpdate = {
         id: user.id,
         full_name: profileData.full_name,
         phone: profileData.phone,
         email: profileData.email,
         date_of_birth: profileData.date_of_birth,
-        gender: profileData.gender,
         permanent_address_city: profileData.permanent_address_city,
         permanent_address_district: profileData.permanent_address_district,
         permanent_address_ward: profileData.permanent_address_ward,
@@ -166,10 +148,6 @@ const CustomerProfileForm = () => {
         id_never_expires: profileData.id_never_expires,
         id_issuing_authority: profileData.id_issuing_authority,
         old_id_number: profileData.old_id_number,
-        employment_type: profileData.employment_type,
-        monthly_income: profileData.monthly_income,
-        company_name: profileData.company_name,
-        work_experience_years: profileData.work_experience_years,
       };
 
       const { error } = await supabase
@@ -307,64 +285,6 @@ const CustomerProfileForm = () => {
                     onChange={(e) => handleInputChange('date_of_birth', e.target.value)}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="gender">Giới tính</Label>
-                  <Select value={profileData.gender || ''} onValueChange={(value) => handleInputChange('gender', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Chọn giới tính" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="nam">Nam</SelectItem>
-                      <SelectItem value="nu">Nữ</SelectItem>
-                      <SelectItem value="khac">Khác</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="employment_type">Loại công việc</Label>
-                  <Select value={profileData.employment_type || ''} onValueChange={(value) => handleInputChange('employment_type', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Chọn loại công việc" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="employee">Nhân viên</SelectItem>
-                      <SelectItem value="self_employed">Tự kinh doanh</SelectItem>
-                      <SelectItem value="freelancer">Freelancer</SelectItem>
-                      <SelectItem value="retired">Đã nghỉ hưu</SelectItem>
-                      <SelectItem value="student">Sinh viên</SelectItem>
-                      <SelectItem value="unemployed">Thất nghiệp</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="monthly_income">Thu nhập hàng tháng (VND)</Label>
-                  <Input
-                    id="monthly_income"
-                    type="number"
-                    value={profileData.monthly_income}
-                    onChange={(e) => handleInputChange('monthly_income', parseInt(e.target.value) || 0)}
-                    placeholder="Nhập thu nhập hàng tháng"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="company_name">Tên công ty</Label>
-                  <Input
-                    id="company_name"
-                    value={profileData.company_name}
-                    onChange={(e) => handleInputChange('company_name', e.target.value)}
-                    placeholder="Nhập tên công ty"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="work_experience_years">Số năm kinh nghiệm</Label>
-                  <Input
-                    id="work_experience_years"
-                    type="number"
-                    value={profileData.work_experience_years}
-                    onChange={(e) => handleInputChange('work_experience_years', parseInt(e.target.value) || 0)}
-                    placeholder="Nhập số năm kinh nghiệm"
-                  />
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -484,15 +404,16 @@ const CustomerProfileForm = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="id_type">Loại giấy tờ *</Label>
-                  <Select value={profileData.id_type || ''} onValueChange={(value) => handleInputChange('id_type', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Chọn loại giấy tờ" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cccd">Căn cước công dân</SelectItem>
-                      <SelectItem value="cmnd">Chứng minh nhân dân</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <select
+                    id="id_type"
+                    value={profileData.id_type || ''}
+                    onChange={(e) => handleInputChange('id_type', e.target.value || null)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Chọn loại giấy tờ</option>
+                    <option value="cccd">Căn cước công dân</option>
+                    <option value="cmnd">Chứng minh nhân dân</option>
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="id_number">Số giấy tờ *</Label>
