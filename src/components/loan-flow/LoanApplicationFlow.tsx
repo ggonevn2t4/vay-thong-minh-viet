@@ -88,7 +88,7 @@ const LoanApplicationFlow = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
-        <LoanApplicationProgress currentStep={currentStep} totalSteps={3} />
+        <LoanApplicationProgress currentStep={currentStep} totalSteps={2} />
         
         <LoanApplicationSteps
           currentStep={currentStep}

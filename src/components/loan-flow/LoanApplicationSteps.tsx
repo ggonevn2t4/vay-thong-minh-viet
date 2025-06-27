@@ -1,8 +1,8 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LoanProductType } from '@/types/loan-application-flow';
 import LoanProductSelection from './LoanProductSelection';
-import CustomQuestionForm from './CustomQuestionForm';
 import AdvisorSelectionStep from './AdvisorSelectionStep';
 
 interface LoanApplicationStepsProps {
@@ -26,29 +26,22 @@ const LoanApplicationSteps = ({
   onBack,
   onSelectAdvisor
 }: LoanApplicationStepsProps) => {
+  const navigate = useNavigate();
+
   if (currentStep === 1) {
     return (
       <LoanProductSelection
         selectedProduct={selectedProduct}
         onSelectProduct={onSelectProduct}
-        onNext={onNext}
+        onNext={() => {
+          // Chuyển hướng đến trang khảo sát thay vì next step
+          navigate('/khao-sat');
+        }}
       />
     );
   }
 
   if (currentStep === 2 && selectedProduct) {
-    return (
-      <CustomQuestionForm
-        productType={selectedProduct}
-        formData={formData}
-        onUpdateFormData={onUpdateFormData}
-        onBack={onBack}
-        onNext={onNext}
-      />
-    );
-  }
-
-  if (currentStep === 3 && selectedProduct) {
     return (
       <AdvisorSelectionStep
         selectedProductType={selectedProduct}
