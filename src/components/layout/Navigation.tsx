@@ -1,77 +1,145 @@
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
-import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/contexts/AuthContext';
-
-interface NavigationProps {
-  className?: string;
+interface MobileMenuProps {
+  isOpen: boolean;
+  toggleMenu: () => void;
+  mainNavItems: { href: string; label: string }[];
+  isActive: (path: string) => boolean;
+  user: any;
 }
 
-const Navigation = ({ className }: NavigationProps = {}) => {
-  const location = useLocation();
-  const { userRole } = useAuth();
+const MobileMenu = ({
+  isOpen,
+  toggleMenu,
+  mainNavItems,
+  isActive,
+  user,
+}: MobileMenuProps) => {
+  return (
+    <Sheet open={isOpen} onOpenChange={toggleMenu}>
+      <SheetTrigger asChild className="lg:hidden">
+        <Menu className="h-6 w-6 text-gray-700" />
+      </SheetTrigger>
+      <SheetContent side="left" className="w-full sm:w-64">
+        <SheetHeader>
+          <SheetTitle>Menu</SheetTitle>
+          <SheetDescription>
+            Explore our services and manage your account.
+          </SheetDescription>
+        </SheetHeader>
+        <div className="grid gap-4 py-4">
+          {mainNavItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={`block px-4 py-2 text-sm font-medium rounded-md transition-colors hover:bg-gray-100 ${
+                isActive(item.href)
+                  ? "bg-brand-50 text-brand-700"
+                  : "text-gray-700 hover:text-gray-900"
+              }`}
+              onClick={toggleMenu}
+            >
+              {item.label}
+            </Link>
+          ))}
+          {user ? (
+            <>
+              <Link
+                to="/user-dashboard"
+                className={`block px-4 py-2 text-sm font-medium rounded-md transition-colors hover:bg-gray-100 ${
+                  isActive("/user-dashboard")
+                    ? "bg-brand-50 text-brand-700"
+                    : "text-gray-700 hover:text-gray-900"
+                }`}
+                onClick={toggleMenu}
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/settings"
+                className={`block px-4 py-2 text-sm font-medium rounded-md transition-colors hover:bg-gray-100 ${
+                  isActive("/settings")
+                    ? "bg-brand-50 text-brand-700"
+                    : "text-gray-700 hover:text-gray-900"
+                }`}
+                onClick={toggleMenu}
+              >
+                Settings
+              </Link>
+            </>
+          ) : (
+            <Link
+              to="/auth"
+              className="block px-4 py-2 text-sm font-medium text-gray-700 rounded-md transition-colors hover:bg-gray-100 hover:text-gray-900"
+              onClick={toggleMenu}
+            >
+              Login/Register
+            </Link>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+};
 
-  // Base navigation items for all users
-  const baseNavigationItems = [
-    { href: '/', label: 'Trang chủ' },
-    { href: '/marketplace', label: 'Marketplace' },
-    { href: '/advisor-directory', label: 'Tư vấn viên' },
-    { href: '/loan-comparison', label: 'So sánh khoản vay' },
-    { href: '/loan-optimization', label: 'Tối ưu khoản vay' },
+interface NavigationProps {
+  isOpen: boolean;
+  toggleMenu: () => void;
+}
+
+export const Navigation = ({ isOpen, toggleMenu }: NavigationProps) => {
+  const { user } = useAuth();
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
+
+  const mainNavItems = [
+    { href: "/marketplace", label: "Sàn giao dịch" },
+    { href: "/advisor-directory", label: "Tư vấn viên" },
+    { href: "/loan-comparison", label: "So sánh vay" },
+    { href: "/loan-application", label: "Đăng ký vay" },
+    { href: "/about", label: "Về chúng tôi" },
   ];
 
-  // Role-specific navigation items
-  const getRoleSpecificItems = () => {
-    const items = [];
-    
-    if (userRole) {
-      items.push({ href: '/messages', label: 'Tin nhắn' });
-    }
-
-    switch (userRole) {
-      case 'customer':
-        items.push(
-          { href: '/user-dashboard', label: 'Dashboard' },
-          { href: '/ai-advisory', label: 'Tư vấn AI' },
-          { href: '/document-checklist', label: 'Hồ sơ tài liệu' }
-        );
-        break;
-      case 'advisor':
-        items.push(
-          { href: '/advisor-dashboard', label: 'Dashboard' },
-          { href: '/advisor-profile', label: 'Hồ sơ cá nhân' },
-          { href: '/knowledge-management', label: 'Quản lý kiến thức' }
-        );
-        break;
-      case 'admin':
-        items.push(
-          { href: '/admin-dashboard', label: 'Admin Dashboard' },
-          { href: '/user-management', label: 'Quản lý người dùng' },
-          { href: '/system-analytics', label: 'Phân tích hệ thống' }
-        );
-        break;
-    }
-
-    return items;
-  };
-
-  const allItems = [...baseNavigationItems, ...getRoleSpecificItems()];
-
   return (
-    <nav className={cn('flex space-x-8', className)}>
-      {allItems.map((item) => (
-        <Link
-          key={item.href}
-          to={item.href}
-          className={cn(
-            'text-gray-600 hover:text-brand-600 px-3 py-2 text-sm font-medium transition-colors',
-            location.pathname === item.href && 'text-brand-600 border-b-2 border-brand-600'
-          )}
-        >
-          {item.label}
-        </Link>
-      ))}
-    </nav>
+    <>
+      {/* Desktop Navigation */}
+      <nav className="hidden lg:flex items-center space-x-1">
+        {mainNavItems.map((item) => (
+          <Link
+            key={item.href}
+            to={item.href}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors hover:bg-gray-100 ${
+              isActive(item.href)
+                ? "bg-brand-50 text-brand-700"
+                : "text-gray-700 hover:text-gray-900"
+            }`}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+
+      {/* Mobile Menu */}
+      <MobileMenu
+        isOpen={isOpen}
+        toggleMenu={toggleMenu}
+        mainNavItems={mainNavItems}
+        isActive={isActive}
+        user={user}
+      />
+    </>
   );
 };
 

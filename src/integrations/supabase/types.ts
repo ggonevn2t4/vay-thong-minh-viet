@@ -381,6 +381,47 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          advisor_id: string | null
+          created_at: string | null
+          customer_id: string
+          id: string
+          last_message_at: string | null
+          loan_application_id: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          advisor_id?: string | null
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          last_message_at?: string | null
+          loan_application_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          advisor_id?: string | null
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          last_message_at?: string | null
+          loan_application_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_cic_history: {
         Row: {
           bank_name: string
@@ -936,15 +977,23 @@ export type Database = {
       }
       loan_applications: {
         Row: {
+          advisor_id: string | null
+          advisor_notes: string | null
           amount: number
           bank_responses: Json | null
+          collateral_info: Json | null
           created_at: string | null
           customer_education_completed: boolean | null
+          customer_questions: Json | null
           employment_type: Database["public"]["Enums"]["employment_type"] | null
           id: string
+          loan_to_value_ratio: number | null
           loan_type: Database["public"]["Enums"]["loan_type"]
           monthly_income: number | null
           offers_generated_at: string | null
+          product_type: string | null
+          property_address: string | null
+          property_value: number | null
           purpose: string | null
           status: Database["public"]["Enums"]["loan_status"] | null
           term_months: number
@@ -953,17 +1002,25 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          advisor_id?: string | null
+          advisor_notes?: string | null
           amount: number
           bank_responses?: Json | null
+          collateral_info?: Json | null
           created_at?: string | null
           customer_education_completed?: boolean | null
+          customer_questions?: Json | null
           employment_type?:
             | Database["public"]["Enums"]["employment_type"]
             | null
           id?: string
+          loan_to_value_ratio?: number | null
           loan_type: Database["public"]["Enums"]["loan_type"]
           monthly_income?: number | null
           offers_generated_at?: string | null
+          product_type?: string | null
+          property_address?: string | null
+          property_value?: number | null
           purpose?: string | null
           status?: Database["public"]["Enums"]["loan_status"] | null
           term_months: number
@@ -972,17 +1029,25 @@ export type Database = {
           user_id: string
         }
         Update: {
+          advisor_id?: string | null
+          advisor_notes?: string | null
           amount?: number
           bank_responses?: Json | null
+          collateral_info?: Json | null
           created_at?: string | null
           customer_education_completed?: boolean | null
+          customer_questions?: Json | null
           employment_type?:
             | Database["public"]["Enums"]["employment_type"]
             | null
           id?: string
+          loan_to_value_ratio?: number | null
           loan_type?: Database["public"]["Enums"]["loan_type"]
           monthly_income?: number | null
           offers_generated_at?: string | null
+          product_type?: string | null
+          property_address?: string | null
+          property_value?: number | null
           purpose?: string | null
           status?: Database["public"]["Enums"]["loan_status"] | null
           term_months?: number
@@ -990,7 +1055,15 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "loan_applications_advisor_id_fkey"
+            columns: ["advisor_id"]
+            isOneToOne: false
+            referencedRelation: "advisor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       loan_optimization_alerts: {
         Row: {
@@ -1095,6 +1168,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          message_type: string | null
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          message_type?: string | null
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          message_type?: string | null
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -1511,7 +1620,14 @@ export type Database = {
       gender_type: "nam" | "nu" | "khac"
       id_type: "cccd" | "cmnd"
       loan_status: "draft" | "pending" | "approved" | "rejected" | "reviewing"
-      loan_type: "personal" | "mortgage" | "business" | "auto" | "education"
+      loan_type:
+        | "personal"
+        | "mortgage"
+        | "business"
+        | "auto"
+        | "education"
+        | "credit_loan"
+        | "mortgage_loan"
       points_transaction_type:
         | "purchase"
         | "spend"
@@ -1645,7 +1761,15 @@ export const Constants = {
       gender_type: ["nam", "nu", "khac"],
       id_type: ["cccd", "cmnd"],
       loan_status: ["draft", "pending", "approved", "rejected", "reviewing"],
-      loan_type: ["personal", "mortgage", "business", "auto", "education"],
+      loan_type: [
+        "personal",
+        "mortgage",
+        "business",
+        "auto",
+        "education",
+        "credit_loan",
+        "mortgage_loan",
+      ],
       points_transaction_type: [
         "purchase",
         "spend",
