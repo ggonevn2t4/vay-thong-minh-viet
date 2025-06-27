@@ -12,7 +12,7 @@ const HeroSectionComponent = () => {
       }}
       description="Finzy - Giải pháp thông minh giúp sàng lọc và đề xuất các khoản vay từ các ngân hàng hàng đầu Việt Nam dựa trên điều kiện tài chính của bạn"
       ctaText="Bắt đầu ngay"
-      ctaHref="/khao-sat"
+      ctaHref="/loan-application"
       gridOptions={{
         angle: 65,
         opacity: 0.3,

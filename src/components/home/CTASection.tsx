@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react';
 
 /**
  * Call-to-action section component
- * Displays a prominent CTA to encourage users to start the loan survey
+ * Displays a prominent CTA to encourage users to start the loan application
  * @returns {JSX.Element} The CTA section with gradient background
  */
 const CTASection = () => {
@@ -19,11 +19,11 @@ const CTASection = () => {
           Bắt đầu tìm kiếm khoản vay phù hợp ngay hôm nay
         </h2>
         <p className="text-xl mb-10 max-w-2xl mx-auto text-brand-50">
-          Chỉ mất vài phút để hoàn thành khảo sát và nhận đề xuất cá nhân hóa từ các ngân hàng hàng đầu Việt Nam
+          Chọn sản phẩm tài chính phù hợp và nhận đề xuất cá nhân hóa từ các ngân hàng hàng đầu Việt Nam
         </p>
-        <Link to="/khao-sat">
+        <Link to="/loan-application">
           <Button className="bg-white text-brand-600 hover:bg-brand-50 text-lg py-6 px-10 rounded-full shadow-lg hover:shadow-xl transition-all font-semibold">
-            Bắt đầu khảo sát miễn phí
+            Chọn sản phẩm tài chính
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
