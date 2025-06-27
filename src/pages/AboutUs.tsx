@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,17 +29,17 @@ const COMPANY_VALUES = [{
  * Team members configuration
  */
 const TEAM_MEMBERS = [{
-  name: "Nguyễn Văn A",
-  position: "CEO & Founder",
-  description: "Cựu Giám đốc Khối Bán lẻ tại Vietcombank, 12 năm kinh nghiệm ngành ngân hàng",
-  icon: <Users className="h-12 w-12 text-brand-600" />
+  name: "Lê Cao Thái",
+  position: "Founder & CEO",
+  description: "Nhà sáng lập và CEO của Finzy, với tầm nhìn kiến tạo nền tảng công nghệ tài chính hàng đầu Việt Nam",
+  image: "/lovable-uploads/8767c56b-d1a5-49e2-ae33-dc8c6c27602c.png"
 }, {
-  name: "Trần Thị B",
+  name: "Nguyễn Văn A",
   position: "CTO",
   description: "Cựu Senior Engineer tại Grab, chuyên gia về AI và machine learning",
   icon: <Target className="h-12 w-12 text-brand-600" />
 }, {
-  name: "Lê Văn C",
+  name: "Trần Thị B",
   position: "Head of Business",
   description: "Cựu Giám đốc Kinh doanh tại Techcombank, 10 năm kinh nghiệm phát triển sản phẩm",
   icon: <Award className="h-12 w-12 text-brand-600" />
@@ -72,7 +73,7 @@ const AboutUs = () => {
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-brand-600 to-brand-700 text-white py-20">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Về VayThôngMinh</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">Về Finzy</h1>
             <p className="text-xl md:text-2xl text-brand-100 max-w-3xl mx-auto">
               Nền tảng so sánh và tư vấn khoản vay hàng đầu Việt Nam, giúp bạn tìm được giải pháp tài chính phù hợp nhất
             </p>
@@ -133,8 +134,16 @@ const AboutUs = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               {TEAM_MEMBERS.map((member, index) => <Card key={index} className="text-center">
                   <CardContent className="pt-6">
-                    <div className="w-24 h-24 bg-brand-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                      {member.icon}
+                    <div className="w-24 h-24 bg-brand-100 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                      {member.image ? (
+                        <img 
+                          src={member.image} 
+                          alt={member.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        member.icon
+                      )}
                     </div>
                     <h3 className="text-xl font-semibold mb-2">{member.name}</h3>
                     <p className="text-brand-600 font-medium mb-2">{member.position}</p>
