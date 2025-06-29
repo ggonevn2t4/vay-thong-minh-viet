@@ -44,6 +44,26 @@ export const customQuestionForms: Record<LoanProductType, CustomQuestionForm> = 
   credit_loan: {
     productType: 'credit_loan',
     questions: [
+      // Thông tin mong muốn về thẻ tín dụng
+      {
+        id: 'han_muc_the_mong_muon',
+        type: 'number',
+        label: 'Hạn mức thẻ mong muốn (triệu VNĐ)',
+        placeholder: 'Nhập hạn mức mong muốn',
+        required: true,
+        validation: {
+          min: 1,
+          max: 500
+        }
+      },
+      {
+        id: 'loai_the_mong_muon',
+        type: 'select',
+        label: 'Loại thẻ mong muốn phát hành',
+        required: true,
+        options: ['Visa', 'JCB', 'Mastercard', 'Khác']
+      },
+
       // Thông tin cơ bản
       {
         id: 'ho_ten',
