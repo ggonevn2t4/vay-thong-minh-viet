@@ -51,12 +51,24 @@ const Marketplace = () => {
   const isSignedIn = !!user;
   const canCreateLoanRequest = isSignedIn && userRole === 'customer';
   
-  const [activeTab, setActiveTab] = useState('requests');
+  // Set default tab based on user role
+  const getDefaultTab = () => {
+    if (userRole === 'customer') return 'offers';
+    if (userRole === 'advisor') return 'requests';
+    return 'requests'; // default for guests
+  };
+  
+  const [activeTab, setActiveTab] = useState(getDefaultTab());
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('all');
   const [amountFilter, setAmountFilter] = useState('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Update active tab when user role changes
+  useEffect(() => {
+    setActiveTab(getDefaultTab());
+  }, [userRole]);
 
   const [loanRequests, setLoanRequests] = useState<LoanRequest[]>([
     {
@@ -247,6 +259,7 @@ const Marketplace = () => {
             filteredOffers={filteredOffers}
             canCreateLoanRequest={canCreateLoanRequest}
             onCreateLoanRequest={handleCreateLoanRequest}
+            userRole={userRole}
           />
 
           {canCreateLoanRequest && (
