@@ -9,6 +9,8 @@ import LoanApplicationSteps from './LoanApplicationSteps';
 import { LoanApplicationService } from './LoanApplicationService';
 
 const LoanApplicationFlow = () => {
+  console.log('LoanApplicationFlow component loaded');
+  
   const { user } = useAuth();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
@@ -17,18 +19,23 @@ const LoanApplicationFlow = () => {
   const [loading, setLoading] = useState(false);
 
   const handleProductSelection = (productType: LoanProductType) => {
+    console.log('Product selected:', productType);
     setSelectedProduct(productType);
+    setFormData(prev => ({ ...prev, product_type: productType }));
   };
 
   const handleNextStep = () => {
+    console.log('Moving to next step. Current step:', currentStep);
     setCurrentStep(prev => prev + 1);
   };
 
   const handleBackStep = () => {
+    console.log('Moving to previous step. Current step:', currentStep);
     setCurrentStep(prev => prev - 1);
   };
 
   const handleFormDataUpdate = (data: Record<string, any>) => {
+    console.log('Form data updated:', data);
     setFormData(data);
   };
 
