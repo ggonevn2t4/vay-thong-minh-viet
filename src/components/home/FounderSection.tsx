@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Quote } from 'lucide-react';
@@ -9,8 +8,7 @@ import { Quote } from 'lucide-react';
  * @returns {JSX.Element} The founder section with photos and descriptions
  */
 const FounderSection = () => {
-  return (
-    <section className="py-16 bg-white">
+  return <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -28,11 +26,7 @@ const FounderSection = () => {
                 <div className="md:w-1/3 bg-gradient-to-br from-brand-50 to-brand-100">
                   <div className="h-64 md:h-full flex items-center justify-center p-8">
                     <div className="w-48 h-48 rounded-full overflow-hidden shadow-lg">
-                      <img 
-                        src="/lovable-uploads/8767c56b-d1a5-49e2-ae33-dc8c6c27602c.png" 
-                        alt="Lê Cao Thái - Founder & CEO"
-                        className="w-full h-full object-cover"
-                      />
+                      <img alt="Lê Cao Thái - Founder & CEO" className="w-full h-full object-cover" src="/lovable-uploads/7e3fec87-b5c9-4fbe-836c-0ef15392bfea.jpg" />
                     </div>
                   </div>
                 </div>
@@ -70,11 +64,7 @@ const FounderSection = () => {
                 <div className="md:w-1/3 bg-gradient-to-br from-brand-50 to-brand-100">
                   <div className="h-64 md:h-full flex items-center justify-center p-8">
                     <div className="w-48 h-48 rounded-full overflow-hidden shadow-lg">
-                      <img 
-                        src="/lovable-uploads/48ab54bd-523b-426b-969f-e8344d2841fc.png" 
-                        alt="Cao Nhật Quang - Co-founder & CTO"
-                        className="w-full h-full object-cover"
-                      />
+                      <img src="/lovable-uploads/48ab54bd-523b-426b-969f-e8344d2841fc.png" alt="Cao Nhật Quang - Co-founder & CTO" className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
@@ -104,8 +94,6 @@ const FounderSection = () => {
           </Card>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default FounderSection;
