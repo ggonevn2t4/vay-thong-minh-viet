@@ -34,8 +34,8 @@ export const useNavigation = () => {
       },
       {
         label: 'Đăng ký vay',
-        href: '/khao-sat',
-        description: 'Khảo sát nhu cầu vay vốn mới',
+        href: '/loan-application',
+        description: 'Đăng ký khoản vay mới',
       },
       {
         label: 'Tối ưu khoản vay',
@@ -53,7 +53,7 @@ export const useNavigation = () => {
       },
       {
         label: 'Kiểm tra điều kiện',
-        href: '/kiem-tra-dieu-kien',
+        href: '/loan-eligibility',
         description: 'Kiểm tra điều kiện vay vốn',
       },
       {
@@ -73,12 +73,12 @@ export const useNavigation = () => {
       },
       {
         label: 'Tư vấn AI',
-        href: '/tu-van-ai',
+        href: '/ai-advisory',
         description: 'Tư vấn thông minh với AI',
       },
       {
         label: 'Hồ sơ tài liệu',
-        href: '/ho-so-tai-lieu',
+        href: '/document-checklist',
         description: 'Danh sách hồ sơ cần thiết',
       },
     ];

@@ -72,10 +72,15 @@ function App() {
               <Route path="/about" element={<AboutUs />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/guides" element={<FinancialGuides />} />
+              <Route path="/financial-guides" element={<FinancialGuides />} />
               <Route path="/khao-sat" element={<KhaoSat />} />
               <Route path="/ket-qua" element={<KetQua />} />
               <Route path="/so-sanh" element={<SoSanh />} />
               <Route path="/loan-application" element={<LoanApplication />} />
+              {/* Add missing routes from navigation */}
+              <Route path="/kiem-tra-dieu-kien" element={<LoanEligibility />} />
+              <Route path="/tu-van-ai" element={<AIAdvisory />} />
+              <Route path="/ho-so-tai-lieu" element={<DocumentChecklistPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
