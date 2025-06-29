@@ -38,6 +38,8 @@ import LoanApplication from "./pages/LoanApplication";
 const queryClient = new QueryClient();
 
 function App() {
+  console.log('App component initialized');
+  
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
