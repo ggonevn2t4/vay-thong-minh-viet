@@ -1,9 +1,10 @@
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Percent, Calendar, Shield, Home, Car, Building2, CreditCard, GraduationCap, Users } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface LoanProduct {
   id: string;
@@ -140,6 +141,7 @@ const loanProducts: LoanProduct[] = [
 ];
 
 const LoanProductGrid = () => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = React.useState('all');
   
   const categories = [
@@ -157,6 +159,24 @@ const LoanProductGrid = () => {
         };
         return product.category === categoryMap[selectedCategory];
       });
+
+  const handleRegisterNow = (productTitle: string) => {
+    console.log('Register now clicked for:', productTitle);
+    toast.success(`Đang chuyển đến trang đăng ký cho ${productTitle}`);
+    navigate('/loan-application', { 
+      state: { 
+        selectedProduct: productTitle,
+        fromMarketplace: true 
+      } 
+    });
+  };
+
+  const handleViewDetails = (productId: string, productTitle: string) => {
+    console.log('View details clicked for:', productTitle);
+    toast.info(`Đang xem chi tiết ${productTitle}`);
+    // For now, we'll show a toast. Later this could navigate to a detailed product page
+    // navigate(`/product/${productId}`);
+  };
 
   return (
     <div className="py-16 bg-white">
@@ -248,10 +268,17 @@ const LoanProductGrid = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2">
+                  <Button 
+                    onClick={() => handleRegisterNow(product.title)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2"
+                  >
                     Đăng ký ngay
                   </Button>
-                  <Button variant="outline" className="flex-1 border-blue-600 text-blue-600 hover:bg-blue-50 text-sm py-2">
+                  <Button 
+                    onClick={() => handleViewDetails(product.id, product.title)}
+                    variant="outline" 
+                    className="flex-1 border-blue-600 text-blue-600 hover:bg-blue-50 text-sm py-2"
+                  >
                     Xem chi tiết
                   </Button>
                 </div>
