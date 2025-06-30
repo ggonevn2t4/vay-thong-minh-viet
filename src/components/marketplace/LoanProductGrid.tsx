@@ -120,54 +120,6 @@ const loanProducts: LoanProduct[] = [
     icon: <Building2 className="h-6 w-6" />,
     category: 'Vay bất động sản',
     description: 'Sở hữu căn hộ mơ ước tại các dự án uy tín với điều kiện vay ưu đãi'
-  },
-  {
-    id: '7',
-    title: 'Vay học phí',
-    subtitle: 'Giáo dục - Tương lai',
-    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=300&h=200&fit=crop&crop=center',
-    interestRate: '6.5% - 10%',
-    term: '12 - 120 tháng',
-    loanAmount: '10 - 500 triệu',
-    processingTime: '1-2 ngày',
-    features: ['Lãi suất ưu đãi cho sinh viên', 'Ân hạn trong thời gian học', 'Thủ tục đơn giản'],
-    benefits: ['Miễn phí quản lý tài khoản', 'Tư vấn kế hoạch tài chính', 'Hỗ trợ việc làm sau tốt nghiệp'],
-    requirements: ['Có giấy báo trúng tuyển', 'Người bảo lãnh có thu nhập ổn định', 'Thông tin học vụ rõ ràng'],
-    icon: <GraduationCap className="h-6 w-6" />,
-    category: 'Vay giáo dục',
-    description: 'Đầu tư cho tương lai với gói vay học phí ưu đãi dành cho sinh viên'
-  },
-  {
-    id: '8',
-    title: 'Vay cầm cố',
-    subtitle: 'Nhanh chóng - Đơn giản',
-    image: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=300&h=200&fit=crop&crop=center',
-    interestRate: '12% - 18%',
-    term: '1 - 36 tháng',
-    loanAmount: '5 - 200 triệu',
-    processingTime: '30 phút',
-    features: ['Giải ngân siêu tốc', 'Không cần chứng minh thu nhập', 'Cầm cố vàng, ô tô, BĐS'],
-    benefits: ['Thủ tục tại nhà', 'Bảo quản tài sản an toàn', 'Có thể chuộc lại bất cứ lúc nào'],
-    requirements: ['Tài sản cầm cố có giá trị', 'CMND/CCCD hợp lệ', 'Đủ 18 tuổi'],
-    icon: <Shield className="h-6 w-6" />,
-    category: 'Vay cầm cố',
-    description: 'Giải pháp vay nhanh với tài sản bảo đảm, phù hợp khi cần tiền gấp'
-  },
-  {
-    id: '9',
-    title: 'Vay theo nhóm',
-    subtitle: 'Cộng đồng - Tương trợ',
-    image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=300&h=200&fit=crop&crop=center',
-    interestRate: '10% - 14%',
-    term: '6 - 60 tháng',
-    loanAmount: '20 - 300 triệu',
-    processingTime: '2-3 ngày',
-    features: ['Lãi suất ưu đãi cho nhóm', 'Cùng vay cùng trả', 'Hỗ trợ lẫn nhau'],
-    benefits: ['Tăng cơ hội được duyệt', 'Giảm rủi ro cho từng cá nhân', 'Xây dựng uy tín tập thể'],
-    requirements: ['Nhóm 3-5 người', 'Cùng địa bàn sinh sống', 'Có mối quan hệ tin cậy'],
-    icon: <Users className="h-6 w-6" />,
-    category: 'Vay nhóm',
-    description: 'Mô hình vay tương trợ cộng đồng, phù hợp với nông thôn và khu vực xa thành phố'
   }
 ];
 
@@ -179,10 +131,7 @@ const LoanProductGrid = () => {
     { id: 'tiêu dùng', name: 'Vay tiêu dùng' },
     { id: 'xe', name: 'Vay mua xe' },
     { id: 'bất động sản', name: 'Vay bất động sản' },
-    { id: 'kinh doanh', name: 'Vay kinh doanh' },
-    { id: 'giáo dục', name: 'Vay giáo dục' },
-    { id: 'cầm cố', name: 'Vay cầm cố' },
-    { id: 'nhóm', name: 'Vay nhóm' }
+    { id: 'kinh doanh', name: 'Vay kinh doanh' }
   ];
 
   const filteredProducts = selectedCategory === 'all' 
@@ -192,10 +141,7 @@ const LoanProductGrid = () => {
           'tiêu dùng': 'Vay tiêu dùng',
           'xe': 'Vay mua xe',
           'bất động sản': 'Vay bất động sản',
-          'kinh doanh': 'Vay kinh doanh',
-          'giáo dục': 'Vay giáo dục',
-          'cầm cố': 'Vay cầm cố',
-          'nhóm': 'Vay nhóm'
+          'kinh doanh': 'Vay kinh doanh'
         };
         return product.category === categoryMap[selectedCategory];
       });
