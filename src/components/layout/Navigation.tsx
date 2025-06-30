@@ -147,6 +147,15 @@ export const Navigation = ({ isOpen, toggleMenu }: NavigationProps) => {
       ]
     },
     { href: "/marketplace", label: "Marketplace" },
+    {
+      href: "/support-tools",
+      label: "Công cụ hỗ trợ",
+      children: [
+        { href: "/loan-eligibility", label: "Kiểm tra khả năng vay" },
+        { href: "/document-checklist", label: "Hồ sơ tài liệu" },
+        { href: "/ai-advisory", label: "Tư vấn AI" },
+      ]
+    },
   ];
 
   return (
@@ -170,52 +179,64 @@ export const Navigation = ({ isOpen, toggleMenu }: NavigationProps) => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
-                  <div className="px-2 py-1">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-                      Tín chấp
-                    </p>
-                    <DropdownMenuItem asChild>
-                      <Link to="/loan-application?type=credit-card" className="w-full">
-                        Thẻ tín dụng
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/loan-application?type=consumer-unsecured" className="w-full">
-                        Vay tiêu dùng
-                      </Link>
-                    </DropdownMenuItem>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <div className="px-2 py-1">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-                      Thế chấp
-                    </p>
-                    <DropdownMenuItem asChild>
-                      <Link to="/loan-application?type=consumer-secured" className="w-full">
-                        Vay tiêu dùng
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/loan-application?type=car-loan" className="w-full">
-                        Vay mua xe
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/loan-application?type=real-estate" className="w-full">
-                        Vay mua bất động sản
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/loan-application?type=home-improvement" className="w-full">
-                        Vay xây sửa nhà ở
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/loan-application?type=business" className="w-full">
-                        Vay kinh doanh
-                      </Link>
-                    </DropdownMenuItem>
-                  </div>
+                  {item.label === "Khởi tạo khoán vay" ? (
+                    <>
+                      <div className="px-2 py-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                          Tín chấp
+                        </p>
+                        <DropdownMenuItem asChild>
+                          <Link to="/loan-application?type=credit-card" className="w-full">
+                            Thẻ tín dụng
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/loan-application?type=consumer-unsecured" className="w-full">
+                            Vay tiêu dùng
+                          </Link>
+                        </DropdownMenuItem>
+                      </div>
+                      <DropdownMenuSeparator />
+                      <div className="px-2 py-1">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                          Thế chấp
+                        </p>
+                        <DropdownMenuItem asChild>
+                          <Link to="/loan-application?type=consumer-secured" className="w-full">
+                            Vay tiêu dùng
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/loan-application?type=car-loan" className="w-full">
+                            Vay mua xe
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/loan-application?type=real-estate" className="w-full">
+                            Vay mua bất động sản
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/loan-application?type=home-improvement" className="w-full">
+                            Vay xây sửa nhà ở
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/loan-application?type=business" className="w-full">
+                            Vay kinh doanh
+                          </Link>
+                        </DropdownMenuItem>
+                      </div>
+                    </>
+                  ) : (
+                    item.children.map((child) => (
+                      <DropdownMenuItem asChild key={child.href}>
+                        <Link to={child.href} className="w-full">
+                          {child.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (

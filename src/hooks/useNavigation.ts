@@ -13,7 +13,7 @@ export const useNavigation = () => {
   const location = useLocation();
   const { userRole } = useAuth();
 
-  // Simplified navigation structure based on your requirements
+  // Updated navigation structure with support tools
   const navLinks: NavLink[] = [
     {
       label: 'Trang chủ',
@@ -29,6 +29,11 @@ export const useNavigation = () => {
       label: 'Marketplace',
       href: '/marketplace',
       description: 'Sàn giao dịch vay vốn',
+    },
+    {
+      label: 'Công cụ hỗ trợ',
+      href: '/support-tools',
+      description: 'Các công cụ hỗ trợ vay vốn',
     },
   ];
 
