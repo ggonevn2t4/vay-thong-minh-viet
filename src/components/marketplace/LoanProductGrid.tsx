@@ -26,8 +26,24 @@ interface LoanProduct {
 const loanProducts: LoanProduct[] = [
   {
     id: '1',
-    title: 'Vay tín chấp theo lương',
-    subtitle: 'Linh hoạt - Nhanh chóng',
+    title: 'Thẻ tín dụng',
+    subtitle: 'Linh hoạt - Tiện lợi',
+    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=300&h=200&fit=crop&crop=center',
+    interestRate: '1.8% - 2.5%',
+    term: 'Không kỳ hạn',
+    loanAmount: '5 - 200 triệu',
+    processingTime: '1-2 ngày',
+    features: ['Thanh toán không tiền mặt', 'Ưu đãi cashback', 'Miễn lãi đến 55 ngày'],
+    benefits: ['Tích điểm đổi quà', 'Bảo hiểm du lịch miễn phí', 'Giảm giá tại các đối tác'],
+    requirements: ['Thu nhập từ 6 triệu/tháng', 'Làm việc ổn định từ 6 tháng', 'Không nợ xấu CIC'],
+    icon: <CreditCard className="h-6 w-6" />,
+    category: 'Tín chấp',
+    description: 'Giải pháp thanh toán hiện đại với nhiều tiện ích và ưu đãi hấp dẫn'
+  },
+  {
+    id: '2',
+    title: 'Vay tiêu dùng tín chấp',
+    subtitle: 'Nhanh chóng - Đơn giản',
     image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=200&fit=crop&crop=center',
     interestRate: '8.5% - 15%',
     term: '6 - 84 tháng',
@@ -37,11 +53,27 @@ const loanProducts: LoanProduct[] = [
     benefits: ['Lãi suất ưu đãi cho khách hàng thân thiết', 'Miễn phí thẩm định', 'Tư vấn 24/7'],
     requirements: ['Thu nhập từ 8 triệu/tháng', 'Làm việc tại công ty từ 6 tháng', 'Không nợ xấu CIC'],
     icon: <CreditCard className="h-6 w-6" />,
-    category: 'Vay tiêu dùng',
+    category: 'Tín chấp',
     description: 'Giải pháp vay vốn nhanh chóng dành cho người lao động có thu nhập ổn định'
   },
   {
-    id: '2',
+    id: '3',
+    title: 'Vay tiêu dùng thế chấp',
+    subtitle: 'Lãi suất ưu đãi - Mức vay cao',
+    image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=300&h=200&fit=crop&crop=center',
+    interestRate: '6.5% - 12%',
+    term: '12 - 120 tháng',
+    loanAmount: '50 triệu - 5 tỷ',
+    processingTime: '3-5 ngày',
+    features: ['Lãi suất ưu đãi với tài sản đảm bảo', 'Mức vay cao đến 90% giá trị tài sản', 'Thời hạn vay dài'],
+    benefits: ['Miễn phí thẩm định tài sản', 'Tư vấn pháp lý miễn phí', 'Ưu đãi khách hàng VIP'],
+    requirements: ['Có tài sản đảm bảo hợp pháp', 'Thu nhập ổn định chứng minh được', 'Giấy tờ pháp lý đầy đủ'],
+    icon: <Shield className="h-6 w-6" />,
+    category: 'Thế chấp',
+    description: 'Giải pháp vay tiêu dùng với lãi suất tốt nhất khi có tài sản đảm bảo'
+  },
+  {
+    id: '4',
     title: 'Vay mua ô tô',
     subtitle: 'Ưu đãi - Linh hoạt',
     image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=300&h=200&fit=crop&crop=center',
@@ -53,27 +85,27 @@ const loanProducts: LoanProduct[] = [
     benefits: ['Miễn phí bảo hiểm năm đầu', 'Hỗ trợ làm thủ tục đăng ký xe', 'Ưu đãi phí trước bạ'],
     requirements: ['Thu nhập từ 15 triệu/tháng', 'Có giấy phép lái xe', 'Đóng BHXH đầy đủ'],
     icon: <Car className="h-6 w-6" />,
-    category: 'Vay mua xe',
+    category: 'Thế chấp',
     description: 'Sở hữu chiếc xe mơ ước với lãi suất ưu đãi và thủ tục đơn giản'
   },
   {
-    id: '3',
-    title: 'Vay sản xuất kinh doanh',
-    subtitle: 'Doanh nghiệp - Phát triển',
-    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=300&h=200&fit=crop&crop=center',
-    interestRate: '9.5% - 16%',
-    term: '12 - 84 tháng',
-    loanAmount: '50 triệu - 10 tỷ',
-    processingTime: '3-5 ngày',
-    features: ['Vay đến 70% nhu cầu vốn', 'Thời hạn vay linh hoạt', 'Ân hạn nợ gốc'],
-    benefits: ['Tư vấn kế hoạch kinh doanh', 'Hỗ trợ mở rộng thị trường', 'Ưu đãi khách hàng lâu năm'],
-    requirements: ['Doanh nghiệp hoạt động từ 1 năm', 'Có kế hoạch sử dụng vốn rõ ràng', 'Báo cáo tài chính minh bạch'],
+    id: '5',
+    title: 'Vay mua bất động sản',
+    subtitle: 'Bất động sản - Đầu tư',
+    image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=300&h=200&fit=crop&crop=center',
+    interestRate: '7.5% - 11%',
+    term: '60 - 360 tháng',
+    loanAmount: '200 triệu - 15 tỷ',
+    processingTime: '5-7 ngày',
+    features: ['Vay đến 70% giá trị căn hộ', 'Ân hạn nợ gốc đến khi nhận nhà', 'Lãi suất ưu đãi 6 tháng đầu'],
+    benefits: ['Tư vấn chọn dự án uy tín', 'Hỗ trợ thủ tục pháp lý', 'Bảo hiểm khoản vay'],
+    requirements: ['Có hợp đồng mua bán hợp lệ', 'Đã thanh toán tối thiểu 30%', 'Thu nhập ổn định chứng minh được'],
     icon: <Building2 className="h-6 w-6" />,
-    category: 'Vay kinh doanh',
-    description: 'Nguồn vốn tin cậy để phát triển và mở rộng hoạt động kinh doanh'
+    category: 'Thế chấp',
+    description: 'Sở hữu căn hộ mơ ước tại các dự án uy tín với điều kiện vay ưu đãi'
   },
   {
-    id: '4',
+    id: '6',
     title: 'Vay xây sửa nhà ở',
     subtitle: 'Nhà ở - Đầu tư',
     image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop&crop=center',
@@ -85,41 +117,25 @@ const loanProducts: LoanProduct[] = [
     benefits: ['Tư vấn thiết kế miễn phí', 'Hỗ trợ giám sát thi công', 'Ưu đãi lãi suất giai đoạn đầu'],
     requirements: ['Có quyền sử dụng đất hợp pháp', 'Có thiết kế và dự toán chi tiết', 'Thu nhập ổn định'],
     icon: <Home className="h-6 w-6" />,
-    category: 'Vay bất động sản',
+    category: 'Thế chấp',
     description: 'Hiện thực hóa ước mơ xây dựng tổ ấm với nguồn vốn ưu đãi'
   },
   {
-    id: '5',
-    title: 'Nhà Mơ Thành Đạt',
-    subtitle: 'Ưu đãi đặc biệt - Hot',
-    image: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=300&h=200&fit=crop&crop=center',
-    interestRate: '6.8% - 10%',
-    term: '120 - 480 tháng',
-    loanAmount: '500 triệu - 20 tỷ',
-    processingTime: '7-10 ngày',
-    features: ['Vay đến 85% giá trị căn nhà', 'Lãi suất ưu đãi 2 năm đầu', 'Hỗ trợ pháp lý trọn gói'],
-    benefits: ['Miễn phí thẩm định BĐS', 'Tư vấn đầu tư chuyên nghiệp', 'Ưu đãi cho khách hàng VIP'],
-    requirements: ['Thu nhập từ 25 triệu/tháng', 'Có kinh nghiệm đầu tư BĐS', 'Tài sản đảm bảo có giá trị cao'],
-    icon: <Home className="h-6 w-6" />,
-    category: 'Vay bất động sản',
-    description: 'Gói sản phẩm cao cấp dành cho nhà đầu tư bất động sản chuyên nghiệp',
-    isHighlighted: true
-  },
-  {
-    id: '6',
-    title: 'Vay mua nhà dự án',
-    subtitle: 'Bất động sản - Đầu tư',
-    image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=300&h=200&fit=crop&crop=center',
-    interestRate: '7.5% - 11%',
-    term: '60 - 360 tháng',
-    loanAmount: '200 triệu - 15 tỷ',
-    processingTime: '5-7 ngày',
-    features: ['Vay đến 70% giá trị căn hộ', 'Ân hạn nợ gốc đến khi nhận nhà', 'Lãi suất ưu đãi 6 tháng đầu'],
-    benefits: ['Tư vấn chọn dự án uy tín', 'Hỗ trợ thủ tục pháp lý', 'Bảo hiểm khoản vay'],
-    requirements: ['Có hợp đồng mua bán hợp lệ', 'Đã thanh toán tối thiểu 30%', 'Thu nhập ổn định chứng minh được'],
+    id: '7',
+    title: 'Vay sản xuất kinh doanh',
+    subtitle: 'Doanh nghiệp - Phát triển',
+    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=300&h=200&fit=crop&crop=center',
+    interestRate: '9.5% - 16%',
+    term: '12 - 84 tháng',
+    loanAmount: '50 triệu - 10 tỷ',
+    processingTime: '3-5 ngày',
+    features: ['Vay đến 70% nhu cầu vốn', 'Thời hạn vay linh hoạt', 'Ân hạn nợ gốc'],
+    benefits: ['Tư vấn kế hoạch kinh doanh', 'Hỗ trợ mở rộng thị trường', 'Ưu đãi khách hàng lâu năm'],
+    requirements: ['Doanh nghiệp hoạt động từ 1 năm', 'Có kế hoạch sử dụng vốn rõ ràng', 'Báo cáo tài chính minh bạch'],
     icon: <Building2 className="h-6 w-6" />,
-    category: 'Vay bất động sản',
-    description: 'Sở hữu căn hộ mơ ước tại các dự án uy tín với điều kiện vay ưu đãi'
+    category: 'Thế chấp',
+    description: 'Nguồn vốn tin cậy để phát triển và mở rộng hoạt động kinh doanh',
+    isHighlighted: true
   }
 ];
 
@@ -128,20 +144,16 @@ const LoanProductGrid = () => {
   
   const categories = [
     { id: 'all', name: 'Tất cả sản phẩm' },
-    { id: 'tiêu dùng', name: 'Vay tiêu dùng' },
-    { id: 'xe', name: 'Vay mua xe' },
-    { id: 'bất động sản', name: 'Vay bất động sản' },
-    { id: 'kinh doanh', name: 'Vay kinh doanh' }
+    { id: 'tín chấp', name: 'Tín chấp' },
+    { id: 'thế chấp', name: 'Thế chấp' }
   ];
 
   const filteredProducts = selectedCategory === 'all' 
     ? loanProducts 
     : loanProducts.filter(product => {
         const categoryMap: { [key: string]: string } = {
-          'tiêu dùng': 'Vay tiêu dùng',
-          'xe': 'Vay mua xe',
-          'bất động sản': 'Vay bất động sản',
-          'kinh doanh': 'Vay kinh doanh'
+          'tín chấp': 'Tín chấp',
+          'thế chấp': 'Thế chấp'
         };
         return product.category === categoryMap[selectedCategory];
       });
