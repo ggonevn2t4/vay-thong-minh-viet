@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/layout/Layout';
-import MarketplaceHero from '@/components/marketplace/MarketplaceHero';
+import BankingHeroSection from '@/components/marketplace/BankingHeroSection';
+import LoanProductGrid from '@/components/marketplace/LoanProductGrid';
+import BankingAdvantages from '@/components/marketplace/BankingAdvantages';
+import LoanApplicationCTA from '@/components/marketplace/LoanApplicationCTA';
 import MarketplaceFilters from '@/components/marketplace/MarketplaceFilters';
 import MarketplaceTabs from '@/components/marketplace/MarketplaceTabs';
 import CreateLoanRequestModal from '@/components/marketplace/CreateLoanRequestModal';
@@ -70,6 +73,7 @@ const Marketplace = () => {
     setActiveTab(getDefaultTab());
   }, [userRole]);
 
+  // ... keep existing code (loanRequests and bankOffers state)
   const [loanRequests, setLoanRequests] = useState<LoanRequest[]>([
     {
       id: 'LR-001',
@@ -182,6 +186,7 @@ const Marketplace = () => {
     }
   ]);
 
+  // ... keep existing code (filtered data logic)
   const filteredRequests = loanRequests.filter(request => {
     const matchesSearch = request.borrowerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          request.purpose.toLowerCase().includes(searchTerm.toLowerCase());
@@ -219,8 +224,8 @@ const Marketplace = () => {
   if (isLoading) {
     return (
       <Layout>
-        <div className="min-h-screen bg-gradient-to-b from-brand-50 to-white">
-          <MarketplaceHero 
+        <div className="min-h-screen bg-white">
+          <BankingHeroSection 
             canCreateLoanRequest={canCreateLoanRequest}
             onCreateLoanRequest={handleCreateLoanRequest}
           />
@@ -235,44 +240,56 @@ const Marketplace = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-brand-50 to-white">
-        <MarketplaceHero 
+      <div className="min-h-screen bg-white">
+        <BankingHeroSection 
           canCreateLoanRequest={canCreateLoanRequest}
           onCreateLoanRequest={handleCreateLoanRequest}
         />
 
-        <div className="container mx-auto px-4 py-8">
-          <MarketplaceFilters
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            locationFilter={locationFilter}
-            setLocationFilter={setLocationFilter}
-            amountFilter={amountFilter}
-            setAmountFilter={setAmountFilter}
-            activeTab={activeTab}
-          />
+        <LoanProductGrid />
+        
+        <BankingAdvantages />
 
-          <MarketplaceTabs
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            filteredRequests={filteredRequests}
-            filteredOffers={filteredOffers}
-            canCreateLoanRequest={canCreateLoanRequest}
-            onCreateLoanRequest={handleCreateLoanRequest}
-            userRole={userRole}
-          />
+        <LoanApplicationCTA 
+          canCreateLoanRequest={canCreateLoanRequest}
+          onCreateLoanRequest={handleCreateLoanRequest}
+        />
 
-          {canCreateLoanRequest && (
-            <CreateLoanRequestModal
-              isOpen={isCreateModalOpen}
-              onClose={() => setIsCreateModalOpen(false)}
-              onSubmit={(newRequest) => {
-                setLoanRequests(prev => [newRequest, ...prev]);
-                setIsCreateModalOpen(false);
-              }}
+        {/* Existing Marketplace Tabs for role-based content */}
+        <div className="container mx-auto px-4 py-16">
+          <div className="bg-gray-50 rounded-2xl p-8">
+            <MarketplaceFilters
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              locationFilter={locationFilter}
+              setLocationFilter={setLocationFilter}
+              amountFilter={amountFilter}
+              setAmountFilter={setAmountFilter}
+              activeTab={activeTab}
             />
-          )}
+
+            <MarketplaceTabs
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              filteredRequests={filteredRequests}
+              filteredOffers={filteredOffers}
+              canCreateLoanRequest={canCreateLoanRequest}
+              onCreateLoanRequest={handleCreateLoanRequest}
+              userRole={userRole}
+            />
+          </div>
         </div>
+
+        {canCreateLoanRequest && (
+          <CreateLoanRequestModal
+            isOpen={isCreateModalOpen}
+            onClose={() => setIsCreateModalOpen(false)}
+            onSubmit={(newRequest) => {
+              setLoanRequests(prev => [newRequest, ...prev]);
+              setIsCreateModalOpen(false);
+            }}
+          />
+        )}
       </div>
     </Layout>
   );
