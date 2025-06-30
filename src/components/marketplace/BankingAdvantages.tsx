@@ -6,17 +6,17 @@ import { Zap, Shield, Clock } from 'lucide-react';
 const BankingAdvantages = () => {
   const advantages = [
     {
-      icon: <Zap className="h-12 w-12 text-green-600" />,
+      icon: <Zap className="h-12 w-12 text-blue-600" />,
       title: 'Giải ngân nhanh chóng',
       description: 'Thủ tục đơn giản, phê duyệt và giải ngân nhanh chóng, đáp ứng mọi nhu cầu cấp bách'
     },
     {
-      icon: <Shield className="h-12 w-12 text-green-600" />,
+      icon: <Shield className="h-12 w-12 text-blue-600" />,
       title: 'Lãi suất cạnh tranh',
       description: 'Lãi suất ưu đãi và cạnh tranh, mức vay cao với nhiều ưu đãi cho khách hàng thân thiết'
     },
     {
-      icon: <Clock className="h-12 w-12 text-green-600" />,
+      icon: <Clock className="h-12 w-12 text-blue-600" />,
       title: 'Phương thức trả nợ thuận tiện',
       description: 'Phương thức thanh toán khoa học giúp khách trả nợ, đóng góp, online hoặc tại quầy'
     }

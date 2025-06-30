@@ -11,7 +11,7 @@ interface LoanApplicationCTAProps {
 
 const LoanApplicationCTA = ({ canCreateLoanRequest, onCreateLoanRequest }: LoanApplicationCTAProps) => {
   return (
-    <div className="py-16 bg-gradient-to-r from-green-600 to-green-700 text-white">
+    <div className="py-16 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
@@ -39,7 +39,7 @@ const LoanApplicationCTA = ({ canCreateLoanRequest, onCreateLoanRequest }: LoanA
             {canCreateLoanRequest && (
               <Button 
                 onClick={onCreateLoanRequest}
-                className="bg-white text-green-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold"
+                className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold"
               >
                 Đăng ký ngay
               </Button>
@@ -62,9 +62,9 @@ const LoanApplicationCTA = ({ canCreateLoanRequest, onCreateLoanRequest }: LoanA
         <div className="mt-12 text-center">
           <div className="flex items-center justify-center gap-4 mb-4">
             <Phone className="h-6 w-6" />
-            <span className="text-2xl font-bold">1900 54 54 13</span>
+            <span className="text-2xl font-bold">0765080960</span>
           </div>
-          <p className="text-green-100">Kết nối với chúng tôi</p>
+          <p className="text-blue-100">Kết nối với chúng tôi</p>
         </div>
       </div>
     </div>
