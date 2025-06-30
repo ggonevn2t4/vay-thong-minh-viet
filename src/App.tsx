@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import RouteDebugger from "@/components/layout/RouteDebugger";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import UserDashboard from "./pages/UserDashboard";
@@ -38,7 +39,7 @@ import LoanApplication from "./pages/LoanApplication";
 const queryClient = new QueryClient();
 
 function App() {
-  console.log('App component initialized');
+  console.log('App component initialized - routing setup for direct link sharing');
   
   return (
     <QueryClientProvider client={queryClient}>
@@ -46,6 +47,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <BrowserRouter>
+            <RouteDebugger />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -77,10 +79,18 @@ function App() {
               <Route path="/ket-qua" element={<KetQua />} />
               <Route path="/so-sanh" element={<SoSanh />} />
               <Route path="/loan-application" element={<LoanApplication />} />
-              {/* Add missing routes from navigation */}
+              {/* Vietnamese path aliases for better user experience */}
               <Route path="/kiem-tra-dieu-kien" element={<LoanEligibility />} />
               <Route path="/tu-van-ai" element={<AIAdvisory />} />
               <Route path="/ho-so-tai-lieu" element={<DocumentChecklistPage />} />
+              <Route path="/san-giao-dich" element={<Marketplace />} />
+              <Route path="/tu-van-vien" element={<AdvisorDirectory />} />
+              <Route path="/dang-ky-vay" element={<LoanApplication />} />
+              <Route path="/toi-uu-vay" element={<LoanOptimization />} />
+              <Route path="/ve-chung-toi" element={<AboutUs />} />
+              <Route path="/cau-hoi-thuong-gap" element={<FAQ />} />
+              <Route path="/huong-dan-tai-chinh" element={<FinancialGuides />} />
+              {/* Catch-all route for 404 errors */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
