@@ -149,11 +149,14 @@ export const Navigation = ({ isOpen, toggleMenu }: NavigationProps) => {
     { href: "/marketplace", label: "Marketplace" },
     {
       href: "/support-tools",
-      label: "Công cụ hỗ trợ",
+      label: "Hỗ trợ",
       children: [
+        { href: "/", label: "Máy tính khoản vay" },
         { href: "/loan-eligibility", label: "Kiểm tra khả năng vay" },
         { href: "/document-checklist", label: "Hồ sơ tài liệu" },
         { href: "/ai-advisory", label: "Tư vấn AI" },
+        { href: "/so-sanh", label: "So sánh lãi suất" },
+        { href: "/advisor-directory", label: "Liên hệ tư vấn" },
       ]
     },
   ];
@@ -179,7 +182,7 @@ export const Navigation = ({ isOpen, toggleMenu }: NavigationProps) => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
-                  {item.label === "Khởi tạo khoán vay" ? (
+                  {item.label === "Khởi tạo khoản vay" ? (
                     <>
                       <div className="px-2 py-1">
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">

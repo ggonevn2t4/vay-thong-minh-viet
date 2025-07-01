@@ -31,7 +31,7 @@ export const useNavigation = () => {
       description: 'Sàn giao dịch vay vốn',
     },
     {
-      label: 'Công cụ hỗ trợ',
+      label: 'Hỗ trợ',
       href: '/support-tools',
       description: 'Các công cụ hỗ trợ vay vốn',
     },
