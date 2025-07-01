@@ -99,4 +99,54 @@ export class LoanApplicationService {
         message_type: 'text'
       });
   }
+
+  static async completeApplication(
+    userId: string,
+    selectedProduct: LoanProductType,
+    formData: Record<string, any>,
+    advisorId: string
+  ) {
+    try {
+      console.log('Creating loan application...', { userId, selectedProduct, formData, advisorId });
+      
+      // Create loan application
+      const loanApplication = await this.createLoanApplication(
+        userId,
+        selectedProduct,
+        formData,
+        advisorId
+      );
+
+      console.log('Created loan application:', loanApplication);
+
+      // Create conversation
+      const conversation = await this.createConversation(
+        loanApplication.id,
+        userId,
+        advisorId
+      );
+
+      console.log('Created conversation:', conversation);
+
+      // Send initial message
+      await this.sendInitialMessage(
+        conversation.id,
+        userId,
+        advisorId,
+        selectedProduct
+      );
+
+      console.log('Sent initial message');
+
+      return {
+        loanApplication,
+        conversation,
+        success: true
+      };
+    } catch (error) {
+      console.error('Error completing application:', error);
+      toast.error('Có lỗi xảy ra khi gửi yêu cầu vay. Vui lòng thử lại.');
+      throw error;
+    }
+  }
 }

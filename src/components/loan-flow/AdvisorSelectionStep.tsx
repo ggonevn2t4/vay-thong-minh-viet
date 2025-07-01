@@ -4,74 +4,126 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Star, MapPin, Award, ArrowLeft, MessageCircle } from 'lucide-react';
+import { Star, MapPin, Clock, Users, Award } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { LoanProductType } from '@/types/loan-application-flow';
 import { toast } from 'sonner';
 
-interface AdvisorProfile {
+interface Advisor {
   id: string;
+  user_id: string;
   full_name: string;
   bank_name: string;
-  avatar_url?: string;
+  job_title: string;
   years_experience: number;
   average_rating: number;
   total_reviews: number;
   specializations: string[];
+  location: string;
+  avatar_url?: string;
   bio?: string;
   availability_status: string;
 }
 
 interface AdvisorSelectionStepProps {
+  selectedProductType: LoanProductType;
   onSelectAdvisor: (advisorId: string) => void;
   onBack: () => void;
-  selectedProductType: string;
+  isSubmitting?: boolean;
 }
 
-const AdvisorSelectionStep = ({ onSelectAdvisor, onBack, selectedProductType }: AdvisorSelectionStepProps) => {
-  const [advisors, setAdvisors] = useState<AdvisorProfile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedAdvisor, setSelectedAdvisor] = useState<string | null>(null);
+const AdvisorSelectionStep: React.FC<AdvisorSelectionStepProps> = ({
+  selectedProductType,
+  onSelectAdvisor,
+  onBack,
+  isSubmitting = false
+}) => {
+  const [advisors, setAdvisors] = useState<Advisor[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedAdvisorId, setSelectedAdvisorId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAdvisors();
-  }, []);
+  }, [selectedProductType]);
 
   const fetchAdvisors = async () => {
     try {
+      setIsLoading(true);
+      
+      // Fetch advisors based on product type and specializations
       const { data, error } = await supabase
         .from('advisor_profiles')
         .select('*')
         .eq('availability_status', 'available')
-        .gte('average_rating', 4.0)
+        .eq('is_verified', true)
         .order('average_rating', { ascending: false })
         .limit(6);
 
       if (error) throw error;
+
       setAdvisors(data || []);
     } catch (error) {
       console.error('Error fetching advisors:', error);
-      toast.error('Lỗi khi tải danh sách tư vấn viên');
+      toast.error('Không thể tải danh sách tư vấn viên');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleSelectAdvisor = (advisorId: string) => {
-    setSelectedAdvisor(advisorId);
+    if (isSubmitting) return;
+    setSelectedAdvisorId(advisorId);
+    onSelectAdvisor(advisorId);
   };
 
-  const handleConfirmSelection = () => {
-    if (selectedAdvisor) {
-      onSelectAdvisor(selectedAdvisor);
-    }
+  const getSpecializationMatch = (advisor: Advisor) => {
+    if (!advisor.specializations) return false;
+    
+    const productSpecializations = {
+      'credit_loan': ['Vay tín chấp', 'Thẻ tín dụng', 'Vay tiêu dùng'],
+      'mortgage_loan': ['Vay thế chấp', 'Vay mua nhà', 'Bất động sản']
+    };
+
+    const relevantSpecs = productSpecializations[selectedProductType] || [];
+    return advisor.specializations.some(spec => 
+      relevantSpecs.some(relevantSpec => 
+        spec.toLowerCase().includes(relevantSpec.toLowerCase())
+      )
+    );
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="flex justify-center items-center py-12">
+      <div className="space-y-6">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Đang tải danh sách tư vấn viên...</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Đang tìm tư vấn viên phù hợp...
+          </h2>
+          <p className="text-gray-600">
+            Chúng tôi đang tìm kiếm những tư vấn viên tốt nhất cho bạn
+          </p>
+        </div>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                  <div className="space-y-2 flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="h-3 bg-gray-200 rounded"></div>
+                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     );
@@ -80,106 +132,116 @@ const AdvisorSelectionStep = ({ onSelectAdvisor, onBack, selectedProductType }: 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">Chọn tư vấn viên</h2>
-        <p className="text-gray-600 text-lg">
-          Chọn tư vấn viên phù hợp để được hỗ trợ tốt nhất cho nhu cầu vay của bạn
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          Chọn tư vấn viên
+        </h2>
+        <p className="text-gray-600">
+          Lựa chọn tư vấn viên phù hợp để được hỗ trợ tốt nhất
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {advisors.map((advisor) => (
-          <Card
-            key={advisor.id}
-            className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${
-              selectedAdvisor === advisor.id
-                ? 'border-brand-500 ring-2 ring-brand-200 bg-brand-50'
-                : 'border-gray-200 hover:border-brand-300'
-            }`}
-            onClick={() => handleSelectAdvisor(advisor.id)}
-          >
-            <CardHeader className="text-center pb-4">
-              <Avatar className="h-16 w-16 mx-auto mb-3">
-                <AvatarImage src={advisor.avatar_url} alt={advisor.full_name} />
-                <AvatarFallback className="bg-brand-600 text-white text-lg">
-                  {advisor.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
-              
-              <CardTitle className="text-lg font-bold">{advisor.full_name}</CardTitle>
-              <p className="text-brand-600 font-medium">{advisor.bank_name}</p>
-              
-              <div className="flex items-center justify-center gap-1 mt-2">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span className="font-semibold">{advisor.average_rating.toFixed(1)}</span>
-                <span className="text-gray-500">({advisor.total_reviews} đánh giá)</span>
-              </div>
-            </CardHeader>
-
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Award className="h-4 w-4 text-brand-500" />
-                <span>{advisor.years_experience} năm kinh nghiệm</span>
-              </div>
-
-              {advisor.specializations && advisor.specializations.length > 0 && (
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Chuyên môn:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {advisor.specializations.slice(0, 3).map((spec, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {spec}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {advisor.bio && (
-                <p className="text-sm text-gray-600 line-clamp-2">{advisor.bio}</p>
-              )}
-
-              <div className="pt-2">
-                <Badge 
-                  variant="outline" 
-                  className={`${
-                    advisor.availability_status === 'available' 
-                      ? 'border-green-500 text-green-700 bg-green-50' 
-                      : 'border-gray-500 text-gray-700'
-                  }`}
-                >
-                  {advisor.availability_status === 'available' ? 'Sẵn sàng tư vấn' : 'Bận'}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {advisors.length === 0 && !loading && (
+      {advisors.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-600 text-lg">
-            Hiện tại chưa có tư vấn viên nào sẵn sàng. 
-            Vui lòng thử lại sau hoặc liên hệ với chúng tôi.
+          <div className="text-gray-400 text-xl mb-4">Không tìm thấy tư vấn viên</div>
+          <p className="text-gray-600 mb-4">
+            Hiện tại không có tư vấn viên phù hợp. Vui lòng thử lại sau.
           </p>
+          <Button onClick={onBack} variant="outline">
+            Quay lại
+          </Button>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {advisors.map((advisor) => {
+            const isSpecialized = getSpecializationMatch(advisor);
+            const isSelected = selectedAdvisorId === advisor.user_id;
+            
+            return (
+              <Card 
+                key={advisor.id}
+                className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
+                  isSelected ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={() => handleSelectAdvisor(advisor.user_id)}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="w-12 h-12">
+                      <AvatarImage src={advisor.avatar_url} />
+                      <AvatarFallback>
+                        {advisor.full_name?.split(' ').map(n => n[0]).join('') || 'TV'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-gray-800 truncate">
+                          {advisor.full_name || 'Tư vấn viên'}
+                        </h3>
+                        {isSpecialized && (
+                          <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs">
+                            Chuyên môn
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-blue-600 font-medium">
+                        {advisor.bank_name}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        {advisor.job_title || 'Tư vấn viên'}
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="font-medium">
+                        {advisor.average_rating?.toFixed(1) || '0.0'}
+                      </span>
+                      <span className="text-gray-500">
+                        ({advisor.total_reviews || 0})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-gray-600">
+                      <Award className="w-4 h-4" />
+                      <span>{advisor.years_experience || 0} năm</span>
+                    </div>
+                  </div>
+
+                  {advisor.location && (
+                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                      <MapPin className="w-4 h-4" />
+                      <span className="truncate">{advisor.location}</span>
+                    </div>
+                  )}
+
+                  {advisor.bio && (
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {advisor.bio}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between pt-2">
+                    <div className="flex items-center gap-1 text-sm text-green-600">
+                      <Clock className="w-4 h-4" />
+                      <span>Sẵn sàng</span>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      className={`${isSelected ? 'bg-blue-600' : 'bg-gray-600'} hover:bg-blue-700`}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting && isSelected ? 'Đang xử lý...' : isSelected ? 'Đã chọn' : 'Chọn'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
-
-      <div className="flex justify-between items-center">
-        <Button variant="outline" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Quay lại
-        </Button>
-
-        {selectedAdvisor && (
-          <Button 
-            onClick={handleConfirmSelection}
-            className="bg-brand-600 hover:bg-brand-700"
-          >
-            <MessageCircle className="h-4 w-4 mr-2" />
-            Bắt đầu tư vấn
-          </Button>
-        )}
-      </div>
     </div>
   );
 };

@@ -7,6 +7,7 @@ import LoanApplicationSteps from './LoanApplicationSteps';
 import SurveyForm from './SurveyForm';
 import AdvisorSelectionStep from './AdvisorSelectionStep';
 import LoanApplicationProgress from './LoanApplicationProgress';
+import { LoanApplicationService } from './LoanApplicationService';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -34,6 +35,8 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
     customer_questions: {}
   });
   const [selectedAdvisor, setSelectedAdvisor] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [applicationResult, setApplicationResult] = useState<any>(null);
 
   // Handle state from navigation
   useEffect(() => {
@@ -61,12 +64,33 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
     setCurrentStep('advisor-selection');
   };
 
-  const handleAdvisorSelect = (advisorId: string) => {
+  const handleAdvisorSelect = async (advisorId: string) => {
+    if (!user || !selectedLoanProduct || !surveyData) {
+      toast.error('Thiếu thông tin cần thiết để hoàn thành yêu cầu');
+      return;
+    }
+
     console.log('Selected advisor ID:', advisorId);
-    // In a real implementation, you'd fetch advisor details
-    setSelectedAdvisor({ id: advisorId, full_name: 'Advisor Name', bank_name: 'Bank Name' });
-    setCurrentStep('completion');
-    toast.success(`Đã chọn tư vấn viên`);
+    setIsSubmitting(true);
+
+    try {
+      // Complete the application through the service
+      const result = await LoanApplicationService.completeApplication(
+        user.id,
+        selectedLoanProduct.productType,
+        surveyData,
+        advisorId
+      );
+
+      setApplicationResult(result);
+      setSelectedAdvisor({ id: advisorId, full_name: 'Tư vấn viên', bank_name: 'Ngân hàng' });
+      setCurrentStep('completion');
+      toast.success('Yêu cầu vay đã được gửi thành công!');
+    } catch (error) {
+      console.error('Error submitting application:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleBackStep = () => {
@@ -134,6 +158,7 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
                 size="sm"
                 onClick={handleBackStep}
                 className="flex items-center gap-2"
+                disabled={isSubmitting}
               >
                 <ArrowLeft className="w-4 h-4" />
                 Quay lại
@@ -175,10 +200,11 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
             selectedProductType={selectedLoanProduct?.productType || 'credit_loan'}
             onSelectAdvisor={handleAdvisorSelect}
             onBack={handleBackStep}
+            isSubmitting={isSubmitting}
           />
         )}
 
-        {currentStep === 'completion' && (
+        {currentStep === 'completion' && applicationResult && (
           <div className="text-center space-y-6">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
               <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
@@ -199,8 +225,8 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
               <h4 className="font-semibold text-blue-800 mb-2">Thông tin yêu cầu:</h4>
               <div className="text-sm text-blue-700 space-y-1">
                 <p>• Sản phẩm: {selectedLoanProduct?.name}</p>
-                <p>• Tư vấn viên: {selectedAdvisor?.full_name}</p>
-                <p>• Ngân hàng: {selectedAdvisor?.bank_name}</p>
+                <p>• Mã đơn: {applicationResult.loanApplication.id.slice(0, 8)}</p>
+                <p>• Trạng thái: Đang chờ xử lý</p>
               </div>
             </div>
 
