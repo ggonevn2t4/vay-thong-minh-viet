@@ -23,7 +23,7 @@ const CTASection = () => {
         </p>
         <Link to="/loan-application">
           <Button className="bg-white text-brand-600 hover:bg-brand-50 text-lg py-6 px-10 rounded-full shadow-lg hover:shadow-xl transition-all font-semibold">
-            Chọn sản phẩm tài chính
+            Bắt đầu ngay
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
