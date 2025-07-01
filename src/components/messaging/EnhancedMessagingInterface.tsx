@@ -10,6 +10,8 @@ import { Send, MessageCircle, Phone, Video } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import FileUpload from './FileUpload';
+import MessageAttachment from './MessageAttachment';
 
 interface Conversation {
   id: string;
@@ -32,6 +34,14 @@ interface Conversation {
   } | null;
 }
 
+interface MessageAttachmentData {
+  id: string;
+  file_name: string;
+  file_path: string;
+  file_size: number;
+  content_type: string;
+}
+
 interface Message {
   id: string;
   conversation_id: string;
@@ -44,6 +54,7 @@ interface Message {
   sender_profile?: {
     full_name: string;
   } | null;
+  attachments?: MessageAttachmentData[];
 }
 
 const EnhancedMessagingInterface = () => {
@@ -54,6 +65,7 @@ const EnhancedMessagingInterface = () => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [pendingAttachments, setPendingAttachments] = useState<MessageAttachmentData[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -133,7 +145,7 @@ const EnhancedMessagingInterface = () => {
 
       if (error) throw error;
 
-      // For each message, fetch the sender profile separately
+      // For each message, fetch the sender profile and attachments separately
       const messagesWithProfiles = await Promise.all(
         (messagesData || []).map(async (message) => {
           const { data: senderProfile } = await supabase
@@ -142,9 +154,15 @@ const EnhancedMessagingInterface = () => {
             .eq('id', message.sender_id)
             .maybeSingle();
 
+          const { data: attachments } = await supabase
+            .from('message_attachments')
+            .select('*')
+            .eq('message_id', message.id);
+
           return {
             ...message,
             sender_profile: senderProfile,
+            attachments: attachments || [],
           };
         })
       );
@@ -171,8 +189,12 @@ const EnhancedMessagingInterface = () => {
     }
   };
 
+  const handleFileUploaded = (attachment: MessageAttachmentData) => {
+    setPendingAttachments(prev => [...prev, attachment]);
+  };
+
   const sendMessage = async () => {
-    if (!newMessage.trim() || !selectedConversation || !user) return;
+    if ((!newMessage.trim() && pendingAttachments.length === 0) || !selectedConversation || !user) return;
 
     setSending(true);
     try {
@@ -180,17 +202,37 @@ const EnhancedMessagingInterface = () => {
         ? selectedConversation.advisor_id 
         : selectedConversation.customer_id;
 
-      const { error } = await supabase
+      // Create message
+      const { data: messageData, error: messageError } = await supabase
         .from('messages')
         .insert({
           conversation_id: selectedConversation.id,
           sender_id: user.id,
           recipient_id: recipientId,
-          content: newMessage,
-          message_type: 'text'
-        });
+          content: newMessage.trim() || 'File attachment',
+          message_type: pendingAttachments.length > 0 ? 'file' : 'text'
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (messageError) throw messageError;
+
+      // Create attachment records if any
+      if (pendingAttachments.length > 0) {
+        const attachmentRecords = pendingAttachments.map(attachment => ({
+          message_id: messageData.id,
+          file_name: attachment.file_name,
+          file_path: attachment.file_path,
+          file_size: attachment.file_size,
+          content_type: attachment.content_type
+        }));
+
+        const { error: attachmentError } = await supabase
+          .from('message_attachments')
+          .insert(attachmentRecords);
+
+        if (attachmentError) throw attachmentError;
+      }
 
       // Update conversation last_message_at
       await supabase
@@ -199,6 +241,7 @@ const EnhancedMessagingInterface = () => {
         .eq('id', selectedConversation.id);
 
       setNewMessage('');
+      setPendingAttachments([]);
       fetchMessages(selectedConversation.id);
       fetchConversations();
     } catch (error) {
@@ -229,7 +272,7 @@ const EnhancedMessagingInterface = () => {
     } else {
       return {
         name: conversation.customer_profile?.full_name || 'Khách hàng',
-        avatar: undefined, // Remove avatar since profiles table doesn't have avatar_url
+        avatar: undefined,
         role: 'customer'
       };
     }
@@ -384,7 +427,20 @@ const EnhancedMessagingInterface = () => {
                             : 'bg-white text-gray-800 rounded-bl-sm border'
                         }`}
                       >
-                        <p className="text-sm">{message.content}</p>
+                        {message.content && (
+                          <p className="text-sm">{message.content}</p>
+                        )}
+                        
+                        {message.attachments && message.attachments.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            {message.attachments.map((attachment) => (
+                              <MessageAttachment
+                                key={attachment.id}
+                                attachment={attachment}
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
                       <div className={`flex items-center gap-1 mt-1 text-xs text-gray-500 ${
                         isMyMessage ? 'justify-end' : 'justify-start'
@@ -407,7 +463,22 @@ const EnhancedMessagingInterface = () => {
 
             {/* Message Input */}
             <div className="p-4 border-t bg-white">
+              {/* Pending Attachments */}
+              {pendingAttachments.length > 0 && (
+                <div className="mb-3 space-y-2">
+                  {pendingAttachments.map((attachment, index) => (
+                    <div key={index} className="bg-gray-100 p-2 rounded-lg">
+                      <MessageAttachment attachment={attachment} />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
               <div className="flex items-center gap-2">
+                <FileUpload
+                  onFileUploaded={handleFileUploaded}
+                  disabled={sending}
+                />
                 <Input
                   placeholder="Nhập tin nhắn..."
                   value={newMessage}
@@ -417,7 +488,7 @@ const EnhancedMessagingInterface = () => {
                 />
                 <Button 
                   onClick={sendMessage}
-                  disabled={!newMessage.trim() || sending}
+                  disabled={(!newMessage.trim() && pendingAttachments.length === 0) || sending}
                   className="bg-brand-600 hover:bg-brand-700"
                 >
                   <Send className="h-4 w-4" />

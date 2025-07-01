@@ -1216,6 +1216,44 @@ export type Database = {
           },
         ]
       }
+      message_attachments: {
+        Row: {
+          content_type: string
+          created_at: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          id: string
+          message_id: string
+        }
+        Insert: {
+          content_type: string
+          created_at?: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          id?: string
+          message_id: string
+        }
+        Update: {
+          content_type?: string
+          created_at?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          id?: string
+          message_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_attachments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
