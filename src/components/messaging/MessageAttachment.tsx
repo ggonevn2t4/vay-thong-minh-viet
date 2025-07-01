@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, Image, File } from 'lucide-react';
+import { Download, FileText, Image, File, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import DocumentPreviewModal from './DocumentPreviewModal';
 
 interface MessageAttachmentProps {
   attachment: {
@@ -16,6 +17,8 @@ interface MessageAttachmentProps {
 }
 
 const MessageAttachment: React.FC<MessageAttachmentProps> = ({ attachment }) => {
+  const [showPreview, setShowPreview] = useState(false);
+
   const getFileIcon = (contentType: string) => {
     if (contentType.startsWith('image/')) return <Image className="h-4 w-4" />;
     if (contentType.includes('pdf') || contentType.includes('document')) return <FileText className="h-4 w-4" />;
@@ -60,40 +63,65 @@ const MessageAttachment: React.FC<MessageAttachmentProps> = ({ attachment }) => 
   };
 
   const isImage = attachment.content_type.startsWith('image/');
+  const isPDF = attachment.content_type === 'application/pdf';
+  const isPreviewable = isImage || isPDF;
 
   return (
-    <div className="bg-gray-50 border rounded-lg p-3 max-w-sm">
-      <div className="flex items-center gap-2 mb-2">
-        {getFileIcon(attachment.content_type)}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{attachment.file_name}</p>
-          <p className="text-xs text-gray-500">{formatFileSize(attachment.file_size)}</p>
+    <>
+      <div className="bg-gray-50 border rounded-lg p-3 max-w-sm">
+        <div className="flex items-center gap-2 mb-2">
+          {getFileIcon(attachment.content_type)}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">{attachment.file_name}</p>
+            <p className="text-xs text-gray-500">{formatFileSize(attachment.file_size)}</p>
+          </div>
+          <div className="flex gap-1">
+            {isPreviewable && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPreview(true)}
+                className="h-8 w-8 p-0"
+                title="Xem trước"
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleDownload}
+              className="h-8 w-8 p-0"
+              title="Tải xuống"
+            >
+              <Download className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleDownload}
-          className="h-8 w-8 p-0"
-        >
-          <Download className="h-4 w-4" />
-        </Button>
+        
+        {isImage && (
+          <div className="mt-2">
+            <img
+              src={getImageUrl()}
+              alt={attachment.file_name}
+              className="max-w-full h-auto rounded border cursor-pointer hover:opacity-80 transition-opacity"
+              style={{ maxHeight: '200px' }}
+              onClick={() => setShowPreview(true)}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
       </div>
-      
-      {isImage && (
-        <div className="mt-2">
-          <img
-            src={getImageUrl()}
-            alt={attachment.file_name}
-            className="max-w-full h-auto rounded border"
-            style={{ maxHeight: '200px' }}
-            onError={(e) => {
-              // Hide image if it fails to load
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        </div>
-      )}
-    </div>
+
+      {/* Document Preview Modal */}
+      <DocumentPreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        attachment={attachment}
+      />
+    </>
   );
 };
 
