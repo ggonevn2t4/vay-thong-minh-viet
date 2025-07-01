@@ -52,6 +52,13 @@ const MessageAttachment: React.FC<MessageAttachmentProps> = ({ attachment }) => 
     }
   };
 
+  const getImageUrl = () => {
+    const { data } = supabase.storage
+      .from('message-attachments')
+      .getPublicUrl(attachment.file_path);
+    return data.publicUrl;
+  };
+
   const isImage = attachment.content_type.startsWith('image/');
 
   return (
@@ -75,7 +82,7 @@ const MessageAttachment: React.FC<MessageAttachmentProps> = ({ attachment }) => 
       {isImage && (
         <div className="mt-2">
           <img
-            src={`${supabase.supabaseUrl}/storage/v1/object/public/message-attachments/${attachment.file_path}`}
+            src={getImageUrl()}
             alt={attachment.file_name}
             className="max-w-full h-auto rounded border"
             style={{ maxHeight: '200px' }}
