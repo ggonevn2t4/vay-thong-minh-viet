@@ -1,12 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Download, ZoomIn, ZoomOut, RotateCw, X } from 'lucide-react';
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
 import PDFViewer from './PDFViewer';
 import ImageViewer from './ImageViewer';
+import { toast } from 'sonner';
 
 interface DocumentPreviewModalProps {
   isOpen: boolean;
@@ -25,98 +23,46 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   onClose,
   attachment
 }) => {
-  const [fileUrl, setFileUrl] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [downloadCount, setDownloadCount] = useState(0);
+  const [fileUrl, setFileUrl] = React.useState<string>('');
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (isOpen && attachment) {
-      fetchFileUrl();
-      fetchDownloadCount();
+      loadFileUrl();
+      trackDownload();
     }
   }, [isOpen, attachment]);
 
-  const fetchFileUrl = async () => {
+  const loadFileUrl = async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase.storage
+      const { data } = supabase.storage
         .from('message-attachments')
-        .createSignedUrl(attachment.file_path, 3600);
-
-      if (error) throw error;
-      setFileUrl(data.signedUrl);
+        .getPublicUrl(attachment.file_path);
+      
+      setFileUrl(data.publicUrl);
     } catch (error) {
-      console.error('Error fetching file URL:', error);
-      toast.error('Không thể tải tệp tin');
+      console.error('Error loading file URL:', error);
+      toast.error('Failed to load file');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchDownloadCount = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('document_downloads')
-        .select('count')
-        .eq('attachment_id', attachment.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching download count:', error);
-        return;
-      }
-
-      setDownloadCount(data?.count || 0);
-    } catch (error) {
-      console.error('Error fetching download count:', error);
-    }
-  };
-
-  const handleDownload = async () => {
-    try {
-      // Track download
-      await trackDownload();
-
-      // Download file
-      const response = await fetch(fileUrl);
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = attachment.file_name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      toast.success('Tệp tin đã được tải xuống');
-      
-      // Update download count
-      setDownloadCount(prev => prev + 1);
-    } catch (error) {
-      console.error('Error downloading file:', error);
-      toast.error('Không thể tải xuống tệp tin');
-    }
-  };
-
   const trackDownload = async () => {
     try {
-      const { data: existingRecord, error: fetchError } = await supabase
+      // Check if download record exists
+      const { data: existingRecord } = await supabase
         .from('document_downloads')
         .select('*')
         .eq('attachment_id', attachment.id)
         .single();
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError;
-      }
-
       if (existingRecord) {
-        // Update existing count
+        // Update existing record
         await supabase
           .from('document_downloads')
-          .update({ 
+          .update({
             count: existingRecord.count + 1,
             last_downloaded_at: new Date().toISOString()
           })
@@ -127,13 +73,43 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
           .from('document_downloads')
           .insert({
             attachment_id: attachment.id,
-            count: 1,
-            last_downloaded_at: new Date().toISOString()
+            count: 1
           });
       }
     } catch (error) {
       console.error('Error tracking download:', error);
+      // Don't show error to user as this is background tracking
     }
+  };
+
+  const renderPreview = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
+        </div>
+      );
+    }
+
+    const isPDF = attachment.content_type === 'application/pdf';
+    const isImage = attachment.content_type.startsWith('image/');
+
+    if (isPDF) {
+      return <PDFViewer fileUrl={fileUrl} />;
+    }
+
+    if (isImage) {
+      return <ImageViewer fileUrl={fileUrl} fileName={attachment.file_name} />;
+    }
+
+    // For other file types, show a message
+    return (
+      <div className="flex flex-col items-center justify-center h-96 text-gray-500">
+        <p className="text-lg mb-4">Preview not available for this file type</p>
+        <p className="text-sm">File: {attachment.file_name}</p>
+        <p className="text-sm">Size: {formatFileSize(attachment.file_size)}</p>
+      </div>
+    );
   };
 
   const formatFileSize = (bytes: number) => {
@@ -144,57 +120,16 @@ const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const isPDF = attachment.content_type === 'application/pdf';
-  const isImage = attachment.content_type.startsWith('image/');
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
-        <DialogHeader className="flex-row items-center justify-between space-y-0 pb-4">
-          <div className="flex-1 min-w-0">
-            <DialogTitle className="text-lg font-semibold truncate">
-              {attachment.file_name}
-            </DialogTitle>
-            <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-              <span>{formatFileSize(attachment.file_size)}</span>
-              <span>•</span>
-              <span>{downloadCount} lượt tải xuống</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDownload}
-              disabled={isLoading}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Tải xuống
-            </Button>
-            <DialogClose asChild>
-              <Button variant="ghost" size="sm">
-                <X className="h-4 w-4" />
-              </Button>
-            </DialogClose>
-          </div>
+      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+        <DialogHeader className="p-4 border-b">
+          <DialogTitle className="text-left truncate">
+            {attachment.file_name}
+          </DialogTitle>
         </DialogHeader>
-
-        <div className="flex-1 overflow-hidden">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-96">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
-            </div>
-          ) : isPDF ? (
-            <PDFViewer fileUrl={fileUrl} />
-          ) : isImage ? (
-            <ImageViewer fileUrl={fileUrl} fileName={attachment.file_name} />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-96 text-gray-500">
-              <div className="text-6xl mb-4">📄</div>
-              <p className="text-lg mb-2">Không thể xem trước tệp tin này</p>
-              <p className="text-sm">Vui lòng tải xuống để xem nội dung</p>
-            </div>
-          )}
+        <div className="flex-1" style={{ height: 'calc(90vh - 120px)' }}>
+          {renderPreview()}
         </div>
       </DialogContent>
     </Dialog>

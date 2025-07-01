@@ -49,9 +49,45 @@ const MessageAttachment: React.FC<MessageAttachmentProps> = ({ attachment }) => 
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      
+      // Track download
+      await trackDownload();
     } catch (error) {
       console.error('Error downloading file:', error);
       toast.error('Failed to download file');
+    }
+  };
+
+  const trackDownload = async () => {
+    try {
+      // Check if download record exists
+      const { data: existingRecord } = await supabase
+        .from('document_downloads')
+        .select('*')
+        .eq('attachment_id', attachment.id)
+        .single();
+
+      if (existingRecord) {
+        // Update existing record
+        await supabase
+          .from('document_downloads')
+          .update({
+            count: existingRecord.count + 1,
+            last_downloaded_at: new Date().toISOString()
+          })
+          .eq('attachment_id', attachment.id);
+      } else {
+        // Create new record
+        await supabase
+          .from('document_downloads')
+          .insert({
+            attachment_id: attachment.id,
+            count: 1
+          });
+      }
+    } catch (error) {
+      console.error('Error tracking download:', error);
+      // Don't show error to user as this is background tracking
     }
   };
 

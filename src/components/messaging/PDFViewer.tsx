@@ -19,15 +19,18 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ fileUrl }) => {
   const [scale, setScale] = useState<number>(1.0);
   const [rotation, setRotation] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setIsLoading(false);
+    setHasError(false);
   };
 
   const onDocumentLoadError = (error: Error) => {
     console.error('Error loading PDF:', error);
     setIsLoading(false);
+    setHasError(true);
   };
 
   const changePage = (offset: number) => {
@@ -45,6 +48,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ fileUrl }) => {
   const rotate = () => {
     setRotation(prevRotation => (prevRotation + 90) % 360);
   };
+
+  if (hasError) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Không thể tải file PDF</p>
+          <p className="text-sm text-gray-500">Vui lòng thử tải xuống file để xem</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

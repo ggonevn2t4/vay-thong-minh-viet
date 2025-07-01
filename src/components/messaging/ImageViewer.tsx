@@ -15,6 +15,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ fileUrl, fileName }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -65,10 +66,12 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ fileUrl, fileName }) => {
 
   const handleImageLoad = () => {
     setIsLoading(false);
+    setHasError(false);
   };
 
   const handleImageError = () => {
     setIsLoading(false);
+    setHasError(true);
   };
 
   // Reset position when scale changes
@@ -77,6 +80,17 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ fileUrl, fileName }) => {
       setPosition({ x: 0, y: 0 });
     }
   }, [scale]);
+
+  if (hasError) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Không thể tải ảnh</p>
+          <p className="text-sm text-gray-500">Vui lòng thử tải xuống file để xem</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

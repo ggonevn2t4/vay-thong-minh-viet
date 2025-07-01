@@ -542,6 +542,30 @@ export type Database = {
         }
         Relationships: []
       }
+      document_downloads: {
+        Row: {
+          attachment_id: string
+          count: number
+          created_at: string
+          id: string
+          last_downloaded_at: string
+        }
+        Insert: {
+          attachment_id: string
+          count?: number
+          created_at?: string
+          id?: string
+          last_downloaded_at?: string
+        }
+        Update: {
+          attachment_id?: string
+          count?: number
+          created_at?: string
+          id?: string
+          last_downloaded_at?: string
+        }
+        Relationships: []
+      }
       document_requests: {
         Row: {
           advisor_id: string | null
