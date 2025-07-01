@@ -1263,6 +1263,7 @@ export type Database = {
           message_type: string | null
           read_at: string | null
           recipient_id: string
+          search_vector: unknown | null
           sender_id: string
           updated_at: string | null
         }
@@ -1274,6 +1275,7 @@ export type Database = {
           message_type?: string | null
           read_at?: string | null
           recipient_id: string
+          search_vector?: unknown | null
           sender_id: string
           updated_at?: string | null
         }
@@ -1285,6 +1287,7 @@ export type Database = {
           message_type?: string | null
           read_at?: string | null
           recipient_id?: string
+          search_vector?: unknown | null
           sender_id?: string
           updated_at?: string | null
         }
@@ -1691,6 +1694,27 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
         }
         Returns: boolean
+      }
+      search_messages: {
+        Args: {
+          p_conversation_id: string
+          p_search_query?: string
+          p_sender_id?: string
+          p_date_from?: string
+          p_date_to?: string
+          p_message_type?: string
+        }
+        Returns: {
+          id: string
+          conversation_id: string
+          sender_id: string
+          recipient_id: string
+          content: string
+          message_type: string
+          read_at: string
+          created_at: string
+          rank: number
+        }[]
       }
     }
     Enums: {

@@ -12,6 +12,9 @@ import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import FileUpload from './FileUpload';
 import MessageAttachment from './MessageAttachment';
+import MessageSearch from './MessageSearch';
+import SearchResultHighlight from './SearchResultHighlight';
+import { useMessageSearch } from '@/hooks/useMessageSearch';
 
 interface Conversation {
   id: string;
@@ -66,6 +69,16 @@ const EnhancedMessagingInterface = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [pendingAttachments, setPendingAttachments] = useState<MessageAttachmentData[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
+
+  const {
+    searchResults,
+    isSearching,
+    searchQuery,
+    searchFilters,
+    searchMessages,
+    clearSearch
+  } = useMessageSearch();
 
   useEffect(() => {
     if (user) {
@@ -278,6 +291,50 @@ const EnhancedMessagingInterface = () => {
     }
   };
 
+  const handleSearch = async (query: string, filters: any) => {
+    if (!selectedConversation) return;
+    
+    if (!query && !Object.keys(filters).some(key => filters[key])) {
+      clearSearch();
+      return;
+    }
+    
+    await searchMessages(selectedConversation.id, query, filters);
+  };
+
+  const handleClearSearch = () => {
+    clearSearch();
+    setShowSearch(false);
+  };
+
+  const getSearchParticipants = () => {
+    if (!selectedConversation) return [];
+    
+    const participants = [];
+    
+    // Add customer
+    if (selectedConversation.customer_profile) {
+      participants.push({
+        id: selectedConversation.customer_id,
+        name: selectedConversation.customer_profile.full_name || 'Khách hàng',
+        role: 'customer'
+      });
+    }
+    
+    // Add advisor
+    if (selectedConversation.advisor_profile) {
+      participants.push({
+        id: selectedConversation.advisor_id,
+        name: selectedConversation.advisor_profile.full_name || 'Tư vấn viên',
+        role: 'advisor'
+      });
+    }
+    
+    return participants;
+  };
+
+  const displayedMessages = searchResults.length > 0 ? searchResults : messages;
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -392,6 +449,23 @@ const EnhancedMessagingInterface = () => {
               </div>
               
               <div className="flex items-center gap-2">
+                <Button 
+                  variant={showSearch ? "default" : "outline"} 
+                  size="sm"
+                  onClick={() => {
+                    setShowSearch(!showSearch);
+                    if (showSearch) {
+                      handleClearSearch();
+                    }
+                  }}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  {searchResults.length > 0 && (
+                    <Badge variant="secondary" className="ml-1">
+                      {searchResults.length}
+                    </Badge>
+                  )}
+                </Button>
                 <Button variant="outline" size="sm">
                   <Phone className="h-4 w-4" />
                 </Button>
@@ -401,9 +475,31 @@ const EnhancedMessagingInterface = () => {
               </div>
             </div>
 
+            {/* Search Component */}
+            {showSearch && (
+              <MessageSearch
+                onSearch={handleSearch}
+                onClear={handleClearSearch}
+                isSearching={isSearching}
+                searchQuery={searchQuery}
+                filters={searchFilters}
+                participants={getSearchParticipants()}
+              />
+            )}
+
+            {/* Search Results Info */}
+            {searchResults.length > 0 && (
+              <div className="px-4 py-2 bg-blue-50 border-b text-sm text-blue-700">
+                Tìm thấy {searchResults.length} tin nhắn phù hợp
+                {searchQuery && (
+                  <span> cho từ khóa "{searchQuery}"</span>
+                )}
+              </div>
+            )}
+
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-              {messages.map((message) => {
+              {displayedMessages.map((message) => {
                 const isMyMessage = message.sender_id === user?.id;
                 
                 return (
@@ -428,7 +524,11 @@ const EnhancedMessagingInterface = () => {
                         }`}
                       >
                         {message.content && (
-                          <p className="text-sm">{message.content}</p>
+                          <SearchResultHighlight
+                            text={message.content}
+                            searchQuery={searchQuery}
+                            className="text-sm"
+                          />
                         )}
                         
                         {message.attachments && message.attachments.length > 0 && (
@@ -461,40 +561,42 @@ const EnhancedMessagingInterface = () => {
               })}
             </div>
 
-            {/* Message Input */}
-            <div className="p-4 border-t bg-white">
-              {/* Pending Attachments */}
-              {pendingAttachments.length > 0 && (
-                <div className="mb-3 space-y-2">
-                  {pendingAttachments.map((attachment, index) => (
-                    <div key={index} className="bg-gray-100 p-2 rounded-lg">
-                      <MessageAttachment attachment={attachment} />
-                    </div>
-                  ))}
+            {/* Message Input - Only show when not in search mode */}
+            {!showSearch && (
+              <div className="p-4 border-t bg-white">
+                {/* Pending Attachments */}
+                {pendingAttachments.length > 0 && (
+                  <div className="mb-3 space-y-2">
+                    {pendingAttachments.map((attachment, index) => (
+                      <div key={index} className="bg-gray-100 p-2 rounded-lg">
+                        <MessageAttachment attachment={attachment} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="flex items-center gap-2">
+                  <FileUpload
+                    onFileUploaded={handleFileUploaded}
+                    disabled={sending}
+                  />
+                  <Input
+                    placeholder="Nhập tin nhắn..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={sendMessage}
+                    disabled={(!newMessage.trim() && pendingAttachments.length === 0) || sending}
+                    className="bg-brand-600 hover:bg-brand-700"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
                 </div>
-              )}
-              
-              <div className="flex items-center gap-2">
-                <FileUpload
-                  onFileUploaded={handleFileUploaded}
-                  disabled={sending}
-                />
-                <Input
-                  placeholder="Nhập tin nhắn..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={sendMessage}
-                  disabled={(!newMessage.trim() && pendingAttachments.length === 0) || sending}
-                  className="bg-brand-600 hover:bg-brand-700"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
               </div>
-            </div>
+            )}
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center bg-gray-50">
