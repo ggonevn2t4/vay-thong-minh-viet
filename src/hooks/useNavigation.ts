@@ -13,7 +13,7 @@ export const useNavigation = () => {
   const location = useLocation();
   const { userRole } = useAuth();
 
-  // Updated navigation structure with support tools
+  // Updated navigation structure focused on the new flow
   const navLinks: NavLink[] = [
     {
       label: 'Trang chủ',
@@ -23,12 +23,12 @@ export const useNavigation = () => {
     {
       label: 'Khởi tạo khoản vay',
       href: '/loan-application',
-      description: 'Đăng ký các loại khoản vay',
+      description: 'Chọn sản phẩm và đăng ký khoản vay',
     },
     {
       label: 'Marketplace',
       href: '/marketplace',
-      description: 'Sàn giao dịch vay vốn',
+      description: 'Sản phẩm vay và nhân viên ngân hàng',
     },
     {
       label: 'Hỗ trợ',

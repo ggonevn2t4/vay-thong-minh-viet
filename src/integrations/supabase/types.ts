@@ -35,6 +35,7 @@ export type Database = {
           languages: string[] | null
           last_rate_update: string | null
           loan_types: Json | null
+          location: string | null
           operating_areas: string[] | null
           permanent_address: string | null
           personal_kyc_documents: Json | null
@@ -42,6 +43,7 @@ export type Database = {
           position: string | null
           processing_priority: string[] | null
           rate_update_frequency: string | null
+          service_area: string[] | null
           specializations: string[] | null
           success_rate: number | null
           total_clients_helped: number | null
@@ -77,6 +79,7 @@ export type Database = {
           languages?: string[] | null
           last_rate_update?: string | null
           loan_types?: Json | null
+          location?: string | null
           operating_areas?: string[] | null
           permanent_address?: string | null
           personal_kyc_documents?: Json | null
@@ -84,6 +87,7 @@ export type Database = {
           position?: string | null
           processing_priority?: string[] | null
           rate_update_frequency?: string | null
+          service_area?: string[] | null
           specializations?: string[] | null
           success_rate?: number | null
           total_clients_helped?: number | null
@@ -119,6 +123,7 @@ export type Database = {
           languages?: string[] | null
           last_rate_update?: string | null
           loan_types?: Json | null
+          location?: string | null
           operating_areas?: string[] | null
           permanent_address?: string | null
           personal_kyc_documents?: Json | null
@@ -126,6 +131,7 @@ export type Database = {
           position?: string | null
           processing_priority?: string[] | null
           rate_update_frequency?: string | null
+          service_area?: string[] | null
           specializations?: string[] | null
           success_rate?: number | null
           total_clients_helped?: number | null
@@ -1061,6 +1067,47 @@ export type Database = {
             columns: ["advisor_id"]
             isOneToOne: false
             referencedRelation: "advisor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loan_conversations: {
+        Row: {
+          advisor_id: string
+          created_at: string
+          customer_id: string
+          id: string
+          last_message_at: string | null
+          loan_application_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          advisor_id: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          last_message_at?: string | null
+          loan_application_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          advisor_id?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          last_message_at?: string | null
+          loan_application_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_conversations_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
             referencedColumns: ["id"]
           },
         ]
