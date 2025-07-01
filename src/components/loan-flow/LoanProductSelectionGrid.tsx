@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CreditCard, Shield, Car, Building2, Home, Users } from 'lucide-react';
+import { LoanProductType } from '@/types/loan-application-flow';
 
 export interface LoanProduct {
   id: string;
@@ -14,7 +14,7 @@ export interface LoanProduct {
   maxAmount: string;
   processingTime: string;
   features: string[];
-  productType: string;
+  productType: LoanProductType;
 }
 
 interface LoanProductSelectionGridProps {
