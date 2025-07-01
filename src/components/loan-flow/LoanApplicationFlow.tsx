@@ -29,7 +29,10 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
   
   const [currentStep, setCurrentStep] = useState<ApplicationStep>('product-selection');
   const [selectedLoanProduct, setSelectedLoanProduct] = useState<LoanProduct | null>(null);
-  const [surveyData, setSurveyData] = useState<any>(null);
+  const [surveyData, setSurveyData] = useState<any>({
+    product_type: 'credit_loan',
+    customer_questions: {}
+  });
   const [selectedAdvisor, setSelectedAdvisor] = useState<any>(null);
 
   // Handle state from navigation
@@ -44,6 +47,10 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
   const handleProductSelect = (product: LoanProduct) => {
     console.log('Selected product:', product);
     setSelectedLoanProduct(product);
+    setSurveyData(prev => ({
+      ...prev,
+      product_type: product.productType
+    }));
     setCurrentStep('survey');
     toast.success(`Đã chọn sản phẩm: ${product.name}`);
   };
@@ -54,11 +61,12 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
     setCurrentStep('advisor-selection');
   };
 
-  const handleAdvisorSelect = (advisor: any) => {
-    console.log('Selected advisor:', advisor);
-    setSelectedAdvisor(advisor);
+  const handleAdvisorSelect = (advisorId: string) => {
+    console.log('Selected advisor ID:', advisorId);
+    // In a real implementation, you'd fetch advisor details
+    setSelectedAdvisor({ id: advisorId, full_name: 'Advisor Name', bank_name: 'Bank Name' });
     setCurrentStep('completion');
-    toast.success(`Đã chọn tư vấn viên: ${advisor.full_name}`);
+    toast.success(`Đã chọn tư vấn viên`);
   };
 
   const handleBackStep = () => {
@@ -155,16 +163,18 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
 
         {currentStep === 'survey' && selectedLoanProduct && (
           <SurveyForm
-            selectedProduct={selectedLoanProduct.productType as any}
-            onComplete={handleSurveyComplete}
+            formData={surveyData}
+            onUpdateFormData={setSurveyData}
+            onNext={() => handleSurveyComplete(surveyData)}
+            onBack={handleBackStep}
           />
         )}
 
         {currentStep === 'advisor-selection' && (
           <AdvisorSelectionStep
-            selectedProduct={selectedLoanProduct}
-            surveyData={surveyData}
+            selectedProductType={selectedLoanProduct?.productType || 'credit_loan'}
             onSelectAdvisor={handleAdvisorSelect}
+            onBack={handleBackStep}
           />
         )}
 
@@ -181,7 +191,7 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
                 Yêu cầu vay đã được gửi thành công!
               </h3>
               <p className="text-gray-600">
-                Tư vấn viên {selectedAdvisor?.full_name} sẽ liên hệ với bạn trong thời gian sớm nhất.
+                Tư vấn viên sẽ liên hệ với bạn trong thời gian sớm nhất.
               </p>
             </div>
 
