@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +14,14 @@ import FileUpload from './FileUpload';
 import MessageAttachment from './MessageAttachment';
 import MessageSearch from './MessageSearch';
 import SearchResultHighlight from './SearchResultHighlight';
+import TypingIndicator from './TypingIndicator';
+import UserPresenceIndicator from './UserPresenceIndicator';
+import ConnectionStatus from './ConnectionStatus';
+import MessageStatus from './MessageStatus';
 import { useMessageSearch } from '@/hooks/useMessageSearch';
+import { useTypingIndicator } from '@/hooks/useTypingIndicator';
+import { useUserPresence } from '@/hooks/useUserPresence';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 interface Conversation {
   id: string;
@@ -70,6 +77,12 @@ const EnhancedMessagingInterface = () => {
   const [sending, setSending] = useState(false);
   const [pendingAttachments, setPendingAttachments] = useState<MessageAttachmentData[]>([]);
   const [showSearch, setShowSearch] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Initialize real-time hooks
+  const { startTyping, stopTyping, getTypingUsers } = useTypingIndicator(selectedConversation?.id || '');
+  const { isOnline } = useUserPresence();
+  const { registerPushNotifications, sendLocalNotification } = usePushNotifications();
 
   const {
     searchResults,
@@ -79,6 +92,11 @@ const EnhancedMessagingInterface = () => {
     searchMessages,
     clearSearch
   } = useMessageSearch();
+
+  // Register push notifications on mount
+  useEffect(() => {
+    registerPushNotifications();
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -93,11 +111,64 @@ const EnhancedMessagingInterface = () => {
     }
   }, [selectedConversation]);
 
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Subscribe to real-time message updates
+  useEffect(() => {
+    if (!selectedConversation) return;
+
+    const channel = supabase
+      .channel(`messages-${selectedConversation.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${selectedConversation.id}`
+        },
+        (payload) => {
+          const newMessage = payload.new as Message;
+          if (newMessage.sender_id !== user?.id) {
+            // Show notification for new messages from others
+            sendLocalNotification(
+              `Tin nhắn mới từ ${newMessage.sender_profile?.full_name || 'Người dùng'}`,
+              {
+                body: newMessage.content,
+                icon: '/favicon.ico'
+              }
+            );
+          }
+          fetchMessages(selectedConversation.id);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${selectedConversation.id}`
+        },
+        () => {
+          fetchMessages(selectedConversation.id);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedConversation, user]);
+
   const fetchConversations = async () => {
     if (!user) return;
 
     try {
-      // Fetch conversations first
+      setLoading(true);
       const { data: conversationsData, error } = await supabase
         .from('conversations')
         .select('*')
@@ -106,7 +177,6 @@ const EnhancedMessagingInterface = () => {
 
       if (error) throw error;
 
-      // For each conversation, fetch the related profile data separately
       const conversationsWithProfiles = await Promise.all(
         (conversationsData || []).map(async (conversation) => {
           const { data: customerProfile } = await supabase
@@ -149,7 +219,6 @@ const EnhancedMessagingInterface = () => {
 
   const fetchMessages = async (conversationId: string) => {
     try {
-      // Fetch messages first
       const { data: messagesData, error } = await supabase
         .from('messages')
         .select('*')
@@ -158,7 +227,6 @@ const EnhancedMessagingInterface = () => {
 
       if (error) throw error;
 
-      // For each message, fetch the sender profile and attachments separately
       const messagesWithProfiles = await Promise.all(
         (messagesData || []).map(async (message) => {
           const { data: senderProfile } = await supabase
@@ -202,6 +270,22 @@ const EnhancedMessagingInterface = () => {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    
+    // Start typing indicator when user starts typing
+    if (e.target.value.length > 0) {
+      startTyping();
+    } else {
+      stopTyping();
+    }
+  };
+
+  const handleInputBlur = () => {
+    // Stop typing indicator when input loses focus
+    stopTyping();
+  };
+
   const handleFileUploaded = (attachment: MessageAttachmentData) => {
     setPendingAttachments(prev => [...prev, attachment]);
   };
@@ -210,12 +294,13 @@ const EnhancedMessagingInterface = () => {
     if ((!newMessage.trim() && pendingAttachments.length === 0) || !selectedConversation || !user) return;
 
     setSending(true);
+    stopTyping(); // Stop typing indicator when sending
+    
     try {
       const recipientId = selectedConversation.customer_id === user.id 
         ? selectedConversation.advisor_id 
         : selectedConversation.customer_id;
 
-      // Create message
       const { data: messageData, error: messageError } = await supabase
         .from('messages')
         .insert({
@@ -230,7 +315,6 @@ const EnhancedMessagingInterface = () => {
 
       if (messageError) throw messageError;
 
-      // Create attachment records if any
       if (pendingAttachments.length > 0) {
         const attachmentRecords = pendingAttachments.map(attachment => ({
           message_id: messageData.id,
@@ -247,7 +331,6 @@ const EnhancedMessagingInterface = () => {
         if (attachmentError) throw attachmentError;
       }
 
-      // Update conversation last_message_at
       await supabase
         .from('conversations')
         .update({ last_message_at: new Date().toISOString() })
@@ -277,6 +360,7 @@ const EnhancedMessagingInterface = () => {
     
     if (conversation.customer_id === user.id) {
       return {
+        id: conversation.advisor_id,
         name: conversation.advisor_profile?.full_name || 'Tư vấn viên',
         avatar: conversation.advisor_profile?.avatar_url,
         role: 'advisor',
@@ -284,6 +368,7 @@ const EnhancedMessagingInterface = () => {
       };
     } else {
       return {
+        id: conversation.customer_id,
         name: conversation.customer_profile?.full_name || 'Khách hàng',
         avatar: undefined,
         role: 'customer'
@@ -312,7 +397,6 @@ const EnhancedMessagingInterface = () => {
     
     const participants = [];
     
-    // Add customer
     if (selectedConversation.customer_profile) {
       participants.push({
         id: selectedConversation.customer_id,
@@ -321,7 +405,6 @@ const EnhancedMessagingInterface = () => {
       });
     }
     
-    // Add advisor
     if (selectedConversation.advisor_profile) {
       participants.push({
         id: selectedConversation.advisor_id,
@@ -334,6 +417,7 @@ const EnhancedMessagingInterface = () => {
   };
 
   const displayedMessages = searchResults.length > 0 ? searchResults : messages;
+  const typingUsers = getTypingUsers();
 
   if (loading) {
     return (
@@ -351,10 +435,13 @@ const EnhancedMessagingInterface = () => {
       {/* Conversations List */}
       <div className="w-1/3 border-r bg-gray-50">
         <div className="p-4 border-b bg-white">
-          <h3 className="font-semibold text-lg flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-brand-600" />
-            Tin nhắn
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-brand-600" />
+              Tin nhắn
+            </h3>
+            <ConnectionStatus />
+          </div>
         </div>
         
         <div className="overflow-y-auto h-full">
@@ -377,12 +464,17 @@ const EnhancedMessagingInterface = () => {
                   onClick={() => setSelectedConversation(conversation)}
                 >
                   <div className="flex items-start gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={otherParticipant.avatar} alt={otherParticipant.name} />
-                      <AvatarFallback className="bg-brand-600 text-white">
-                        {otherParticipant.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={otherParticipant.avatar} alt={otherParticipant.name} />
+                        <AvatarFallback className="bg-brand-600 text-white">
+                          {otherParticipant.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="absolute -bottom-1 -right-1">
+                        <UserPresenceIndicator userId={otherParticipant.id} />
+                      </div>
+                    </div>
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
@@ -431,17 +523,25 @@ const EnhancedMessagingInterface = () => {
                   
                   return (
                     <>
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={otherParticipant.avatar} alt={otherParticipant.name} />
-                        <AvatarFallback className="bg-brand-600 text-white">
-                          {otherParticipant.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="relative">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={otherParticipant.avatar} alt={otherParticipant.name} />
+                          <AvatarFallback className="bg-brand-600 text-white">
+                            {otherParticipant.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="absolute -bottom-1 -right-1">
+                          <UserPresenceIndicator userId={otherParticipant.id} />
+                        </div>
+                      </div>
                       <div>
                         <h4 className="font-semibold">{otherParticipant.name}</h4>
-                        {otherParticipant.bank && (
-                          <p className="text-sm text-brand-600">{otherParticipant.bank}</p>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {otherParticipant.bank && (
+                            <p className="text-sm text-brand-600">{otherParticipant.bank}</p>
+                          )}
+                          <UserPresenceIndicator userId={otherParticipant.id} showText />
+                        </div>
                       </div>
                     </>
                   );
@@ -542,29 +642,42 @@ const EnhancedMessagingInterface = () => {
                           </div>
                         )}
                       </div>
-                      <div className={`flex items-center gap-1 mt-1 text-xs text-gray-500 ${
-                        isMyMessage ? 'justify-end' : 'justify-start'
-                      }`}>
-                        <span>
-                          {formatDistanceToNow(new Date(message.created_at), { 
-                            addSuffix: true, 
-                            locale: vi 
-                          })}
-                        </span>
-                        {isMyMessage && message.read_at && (
-                          <span className="text-blue-500">✓✓</span>
-                        )}
-                      </div>
+                      
+                      {/* Message Status */}
+                      {isMyMessage && (
+                        <div className="flex justify-end mt-1">
+                          <MessageStatus
+                            status={message.read_at ? 'read' : 'sent'}
+                            timestamp={message.created_at}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
               })}
+              
+              {/* Typing Indicators */}
+              {typingUsers.map((typingUser) => {
+                const otherParticipant = getOtherParticipant(selectedConversation);
+                if (typingUser.user_id === otherParticipant?.id) {
+                  return (
+                    <TypingIndicator
+                      key={typingUser.user_id}
+                      userName={otherParticipant.name}
+                      userAvatar={otherParticipant.avatar}
+                    />
+                  );
+                }
+                return null;
+              })}
+              
+              <div ref={messagesEndRef} />
             </div>
 
-            {/* Message Input - Only show when not in search mode */}
+            {/* Message Input */}
             {!showSearch && (
               <div className="p-4 border-t bg-white">
-                {/* Pending Attachments */}
                 {pendingAttachments.length > 0 && (
                   <div className="mb-3 space-y-2">
                     {pendingAttachments.map((attachment, index) => (
@@ -583,18 +696,26 @@ const EnhancedMessagingInterface = () => {
                   <Input
                     placeholder="Nhập tin nhắn..."
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
+                    onBlur={handleInputBlur}
                     className="flex-1"
+                    disabled={!isOnline}
                   />
                   <Button 
                     onClick={sendMessage}
-                    disabled={(!newMessage.trim() && pendingAttachments.length === 0) || sending}
+                    disabled={(!newMessage.trim() && pendingAttachments.length === 0) || sending || !isOnline}
                     className="bg-brand-600 hover:bg-brand-700"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
+                
+                {!isOnline && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Bạn đang offline. Kết nối lại để gửi tin nhắn.
+                  </p>
+                )}
               </div>
             )}
           </>

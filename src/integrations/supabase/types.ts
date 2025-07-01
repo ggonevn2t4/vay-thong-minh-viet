@@ -1593,6 +1593,93 @@ export type Database = {
           },
         ]
       }
+      push_notification_tokens: {
+        Row: {
+          created_at: string
+          device_type: string
+          id: string
+          is_active: boolean
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_type: string
+          id?: string
+          is_active?: boolean
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_type?: string
+          id?: string
+          is_active?: boolean
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      typing_indicators: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          is_typing: boolean
+          last_typing_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          is_typing?: boolean
+          last_typing_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          is_typing?: boolean
+          last_typing_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_presence: {
+        Row: {
+          created_at: string
+          id: string
+          last_seen: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_seen?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_seen?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1704,6 +1791,10 @@ export type Database = {
         Args: { customer_uuid: string }
         Returns: Json
       }
+      cleanup_old_typing_indicators: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_bank_offers: {
         Args: { application_id: string }
         Returns: Json
@@ -1739,6 +1830,14 @@ export type Database = {
           created_at: string
           rank: number
         }[]
+      }
+      update_typing_indicator: {
+        Args: { conv_id: string; user_uuid: string; typing: boolean }
+        Returns: undefined
+      }
+      update_user_presence: {
+        Args: { user_uuid: string; new_status: string }
+        Returns: undefined
       }
     }
     Enums: {
