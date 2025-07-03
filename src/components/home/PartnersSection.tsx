@@ -8,7 +8,7 @@ const PartnersSection = () => {
         
         <div className="flex justify-center">
           <div className="max-w-5xl w-full">
-            <img src="/lovable-uploads/67eb5d3b-4a0f-44a4-9a5d-d64ec54ca5c8.png" alt="Các ngân hàng đối tác" className="w-full h-auto rounded-xl shadow-lg border border-gray-100" />
+            <img alt="Các ngân hàng đối tác" className="w-full h-auto rounded-xl shadow-lg border border-gray-100" src="/lovable-uploads/71ee26a8-4c94-4381-84f3-1ad9b8de5e6f.jpg" />
           </div>
         </div>
       </div>
