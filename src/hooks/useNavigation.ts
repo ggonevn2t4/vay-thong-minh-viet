@@ -26,9 +26,9 @@ export const useNavigation = () => {
       description: 'Chọn sản phẩm và đăng ký khoản vay',
     },
     {
-      label: 'Marketplace',
+      label: 'Tư vấn viên',
       href: '/marketplace',
-      description: 'Sản phẩm vay và nhân viên ngân hàng',
+      description: 'Kết nối với chuyên gia tư vấn tài chính',
     },
     {
       label: 'Hỗ trợ',

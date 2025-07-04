@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/layout/Layout';
-import BankingHeroSection from '@/components/marketplace/BankingHeroSection';
-import LoanProductGrid from '@/components/marketplace/LoanProductGrid';
-import BankingAdvantages from '@/components/marketplace/BankingAdvantages';
 import BankEmployeeDirectory from '@/components/marketplace/BankEmployeeDirectory';
-import PageSkeleton from '@/components/ui/page-skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface LoanRequest {
   id: string;
@@ -49,75 +44,31 @@ interface BankOffer {
 
 const Marketplace = () => {
   const { user, userRole } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('products');
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleEmployeeSelect = (employee: any) => {
     console.log('Selected employee:', employee);
     // TODO: Navigate to conversation or contact flow
   };
 
-  const handleCreateLoanRequest = () => {
-    console.log('Create loan request');
-    // TODO: Navigate to loan application
-  };
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="min-h-screen bg-white">
-          <BankingHeroSection 
-            canCreateLoanRequest={!!user}
-            onCreateLoanRequest={handleCreateLoanRequest}
-          />
-          
-          <div className="container mx-auto px-4 py-8">
-            <PageSkeleton type="marketplace" />
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
-      <div className="min-h-screen bg-white">
-        <BankingHeroSection 
-          canCreateLoanRequest={!!user}
-          onCreateLoanRequest={handleCreateLoanRequest}
-        />
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              Marketplace Tư Vấn Viên
+            </h1>
+            <p className="text-xl mb-8 text-blue-100 max-w-3xl mx-auto">
+              Kết nối với các chuyên gia tư vấn tài chính và nhân viên ngân hàng chuyên nghiệp 
+              để được hỗ trợ tốt nhất cho nhu cầu vay vốn của bạn
+            </p>
+          </div>
+        </div>
 
-        {/* Main Content with Tabs */}
+        {/* Main Content */}
         <div className="container mx-auto px-4 py-16">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="flex justify-center mb-8">
-              <TabsList className="grid w-full max-w-md grid-cols-2">
-                <TabsTrigger value="products" className="text-sm">
-                  Sản phẩm vay
-                </TabsTrigger>
-                <TabsTrigger value="advisors" className="text-sm">
-                  Nhân viên ngân hàng
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-            <TabsContent value="products" className="space-y-16">
-              <LoanProductGrid />
-              <BankingAdvantages />
-            </TabsContent>
-
-            <TabsContent value="advisors">
-              <BankEmployeeDirectory onSelectEmployee={handleEmployeeSelect} />
-            </TabsContent>
-          </Tabs>
+          <BankEmployeeDirectory onSelectEmployee={handleEmployeeSelect} />
         </div>
       </div>
     </Layout>

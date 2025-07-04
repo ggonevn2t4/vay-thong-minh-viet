@@ -9,7 +9,6 @@ import NewFeaturesSection from '@/components/home/NewFeaturesSection';
 import BenefitsSection from '@/components/home/BenefitsSection';
 import FounderSection from '@/components/home/FounderSection';
 import CTASection from '@/components/home/CTASection';
-import LoanCalculatorSection from '@/components/home/LoanCalculatorSection';
 
 /**
  * Homepage component that displays the main landing page
@@ -27,7 +26,6 @@ const Index = () => {
       <FounderSection />
       <ContactForm />
       <CTASection />
-      <LoanCalculatorSection />
     </Layout>
   );
 };
