@@ -459,5 +459,68 @@ export const customQuestionForms: Record<LoanProductType, CustomQuestionForm> = 
         ]
       }
     ]
+  },
+
+  car_loan: {
+    productType: 'car_loan',
+    questions: [
+      {
+        id: 'car_type',
+        type: 'select',
+        label: 'Loại xe',
+        required: true,
+        options: ['Xe du lịch', 'Xe SUV', 'Xe pickup', 'Xe thể thao']
+      },
+      {
+        id: 'car_value',
+        type: 'number',
+        label: 'Giá trị xe (VNĐ)',
+        placeholder: 'Nhập giá trị xe',
+        required: true,
+        validation: { min: 200000000, max: 3000000000 }
+      }
+    ]
+  },
+
+  business_loan: {
+    productType: 'business_loan',
+    questions: [
+      {
+        id: 'business_type',
+        type: 'select',
+        label: 'Loại hình kinh doanh',
+        required: true,
+        options: ['Doanh nghiệp tư nhân', 'Công ty TNHH', 'Công ty cổ phần', 'Hộ kinh doanh']
+      },
+      {
+        id: 'loan_amount',
+        type: 'number',
+        label: 'Số tiền cần vay (VNĐ)',
+        placeholder: 'Nhập số tiền cần vay',
+        required: true,
+        validation: { min: 100000000, max: 10000000000 }
+      }
+    ]
+  },
+
+  education_loan: {
+    productType: 'education_loan',
+    questions: [
+      {
+        id: 'education_level',
+        type: 'select',
+        label: 'Bậc học',
+        required: true,
+        options: ['Đại học', 'Thạc sĩ', 'Tiến sĩ', 'Khóa học nghề']
+      },
+      {
+        id: 'tuition_amount',
+        type: 'number',
+        label: 'Học phí cần vay (VNĐ)',
+        placeholder: 'Nhập số tiền học phí',
+        required: true,
+        validation: { min: 10000000, max: 1000000000 }
+      }
+    ]
   }
 };

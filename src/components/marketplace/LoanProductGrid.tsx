@@ -162,11 +162,27 @@ const LoanProductGrid = () => {
 
   const handleRegisterNow = (productTitle: string) => {
     console.log('Register now clicked for:', productTitle);
-    toast.success(`Đang chuyển đến trang đăng ký cho ${productTitle}`);
+    
+    // Map product title to product type for optimized questionnaire
+    const productTypeMap: { [key: string]: string } = {
+      'Thẻ tín dụng': 'credit_loan',
+      'Vay tiêu dùng tín chấp': 'credit_loan', 
+      'Vay tiêu dùng thế chấp': 'mortgage_loan',
+      'Vay mua ô tô': 'car_loan',
+      'Vay mua bất động sản': 'mortgage_loan',
+      'Vay xây sửa nhà ở': 'mortgage_loan',
+      'Vay sản xuất kinh doanh': 'business_loan'
+    };
+    
+    const productType = productTypeMap[productTitle] || 'credit_loan';
+    
+    toast.success(`Chuyển đến khảo sát thông minh cho ${productTitle}`);
     navigate('/loan-application', { 
       state: { 
-        selectedProduct: productTitle,
-        fromMarketplace: true 
+        selectedProduct: productType,
+        productTitle: productTitle,
+        fromMarketplace: true,
+        optimizedQuestionnaire: true
       } 
     });
   };

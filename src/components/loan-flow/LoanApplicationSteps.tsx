@@ -3,7 +3,7 @@ import React from 'react';
 import { LoanProductType } from '@/types/loan-application-flow';
 import LoanProductSelection from './LoanProductSelection';
 import AdvisorSelectionStep from './AdvisorSelectionStep';
-import SurveyForm from './SurveyForm';
+import OptimizedSurveyForm from './OptimizedSurveyForm';
 
 interface LoanApplicationStepsProps {
   currentStep: number;
@@ -38,7 +38,7 @@ const LoanApplicationSteps = ({
 
   if (currentStep === 2) {
     return (
-      <SurveyForm
+      <OptimizedSurveyForm
         formData={formData}
         onUpdateFormData={onUpdateFormData}
         onNext={onNext}

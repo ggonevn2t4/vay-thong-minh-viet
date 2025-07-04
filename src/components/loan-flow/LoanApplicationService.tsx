@@ -17,7 +17,10 @@ export class LoanApplicationService {
   static mapLoanType = (productType: LoanProductType): 'personal' | 'mortgage' | 'business' | 'auto' | 'education' | 'credit_loan' | 'mortgage_loan' => {
     const mapping: Record<LoanProductType, 'personal' | 'mortgage' | 'business' | 'auto' | 'education' | 'credit_loan' | 'mortgage_loan'> = {
       'credit_loan': 'credit_loan',
-      'mortgage_loan': 'mortgage_loan'
+      'mortgage_loan': 'mortgage_loan',
+      'car_loan': 'auto',
+      'business_loan': 'business', 
+      'education_loan': 'education'
     };
     return mapping[productType] || 'personal';
   };

@@ -1,5 +1,5 @@
 
-export type LoanProductType = 'credit_loan' | 'mortgage_loan';
+export type LoanProductType = 'credit_loan' | 'mortgage_loan' | 'car_loan' | 'business_loan' | 'education_loan';
 
 export interface LoanProduct {
   id: LoanProductType;
