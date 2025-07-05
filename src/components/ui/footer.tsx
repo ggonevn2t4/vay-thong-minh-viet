@@ -27,7 +27,7 @@ const Footer: React.FC = () => {
           <div className="group">
             <div className="flex items-center mb-8">
               <img 
-                src="/lovable-uploads/39f421fa-1206-4fe3-b6ab-286fd6740dbb.png" 
+                src="/lovable-uploads/a61032d1-360d-48f7-9e51-50e6d61d87b1.png" 
                 alt="Finzy Logo" 
                 className="h-12 w-auto group-hover:scale-105 transition-transform duration-300"
               />

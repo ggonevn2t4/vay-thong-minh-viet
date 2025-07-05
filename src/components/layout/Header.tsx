@@ -32,7 +32,7 @@ const Header = () => {
         <div className="flex items-center">
           <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/lovable-uploads/39f421fa-1206-4fe3-b6ab-286fd6740dbb.png" 
+              src="/lovable-uploads/a61032d1-360d-48f7-9e51-50e6d61d87b1.png" 
               alt="Finzy Logo" 
               className="h-8 w-auto"
             />
@@ -91,11 +91,11 @@ const Header = () => {
               className="flex items-center"
               onClick={() => setIsOpen(false)}
             >
-              <img 
-                src="/lovable-uploads/39f421fa-1206-4fe3-b6ab-286fd6740dbb.png" 
-                alt="Finzy Logo" 
-                className="h-6 w-auto"
-              />
+                <img 
+                  src="/lovable-uploads/a61032d1-360d-48f7-9e51-50e6d61d87b1.png" 
+                  alt="Finzy Logo" 
+                  className="h-6 w-auto"
+                />
             </Link>
             <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
               <div className="flex flex-col space-y-3">
