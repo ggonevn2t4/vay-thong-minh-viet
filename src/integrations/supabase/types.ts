@@ -189,6 +189,53 @@ export type Database = {
         }
         Relationships: []
       }
+      application_workflow_stages: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          loan_application_id: string
+          notes: string | null
+          stage_data: Json | null
+          stage_name: string
+          stage_status: string
+          started_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          loan_application_id: string
+          notes?: string | null
+          stage_data?: Json | null
+          stage_name: string
+          stage_status?: string
+          started_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          loan_application_id?: string
+          notes?: string | null
+          stage_data?: Json | null
+          stage_name?: string
+          stage_status?: string
+          started_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_workflow_stages_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bank_employee_profiles: {
         Row: {
           branch_code: string
@@ -257,14 +304,22 @@ export type Database = {
       bank_loan_offers: {
         Row: {
           advisor_id: string | null
+          bank_employee_notes: string | null
           bank_name: string
+          comparison_highlights: Json | null
           conditions: string | null
           created_at: string
+          customer_questions: Json | null
+          customer_responses: Json | null
           id: string
           interest_rate: number
           loan_application_id: string
+          offer_advantages: Json | null
           offer_expires_at: string | null
+          offer_type: string | null
           offered_amount: number
+          processing_time_days: number | null
+          required_documents: Json | null
           requires_cic_check: boolean | null
           status: string
           term_months: number
@@ -272,14 +327,22 @@ export type Database = {
         }
         Insert: {
           advisor_id?: string | null
+          bank_employee_notes?: string | null
           bank_name: string
+          comparison_highlights?: Json | null
           conditions?: string | null
           created_at?: string
+          customer_questions?: Json | null
+          customer_responses?: Json | null
           id?: string
           interest_rate: number
           loan_application_id: string
+          offer_advantages?: Json | null
           offer_expires_at?: string | null
+          offer_type?: string | null
           offered_amount: number
+          processing_time_days?: number | null
+          required_documents?: Json | null
           requires_cic_check?: boolean | null
           status?: string
           term_months: number
@@ -287,14 +350,22 @@ export type Database = {
         }
         Update: {
           advisor_id?: string | null
+          bank_employee_notes?: string | null
           bank_name?: string
+          comparison_highlights?: Json | null
           conditions?: string | null
           created_at?: string
+          customer_questions?: Json | null
+          customer_responses?: Json | null
           id?: string
           interest_rate?: number
           loan_application_id?: string
+          offer_advantages?: Json | null
           offer_expires_at?: string | null
+          offer_type?: string | null
           offered_amount?: number
+          processing_time_days?: number | null
+          required_documents?: Json | null
           requires_cic_check?: boolean | null
           status?: string
           term_months?: number
@@ -390,37 +461,99 @@ export type Database = {
       conversations: {
         Row: {
           advisor_id: string | null
+          conversation_metadata: Json | null
+          conversation_type: string | null
           created_at: string | null
           customer_id: string
           id: string
           last_message_at: string | null
           loan_application_id: string | null
+          priority_level: string | null
           status: string | null
           updated_at: string | null
+          workflow_stage: string | null
         }
         Insert: {
           advisor_id?: string | null
+          conversation_metadata?: Json | null
+          conversation_type?: string | null
           created_at?: string | null
           customer_id: string
           id?: string
           last_message_at?: string | null
           loan_application_id?: string | null
+          priority_level?: string | null
           status?: string | null
           updated_at?: string | null
+          workflow_stage?: string | null
         }
         Update: {
           advisor_id?: string | null
+          conversation_metadata?: Json | null
+          conversation_type?: string | null
           created_at?: string | null
           customer_id?: string
           id?: string
           last_message_at?: string | null
           loan_application_id?: string | null
+          priority_level?: string | null
+          status?: string | null
+          updated_at?: string | null
+          workflow_stage?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_bank_employee_matching: {
+        Row: {
+          assigned_at: string | null
+          assignment_type: string | null
+          bank_employee_id: string
+          created_at: string | null
+          customer_id: string
+          id: string
+          loan_application_id: string
+          matching_criteria: Json | null
+          matching_score: number | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assignment_type?: string | null
+          bank_employee_id: string
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          loan_application_id: string
+          matching_criteria?: Json | null
+          matching_score?: number | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assignment_type?: string | null
+          bank_employee_id?: string
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          loan_application_id?: string
+          matching_criteria?: Json | null
+          matching_score?: number | null
           status?: string | null
           updated_at?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "conversations_loan_application_id_fkey"
+            foreignKeyName: "customer_bank_employee_matching_loan_application_id_fkey"
             columns: ["loan_application_id"]
             isOneToOne: false
             referencedRelation: "loan_applications"
@@ -569,47 +702,62 @@ export type Database = {
       document_requests: {
         Row: {
           advisor_id: string | null
+          auto_generated: boolean | null
           customer_id: string
           description: string | null
+          document_category: string | null
           document_name: string
           document_type: string
           file_url: string | null
           id: string
+          legal_review_required: boolean | null
           loan_application_id: string | null
           notes: string | null
+          priority_level: string | null
           requested_at: string
           reviewed_at: string | null
           status: string
+          template_used: string | null
           uploaded_at: string | null
         }
         Insert: {
           advisor_id?: string | null
+          auto_generated?: boolean | null
           customer_id: string
           description?: string | null
+          document_category?: string | null
           document_name: string
           document_type: string
           file_url?: string | null
           id?: string
+          legal_review_required?: boolean | null
           loan_application_id?: string | null
           notes?: string | null
+          priority_level?: string | null
           requested_at?: string
           reviewed_at?: string | null
           status?: string
+          template_used?: string | null
           uploaded_at?: string | null
         }
         Update: {
           advisor_id?: string | null
+          auto_generated?: boolean | null
           customer_id?: string
           description?: string | null
+          document_category?: string | null
           document_name?: string
           document_type?: string
           file_url?: string | null
           id?: string
+          legal_review_required?: boolean | null
           loan_application_id?: string | null
           notes?: string | null
+          priority_level?: string | null
           requested_at?: string
           reviewed_at?: string | null
           status?: string
+          template_used?: string | null
           uploaded_at?: string | null
         }
         Relationships: [
@@ -949,6 +1097,65 @@ export type Database = {
           },
         ]
       }
+      legal_document_sharing: {
+        Row: {
+          access_expires_at: string | null
+          access_granted_at: string | null
+          bank_employee_id: string | null
+          created_at: string | null
+          customer_id: string
+          document_type: string
+          document_url: string
+          download_count: number | null
+          id: string
+          last_accessed_at: string | null
+          loan_application_id: string
+          sharing_permissions: Json | null
+          sharing_status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_expires_at?: string | null
+          access_granted_at?: string | null
+          bank_employee_id?: string | null
+          created_at?: string | null
+          customer_id: string
+          document_type: string
+          document_url: string
+          download_count?: number | null
+          id?: string
+          last_accessed_at?: string | null
+          loan_application_id: string
+          sharing_permissions?: Json | null
+          sharing_status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_expires_at?: string | null
+          access_granted_at?: string | null
+          bank_employee_id?: string | null
+          created_at?: string | null
+          customer_id?: string
+          document_type?: string
+          document_url?: string
+          download_count?: number | null
+          id?: string
+          last_accessed_at?: string | null
+          loan_application_id?: string
+          sharing_permissions?: Json | null
+          sharing_status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_document_sharing_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loan_application_reviews: {
         Row: {
           approval_amount: number | null
@@ -1010,16 +1217,23 @@ export type Database = {
           advisor_id: string | null
           advisor_notes: string | null
           amount: number
+          application_stage: string | null
+          bank_matching_criteria: Json | null
           bank_responses: Json | null
           collateral_info: Json | null
           created_at: string | null
           customer_education_completed: boolean | null
+          customer_priority_score: number | null
           customer_questions: Json | null
           employment_type: Database["public"]["Enums"]["employment_type"] | null
+          final_selected_offer_id: string | null
           id: string
+          legal_documents_shared: boolean | null
+          legal_documents_shared_at: string | null
           loan_to_value_ratio: number | null
           loan_type: Database["public"]["Enums"]["loan_type"]
           monthly_income: number | null
+          offer_comparison_data: Json | null
           offers_generated_at: string | null
           product_type: string | null
           property_address: string | null
@@ -1030,23 +1244,31 @@ export type Database = {
           total_offers_count: number | null
           updated_at: string | null
           user_id: string
+          workflow_status: string | null
         }
         Insert: {
           advisor_id?: string | null
           advisor_notes?: string | null
           amount: number
+          application_stage?: string | null
+          bank_matching_criteria?: Json | null
           bank_responses?: Json | null
           collateral_info?: Json | null
           created_at?: string | null
           customer_education_completed?: boolean | null
+          customer_priority_score?: number | null
           customer_questions?: Json | null
           employment_type?:
             | Database["public"]["Enums"]["employment_type"]
             | null
+          final_selected_offer_id?: string | null
           id?: string
+          legal_documents_shared?: boolean | null
+          legal_documents_shared_at?: string | null
           loan_to_value_ratio?: number | null
           loan_type: Database["public"]["Enums"]["loan_type"]
           monthly_income?: number | null
+          offer_comparison_data?: Json | null
           offers_generated_at?: string | null
           product_type?: string | null
           property_address?: string | null
@@ -1057,23 +1279,31 @@ export type Database = {
           total_offers_count?: number | null
           updated_at?: string | null
           user_id: string
+          workflow_status?: string | null
         }
         Update: {
           advisor_id?: string | null
           advisor_notes?: string | null
           amount?: number
+          application_stage?: string | null
+          bank_matching_criteria?: Json | null
           bank_responses?: Json | null
           collateral_info?: Json | null
           created_at?: string | null
           customer_education_completed?: boolean | null
+          customer_priority_score?: number | null
           customer_questions?: Json | null
           employment_type?:
             | Database["public"]["Enums"]["employment_type"]
             | null
+          final_selected_offer_id?: string | null
           id?: string
+          legal_documents_shared?: boolean | null
+          legal_documents_shared_at?: string | null
           loan_to_value_ratio?: number | null
           loan_type?: Database["public"]["Enums"]["loan_type"]
           monthly_income?: number | null
+          offer_comparison_data?: Json | null
           offers_generated_at?: string | null
           product_type?: string | null
           property_address?: string | null
@@ -1084,6 +1314,7 @@ export type Database = {
           total_offers_count?: number | null
           updated_at?: string | null
           user_id?: string
+          workflow_status?: string | null
         }
         Relationships: [
           {
@@ -1391,6 +1622,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      offer_comparisons_detailed: {
+        Row: {
+          comparison_criteria: Json | null
+          comparison_notes: string | null
+          created_at: string | null
+          customer_id: string
+          customer_preferences: Json | null
+          customer_selected_offer_id: string | null
+          id: string
+          legal_review_status: string | null
+          loan_application_id: string
+          offers_data: Json
+          recommended_offer_id: string | null
+          shared_with_legal: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          comparison_criteria?: Json | null
+          comparison_notes?: string | null
+          created_at?: string | null
+          customer_id: string
+          customer_preferences?: Json | null
+          customer_selected_offer_id?: string | null
+          id?: string
+          legal_review_status?: string | null
+          loan_application_id: string
+          offers_data?: Json
+          recommended_offer_id?: string | null
+          shared_with_legal?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          comparison_criteria?: Json | null
+          comparison_notes?: string | null
+          created_at?: string | null
+          customer_id?: string
+          customer_preferences?: Json | null
+          customer_selected_offer_id?: string | null
+          id?: string
+          legal_review_status?: string | null
+          loan_application_id?: string
+          offers_data?: Json
+          recommended_offer_id?: string | null
+          shared_with_legal?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_comparisons_detailed_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       points_transactions: {
         Row: {
@@ -1778,6 +2065,59 @@ export type Database = {
           },
         ]
       }
+      workflow_notifications: {
+        Row: {
+          acknowledged_at: string | null
+          action_required: boolean | null
+          action_url: string | null
+          created_at: string | null
+          id: string
+          loan_application_id: string
+          message: string
+          notification_type: string
+          read_at: string | null
+          recipient_id: string
+          title: string
+          workflow_stage: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          action_required?: boolean | null
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          loan_application_id: string
+          message: string
+          notification_type: string
+          read_at?: string | null
+          recipient_id: string
+          title: string
+          workflow_stage?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          action_required?: boolean | null
+          action_url?: string | null
+          created_at?: string | null
+          id?: string
+          loan_application_id?: string
+          message?: string
+          notification_type?: string
+          read_at?: string | null
+          recipient_id?: string
+          title?: string
+          workflow_stage?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_notifications_loan_application_id_fkey"
+            columns: ["loan_application_id"]
+            isOneToOne: false
+            referencedRelation: "loan_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1842,6 +2182,17 @@ export type Database = {
     }
     Enums: {
       app_role: "customer" | "advisor" | "admin" | "bank_employee"
+      application_stage_enum:
+        | "draft"
+        | "submitted"
+        | "under_review"
+        | "offers_pending"
+        | "offers_received"
+        | "customer_reviewing"
+        | "legal_review"
+        | "approved"
+        | "rejected"
+        | "completed"
       employment_type:
         | "employee"
         | "self_employed"
@@ -1866,6 +2217,15 @@ export type Database = {
         | "reward"
         | "refund"
         | "adjustment"
+      workflow_stage_enum:
+        | "initiated"
+        | "survey_completed"
+        | "employee_matched"
+        | "offers_received"
+        | "offers_compared"
+        | "legal_shared"
+        | "final_selection"
+        | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1982,6 +2342,18 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["customer", "advisor", "admin", "bank_employee"],
+      application_stage_enum: [
+        "draft",
+        "submitted",
+        "under_review",
+        "offers_pending",
+        "offers_received",
+        "customer_reviewing",
+        "legal_review",
+        "approved",
+        "rejected",
+        "completed",
+      ],
       employment_type: [
         "employee",
         "self_employed",
@@ -2008,6 +2380,16 @@ export const Constants = {
         "reward",
         "refund",
         "adjustment",
+      ],
+      workflow_stage_enum: [
+        "initiated",
+        "survey_completed",
+        "employee_matched",
+        "offers_received",
+        "offers_compared",
+        "legal_shared",
+        "final_selection",
+        "completed",
       ],
     },
   },
