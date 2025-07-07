@@ -39,6 +39,7 @@ import LoanApplication from "./pages/LoanApplication";
 import SupportTools from "./pages/SupportTools";
 import TestingDashboard from "./pages/TestingDashboard";
 import OfferManagement from "./pages/OfferManagement";
+import LegalDocumentFlow from "./pages/LegalDocumentFlow";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ function App() {
               <Route path="/so-sanh" element={<SoSanh />} />
               <Route path="/loan-application" element={<LoanApplication />} />
               <Route path="/offer-management" element={<OfferManagement />} />
+              <Route path="/legal-document-flow" element={<LegalDocumentFlow />} />
               <Route path="/support-tools" element={<SupportTools />} />
               <Route path="/testing" element={<TestingDashboard />} />
               {/* Vietnamese path aliases for better user experience */}
