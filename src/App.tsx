@@ -36,6 +36,7 @@ import KetQua from "./pages/KetQua";
 import SoSanh from "./pages/SoSanh";
 import LoanApplication from "./pages/LoanApplication";
 import SupportTools from "./pages/SupportTools";
+import TestingDashboard from "./pages/TestingDashboard";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ function App() {
               <Route path="/so-sanh" element={<SoSanh />} />
               <Route path="/loan-application" element={<LoanApplication />} />
               <Route path="/support-tools" element={<SupportTools />} />
+              <Route path="/testing" element={<TestingDashboard />} />
               {/* Vietnamese path aliases for better user experience */}
               <Route path="/kiem-tra-dieu-kien" element={<LoanEligibility />} />
               <Route path="/tu-van-ai" element={<AIAdvisory />} />
