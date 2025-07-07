@@ -15,6 +15,7 @@ import RoleBasedDashboard from "./components/dashboard/RoleBasedDashboard";
 import Messages from "./pages/Messages";
 import Marketplace from "./pages/Marketplace";
 import AdvisorDirectory from "./pages/AdvisorDirectory";
+import AdvisorMarketplace from "./pages/AdvisorMarketplace";
 import AdvisorProfile from "./pages/AdvisorProfile";
 import AdvisorProfileDetail from "./pages/AdvisorProfileDetail";
 import LoanComparison from "./pages/LoanComparison";
@@ -60,7 +61,7 @@ function App() {
               <Route path="/bank-employee-dashboard" element={<BankEmployeeDashboard />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/advisor-directory" element={<AdvisorDirectory />} />
+              <Route path="/advisor-marketplace" element={<AdvisorMarketplace />} />
               <Route path="/advisor-profile" element={<AdvisorProfile />} />
               <Route path="/advisor/:id" element={<AdvisorProfileDetail />} />
               <Route path="/loan-comparison" element={<LoanComparison />} />

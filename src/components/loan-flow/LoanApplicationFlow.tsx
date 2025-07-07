@@ -6,7 +6,7 @@ import LoanProductSelectionGrid, { LoanProduct } from './LoanProductSelectionGri
 import LoanApplicationSteps from './LoanApplicationSteps';
 import BasicInformationSurvey from './BasicInformationSurvey';
 import LegalInformationSurvey from './LegalInformationSurvey';
-import AdvisorSelectionStep from './AdvisorSelectionStep';
+import EnhancedAdvisorSelectionStep from './EnhancedAdvisorSelectionStep';
 import LoanApplicationProgress from './LoanApplicationProgress';
 import { LoanApplicationService } from './LoanApplicationService';
 import { Card, CardContent } from '@/components/ui/card';
@@ -237,7 +237,7 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
         )}
 
         {currentStep === 'advisor-selection' && (
-          <AdvisorSelectionStep
+          <EnhancedAdvisorSelectionStep
             selectedProductType={selectedLoanProduct?.productType || 'credit_loan'}
             onSelectAdvisor={handleAdvisorSelect}
             onBack={handleBackStep}
