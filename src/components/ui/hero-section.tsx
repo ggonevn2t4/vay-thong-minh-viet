@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { Mockup, MockupFrame } from "@/components/ui/mockup";
 import { Glow } from "@/components/ui/glow";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface HeroAction {
   text: string;
@@ -50,10 +51,10 @@ export function HeroSection({
           {badge && (
             <Badge variant="outline" className="animate-appear gap-2">
               <span className="text-muted-foreground">{badge.text}</span>
-              <a href={badge.action.href} className="flex items-center gap-1">
+              <Link to={badge.action.href} className="flex items-center gap-1">
                 {badge.action.text}
                 <ArrowRight className="h-3 w-3" />
-              </a>
+              </Link>
             </Badge>
           )}
 
@@ -71,10 +72,10 @@ export function HeroSection({
           <div className="relative z-10 flex animate-appear justify-center gap-4 opacity-0 delay-300">
             {actions.map((action, index) => (
               <Button key={index} variant={action.variant || "default"} size="lg" asChild>
-                <a href={action.href} className="flex items-center gap-2">
+                <Link to={action.href} className="flex items-center gap-2">
                   {action.icon}
                   {action.text}
-                </a>
+                </Link>
               </Button>
             ))}
           </div>
