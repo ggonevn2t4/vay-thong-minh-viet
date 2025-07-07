@@ -4,7 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import LoanProductSelectionGrid, { LoanProduct } from './LoanProductSelectionGrid';
 import LoanApplicationSteps from './LoanApplicationSteps';
-import SurveyForm from './SurveyForm';
+import BasicInformationSurvey from './BasicInformationSurvey';
+import LegalInformationSurvey from './LegalInformationSurvey';
 import AdvisorSelectionStep from './AdvisorSelectionStep';
 import LoanApplicationProgress from './LoanApplicationProgress';
 import { LoanApplicationService } from './LoanApplicationService';
@@ -13,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
-type ApplicationStep = 'product-selection' | 'survey' | 'advisor-selection' | 'completion';
+type ApplicationStep = 'product-selection' | 'basic-survey' | 'advisor-selection' | 'legal-survey' | 'completion';
 
 interface LoanApplicationFlowProps {
   fromMarketplace?: boolean;
@@ -30,7 +31,11 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
   
   const [currentStep, setCurrentStep] = useState<ApplicationStep>('product-selection');
   const [selectedLoanProduct, setSelectedLoanProduct] = useState<LoanProduct | null>(null);
-  const [surveyData, setSurveyData] = useState<any>({
+  const [basicSurveyData, setBasicSurveyData] = useState<any>({
+    product_type: 'credit_loan',
+    customer_questions: {}
+  });
+  const [legalSurveyData, setLegalSurveyData] = useState<any>({
     product_type: 'credit_loan',
     customer_questions: {}
   });
@@ -43,48 +48,78 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
     const state = location.state as any;
     if (state?.selectedProduct) {
       setSelectedLoanProduct(state.selectedProduct);
-      setCurrentStep('survey');
+      setCurrentStep('basic-survey');
     }
   }, [location.state]);
 
   const handleProductSelect = (product: LoanProduct) => {
     console.log('Selected product:', product);
     setSelectedLoanProduct(product);
-    setSurveyData(prev => ({
+    setBasicSurveyData(prev => ({
       ...prev,
       product_type: product.productType
     }));
-    setCurrentStep('survey');
+    setLegalSurveyData(prev => ({
+      ...prev,
+      product_type: product.productType
+    }));
+    setCurrentStep('basic-survey');
     toast.success(`Đã chọn sản phẩm: ${product.name}`);
   };
 
-  const handleSurveyComplete = (data: any) => {
-    console.log('Survey completed:', data);
-    setSurveyData(data);
+  const handleBasicSurveyComplete = (data: any) => {
+    console.log('Basic survey completed:', data);
+    setBasicSurveyData(data);
     setCurrentStep('advisor-selection');
   };
 
-  const handleAdvisorSelect = async (advisorId: string) => {
-    if (!user || !selectedLoanProduct || !surveyData) {
+  const handleLegalSurveyComplete = (data: any) => {
+    console.log('Legal survey completed:', data);
+    setLegalSurveyData(data);
+    setCurrentStep('completion');
+  };
+
+  const handleAdvisorSelect = async (advisorId: string, advisorInfo?: any) => {
+    if (!user || !selectedLoanProduct || !basicSurveyData) {
       toast.error('Thiếu thông tin cần thiết để hoàn thành yêu cầu');
       return;
     }
 
     console.log('Selected advisor ID:', advisorId);
+    
+    // Store advisor info and move to legal survey
+    setSelectedAdvisor(advisorInfo || { id: advisorId, full_name: 'Tư vấn viên', bank_name: 'Ngân hàng' });
+    setCurrentStep('legal-survey');
+    toast.success('Đã chọn tư vấn viên! Vui lòng hoàn thành thông tin pháp lý.');
+  };
+
+  const handleCompleteApplication = async () => {
+    if (!user || !selectedLoanProduct || !basicSurveyData || !selectedAdvisor) {
+      toast.error('Thiếu thông tin cần thiết để hoàn thành yêu cầu');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      // Merge basic and legal survey data
+      const combinedSurveyData = {
+        ...basicSurveyData,
+        customer_questions: {
+          ...basicSurveyData.customer_questions,
+          ...legalSurveyData.customer_questions
+        }
+      };
+
       // Complete the application through the service
       const result = await LoanApplicationService.completeApplication(
         user.id,
         selectedLoanProduct.productType,
-        surveyData,
-        advisorId
+        combinedSurveyData,
+        selectedAdvisor.id
       );
 
       setApplicationResult(result);
-      setSelectedAdvisor({ id: advisorId, full_name: 'Tư vấn viên', bank_name: 'Ngân hàng' });
-      setCurrentStep('completion');
       toast.success('Yêu cầu vay đã được gửi thành công!');
     } catch (error) {
       console.error('Error submitting application:', error);
@@ -95,15 +130,19 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
 
   const handleBackStep = () => {
     switch (currentStep) {
-      case 'survey':
+      case 'basic-survey':
         setCurrentStep('product-selection');
         setSelectedLoanProduct(null);
         break;
       case 'advisor-selection':
-        setCurrentStep('survey');
+        setCurrentStep('basic-survey');
+        break;
+      case 'legal-survey':
+        setCurrentStep('advisor-selection');
+        setSelectedAdvisor(null);
         break;
       case 'completion':
-        setCurrentStep('advisor-selection');
+        setCurrentStep('legal-survey');
         break;
       default:
         navigate('/');
@@ -113,9 +152,10 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
   const getStepNumber = (): number => {
     switch (currentStep) {
       case 'product-selection': return 1;
-      case 'survey': return 2;
+      case 'basic-survey': return 2;
       case 'advisor-selection': return 3;
-      case 'completion': return 4;
+      case 'legal-survey': return 4;
+      case 'completion': return 5;
       default: return 1;
     }
   };
@@ -123,8 +163,9 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
   const getStepTitle = (): string => {
     switch (currentStep) {
       case 'product-selection': return 'Chọn sản phẩm vay';
-      case 'survey': return 'Thông tin cá nhân';
+      case 'basic-survey': return 'Thông tin cơ bản';
       case 'advisor-selection': return 'Chọn tư vấn viên';
+      case 'legal-survey': return 'Thông tin pháp lý';
       case 'completion': return 'Hoàn thành';
       default: return 'Đăng ký khoản vay';
     }
@@ -167,13 +208,13 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
             <div>
               <h1 className="text-2xl font-bold text-gray-800">{getStepTitle()}</h1>
               <p className="text-gray-600">
-                Bước {getStepNumber()}/4: {getStepTitle()}
+                Bước {getStepNumber()}/5: {getStepTitle()}
               </p>
             </div>
           </div>
         </div>
         
-        <LoanApplicationProgress currentStep={getStepNumber()} totalSteps={4} />
+        <LoanApplicationProgress currentStep={getStepNumber()} totalSteps={5} />
       </div>
 
       {/* Step Content */}
@@ -186,11 +227,11 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
           />
         )}
 
-        {currentStep === 'survey' && selectedLoanProduct && (
-          <SurveyForm
-            formData={surveyData}
-            onUpdateFormData={setSurveyData}
-            onNext={() => handleSurveyComplete(surveyData)}
+        {currentStep === 'basic-survey' && selectedLoanProduct && (
+          <BasicInformationSurvey
+            formData={basicSurveyData}
+            onUpdateFormData={setBasicSurveyData}
+            onNext={() => handleBasicSurveyComplete(basicSurveyData)}
             onBack={handleBackStep}
           />
         )}
@@ -201,6 +242,19 @@ const LoanApplicationFlow: React.FC<LoanApplicationFlowProps> = ({
             onSelectAdvisor={handleAdvisorSelect}
             onBack={handleBackStep}
             isSubmitting={isSubmitting}
+          />
+        )}
+
+        {currentStep === 'legal-survey' && selectedLoanProduct && (
+          <LegalInformationSurvey
+            formData={legalSurveyData}
+            onUpdateFormData={setLegalSurveyData}
+            onNext={() => {
+              handleLegalSurveyComplete(legalSurveyData);
+              handleCompleteApplication();
+            }}
+            onBack={handleBackStep}
+            advisorInfo={selectedAdvisor}
           />
         )}
 
