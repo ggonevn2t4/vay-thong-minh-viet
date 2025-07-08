@@ -41,6 +41,7 @@ import TestingDashboard from "./pages/TestingDashboard";
 import OfferManagement from "./pages/OfferManagement";
 import LegalDocumentFlow from "./pages/LegalDocumentFlow";
 import EnhancedCommunication from "./pages/EnhancedCommunication";
+import CreditCardSurvey from "./pages/CreditCardSurvey";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,7 @@ function App() {
               <Route path="/offer-management" element={<OfferManagement />} />
               <Route path="/legal-document-flow" element={<LegalDocumentFlow />} />
               <Route path="/enhanced-communication" element={<EnhancedCommunication />} />
+              <Route path="/credit-card-survey" element={<CreditCardSurvey />} />
               <Route path="/support-tools" element={<SupportTools />} />
               <Route path="/testing" element={<TestingDashboard />} />
               {/* Vietnamese path aliases for better user experience */}
