@@ -14,7 +14,13 @@ const RoleBasedDashboard = () => {
   
   const { userRole, user, loading } = useAuth();
   
-  console.log('Auth state in RoleBasedDashboard:', { userRole, user: user?.id, loading });
+  console.log('Auth state in RoleBasedDashboard:', { 
+    userRole, 
+    user: user?.id, 
+    userEmail: user?.email,
+    loading,
+    hasUser: !!user
+  });
 
   if (loading) {
     console.log('Auth is still loading, showing loading screen');
