@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Mail, Phone, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import CompanyBankInfo from '@/components/CompanyBankInfo';
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Tên phải có ít nhất 2 ký tự"
@@ -81,6 +82,11 @@ const ContactForm = () => {
                     <p className="text-gray-600">Hỗ trợ trực tuyến 24/7</p>
                   </div>
                 </div>
+              </div>
+
+              {/* Company Bank Information */}
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <CompanyBankInfo compact />
               </div>
             </div>
             

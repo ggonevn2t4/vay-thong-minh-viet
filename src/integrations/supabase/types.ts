@@ -463,6 +463,54 @@ export type Database = {
           },
         ]
       }
+      company_bank_accounts: {
+        Row: {
+          account_holder_name: string
+          account_number: string
+          account_type: string | null
+          bank_code: string | null
+          bank_name: string
+          branch_name: string | null
+          created_at: string
+          currency: string | null
+          id: string
+          is_active: boolean | null
+          is_primary: boolean | null
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_holder_name: string
+          account_number: string
+          account_type?: string | null
+          bank_code?: string | null
+          bank_name: string
+          branch_name?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_holder_name?: string
+          account_number?: string
+          account_type?: string | null
+          bank_code?: string | null
+          bank_name?: string
+          branch_name?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_primary?: boolean | null
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           advisor_id: string | null
