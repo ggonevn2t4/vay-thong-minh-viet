@@ -386,6 +386,135 @@ export type Database = {
           },
         ]
       }
+      car_loan_survey_responses: {
+        Row: {
+          car_brand: string | null
+          car_model: string | null
+          car_type: string | null
+          car_value: number | null
+          created_at: string
+          credit_history_details: string | null
+          credit_history_issues: boolean | null
+          current_vehicle_info: Json | null
+          date_of_birth: string | null
+          down_payment_amount: number | null
+          driving_experience_years: number | null
+          email: string | null
+          employer_name: string | null
+          employment_status: string
+          estimated_credit_score: number | null
+          existing_loans: Json | null
+          full_name: string
+          id: string
+          insurance_requirement: string | null
+          interest_rate_preference: string | null
+          job_title: string | null
+          loan_amount_needed: number | null
+          loan_term_years: number | null
+          marital_status: string | null
+          monthly_expenses: number | null
+          monthly_salary: number | null
+          number_of_dependents: number | null
+          other_income_sources: Json | null
+          payment_schedule_preference: string | null
+          phone_number: string
+          preferred_banks: Json | null
+          previous_car_loans: boolean | null
+          recommended_products: Json | null
+          risk_assessment: Json | null
+          savings_amount: number | null
+          survey_completed_at: string | null
+          total_monthly_income: number | null
+          updated_at: string
+          user_id: string
+          work_experience_years: number | null
+        }
+        Insert: {
+          car_brand?: string | null
+          car_model?: string | null
+          car_type?: string | null
+          car_value?: number | null
+          created_at?: string
+          credit_history_details?: string | null
+          credit_history_issues?: boolean | null
+          current_vehicle_info?: Json | null
+          date_of_birth?: string | null
+          down_payment_amount?: number | null
+          driving_experience_years?: number | null
+          email?: string | null
+          employer_name?: string | null
+          employment_status: string
+          estimated_credit_score?: number | null
+          existing_loans?: Json | null
+          full_name: string
+          id?: string
+          insurance_requirement?: string | null
+          interest_rate_preference?: string | null
+          job_title?: string | null
+          loan_amount_needed?: number | null
+          loan_term_years?: number | null
+          marital_status?: string | null
+          monthly_expenses?: number | null
+          monthly_salary?: number | null
+          number_of_dependents?: number | null
+          other_income_sources?: Json | null
+          payment_schedule_preference?: string | null
+          phone_number: string
+          preferred_banks?: Json | null
+          previous_car_loans?: boolean | null
+          recommended_products?: Json | null
+          risk_assessment?: Json | null
+          savings_amount?: number | null
+          survey_completed_at?: string | null
+          total_monthly_income?: number | null
+          updated_at?: string
+          user_id: string
+          work_experience_years?: number | null
+        }
+        Update: {
+          car_brand?: string | null
+          car_model?: string | null
+          car_type?: string | null
+          car_value?: number | null
+          created_at?: string
+          credit_history_details?: string | null
+          credit_history_issues?: boolean | null
+          current_vehicle_info?: Json | null
+          date_of_birth?: string | null
+          down_payment_amount?: number | null
+          driving_experience_years?: number | null
+          email?: string | null
+          employer_name?: string | null
+          employment_status?: string
+          estimated_credit_score?: number | null
+          existing_loans?: Json | null
+          full_name?: string
+          id?: string
+          insurance_requirement?: string | null
+          interest_rate_preference?: string | null
+          job_title?: string | null
+          loan_amount_needed?: number | null
+          loan_term_years?: number | null
+          marital_status?: string | null
+          monthly_expenses?: number | null
+          monthly_salary?: number | null
+          number_of_dependents?: number | null
+          other_income_sources?: Json | null
+          payment_schedule_preference?: string | null
+          phone_number?: string
+          preferred_banks?: Json | null
+          previous_car_loans?: boolean | null
+          recommended_products?: Json | null
+          risk_assessment?: Json | null
+          savings_amount?: number | null
+          survey_completed_at?: string | null
+          total_monthly_income?: number | null
+          updated_at?: string
+          user_id?: string
+          work_experience_years?: number | null
+        }
+        Relationships: []
+      }
       chat_sessions: {
         Row: {
           created_at: string | null
@@ -1135,6 +1264,129 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      home_loan_survey_responses: {
+        Row: {
+          created_at: string
+          credit_history_details: string | null
+          credit_history_issues: boolean | null
+          date_of_birth: string | null
+          down_payment_amount: number | null
+          email: string | null
+          employer_name: string | null
+          employment_status: string
+          estimated_credit_score: number | null
+          existing_loans: Json | null
+          full_name: string
+          id: string
+          interest_rate_preference: string | null
+          job_title: string | null
+          loan_amount_needed: number | null
+          loan_purpose: string | null
+          loan_term_years: number | null
+          marital_status: string | null
+          monthly_expenses: number | null
+          monthly_salary: number | null
+          number_of_dependents: number | null
+          other_assets: Json | null
+          other_income_sources: Json | null
+          payment_schedule_preference: string | null
+          phone_number: string
+          preferred_banks: Json | null
+          previous_property_ownership: boolean | null
+          property_location: string | null
+          property_type: string | null
+          property_value: number | null
+          recommended_products: Json | null
+          risk_assessment: Json | null
+          savings_amount: number | null
+          survey_completed_at: string | null
+          total_monthly_income: number | null
+          updated_at: string
+          user_id: string
+          work_experience_years: number | null
+        }
+        Insert: {
+          created_at?: string
+          credit_history_details?: string | null
+          credit_history_issues?: boolean | null
+          date_of_birth?: string | null
+          down_payment_amount?: number | null
+          email?: string | null
+          employer_name?: string | null
+          employment_status: string
+          estimated_credit_score?: number | null
+          existing_loans?: Json | null
+          full_name: string
+          id?: string
+          interest_rate_preference?: string | null
+          job_title?: string | null
+          loan_amount_needed?: number | null
+          loan_purpose?: string | null
+          loan_term_years?: number | null
+          marital_status?: string | null
+          monthly_expenses?: number | null
+          monthly_salary?: number | null
+          number_of_dependents?: number | null
+          other_assets?: Json | null
+          other_income_sources?: Json | null
+          payment_schedule_preference?: string | null
+          phone_number: string
+          preferred_banks?: Json | null
+          previous_property_ownership?: boolean | null
+          property_location?: string | null
+          property_type?: string | null
+          property_value?: number | null
+          recommended_products?: Json | null
+          risk_assessment?: Json | null
+          savings_amount?: number | null
+          survey_completed_at?: string | null
+          total_monthly_income?: number | null
+          updated_at?: string
+          user_id: string
+          work_experience_years?: number | null
+        }
+        Update: {
+          created_at?: string
+          credit_history_details?: string | null
+          credit_history_issues?: boolean | null
+          date_of_birth?: string | null
+          down_payment_amount?: number | null
+          email?: string | null
+          employer_name?: string | null
+          employment_status?: string
+          estimated_credit_score?: number | null
+          existing_loans?: Json | null
+          full_name?: string
+          id?: string
+          interest_rate_preference?: string | null
+          job_title?: string | null
+          loan_amount_needed?: number | null
+          loan_purpose?: string | null
+          loan_term_years?: number | null
+          marital_status?: string | null
+          monthly_expenses?: number | null
+          monthly_salary?: number | null
+          number_of_dependents?: number | null
+          other_assets?: Json | null
+          other_income_sources?: Json | null
+          payment_schedule_preference?: string | null
+          phone_number?: string
+          preferred_banks?: Json | null
+          previous_property_ownership?: boolean | null
+          property_location?: string | null
+          property_type?: string | null
+          property_value?: number | null
+          recommended_products?: Json | null
+          risk_assessment?: Json | null
+          savings_amount?: number | null
+          survey_completed_at?: string | null
+          total_monthly_income?: number | null
+          updated_at?: string
+          user_id?: string
+          work_experience_years?: number | null
+        }
+        Relationships: []
       }
       interest_rate_alerts: {
         Row: {
@@ -2066,6 +2318,57 @@ export type Database = {
           id?: string
           is_active?: boolean
           token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      real_time_notifications: {
+        Row: {
+          action_label: string | null
+          action_url: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_dismissed: boolean | null
+          is_read: boolean | null
+          message: string
+          metadata: Json | null
+          priority: string | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_label?: string | null
+          action_url?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          message: string
+          metadata?: Json | null
+          priority?: string | null
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_label?: string | null
+          action_url?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          message?: string
+          metadata?: Json | null
+          priority?: string | null
+          title?: string
+          type?: string
           updated_at?: string
           user_id?: string
         }

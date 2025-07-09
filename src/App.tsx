@@ -42,6 +42,8 @@ import OfferManagement from "./pages/OfferManagement";
 import LegalDocumentFlow from "./pages/LegalDocumentFlow";
 import EnhancedCommunication from "./pages/EnhancedCommunication";
 import CreditCardSurvey from "./pages/CreditCardSurvey";
+import HomeLoanSurvey from "./pages/HomeLoanSurvey";
+import CarLoanSurvey from "./pages/CarLoanSurvey";
 import CompanySettings from "./pages/CompanySettings";
 
 const queryClient = new QueryClient();
@@ -91,6 +93,8 @@ function App() {
               <Route path="/legal-document-flow" element={<LegalDocumentFlow />} />
               <Route path="/enhanced-communication" element={<EnhancedCommunication />} />
               <Route path="/credit-card-survey" element={<CreditCardSurvey />} />
+              <Route path="/home-loan-survey" element={<HomeLoanSurvey />} />
+              <Route path="/car-loan-survey" element={<CarLoanSurvey />} />
               <Route path="/company-settings" element={<CompanySettings />} />
               <Route path="/support-tools" element={<SupportTools />} />
               <Route path="/testing" element={<TestingDashboard />} />
