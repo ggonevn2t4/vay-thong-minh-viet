@@ -11,7 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Calculator, CreditCard } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2, Calculator, CreditCard, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -49,7 +49,9 @@ interface SurveyData {
   jobTitle: string;
   workExperienceYears: number;
   monthlySalary: number;
-  otherIncomeSources: IncomeSource[];
+  businessIncome: number;
+  rentalIncome: number;
+  otherIncome: number;
   
   // Financial Information
   existingCreditCards: CreditCard[];
@@ -82,18 +84,22 @@ const CreditCardSurveyForm = () => {
   const watchedValues = watch();
   const [calculatedTotalIncome, setCalculatedTotalIncome] = useState(0);
   const [estimatedCreditScore, setEstimatedCreditScore] = useState(0);
+  const [desiredCreditLimit, setDesiredCreditLimit] = useState([100000000]); // Default 100 million VNĐ
 
   // Dynamic form arrays
   const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
   const [loans, setLoans] = useState<Loan[]>([]);
-  const [incomeSource, setIncomeSource] = useState<IncomeSource[]>([]);
 
   // Calculate total income
   useEffect(() => {
     const salary = watchedValues.monthlySalary || 0;
-    const otherIncome = incomeSource.reduce((sum, source) => sum + (source.amount || 0), 0);
-    setCalculatedTotalIncome(salary + otherIncome);
-  }, [watchedValues.monthlySalary, incomeSource]);
+    const business = watchedValues.businessIncome || 0;
+    const rental = watchedValues.rentalIncome || 0;
+    const other = watchedValues.otherIncome || 0;
+    const total = salary + business + rental + other;
+    setCalculatedTotalIncome(total);
+    setValue('totalMonthlyIncome' as any, total);
+  }, [watchedValues.monthlySalary, watchedValues.businessIncome, watchedValues.rentalIncome, watchedValues.otherIncome, setValue]);
 
   // Calculate estimated credit score
   useEffect(() => {
@@ -130,14 +136,6 @@ const CreditCardSurveyForm = () => {
     setLoans(loans.filter((_, i) => i !== index));
   };
 
-  const addIncomeSource = () => {
-    setIncomeSource([...incomeSource, { source: '', amount: 0 }]);
-  };
-
-  const removeIncomeSource = (index: number) => {
-    setIncomeSource(incomeSource.filter((_, i) => i !== index));
-  };
-
   const nextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
@@ -171,13 +169,17 @@ const CreditCardSurveyForm = () => {
         job_title: data.jobTitle,
         work_experience_years: data.workExperienceYears,
         monthly_salary: data.monthlySalary,
-        other_income_sources: incomeSource,
+        other_income_sources: [
+          { source: 'business', amount: data.businessIncome || 0 },
+          { source: 'rental', amount: data.rentalIncome || 0 },
+          { source: 'other', amount: data.otherIncome || 0 }
+        ],
         total_monthly_income: calculatedTotalIncome,
         existing_credit_cards: creditCards,
         existing_loans: loans,
         monthly_expenses: data.monthlyExpenses,
         savings_amount: data.savingsAmount,
-        desired_credit_limit: data.desiredCreditLimit,
+        desired_credit_limit: desiredCreditLimit[0],
         primary_card_usage: data.primaryCardUsage,
         preferred_benefits: data.preferredBenefits,
         annual_fee_preference: data.annualFeePreference,
@@ -215,7 +217,7 @@ const CreditCardSurveyForm = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-lg font-semibold">Thông tin cá nhân</h3>
+              <h3 className="text-lg font-semibold">1. Thông Tin Cá Nhân Bổ Sung</h3>
               <p className="text-muted-foreground">Vui lòng cung cấp thông tin cơ bản của bạn</p>
             </div>
             
@@ -271,7 +273,7 @@ const CreditCardSurveyForm = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label>Tình trạng hôn nhân</Label>
+                <Label>Tình trạng hôn nhân *</Label>
                 <Select onValueChange={(value) => setValue('maritalStatus', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Chọn tình trạng" />
@@ -296,6 +298,35 @@ const CreditCardSurveyForm = () => {
                 />
               </div>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Quốc tịch *</Label>
+                <Select defaultValue="vietnam">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="vietnam">Việt Nam</SelectItem>
+                    <SelectItem value="other">Khác</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label>Tiền tệ ưa chuộng khi chi tiêu *</Label>
+                <Select defaultValue="vnd">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="vnd">Việt Nam Đồng</SelectItem>
+                    <SelectItem value="usd">USD</SelectItem>
+                    <SelectItem value="other">Khác</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
         );
 
@@ -303,121 +334,81 @@ const CreditCardSurveyForm = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-lg font-semibold">Thông tin việc làm và thu nhập</h3>
+              <h3 className="text-lg font-semibold">2. Thông Tin Nghề Nghiệp</h3>
               <p className="text-muted-foreground">Cung cấp thông tin về công việc và thu nhập của bạn</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Tình trạng việc làm *</Label>
-                <Select onValueChange={(value) => setValue('employmentStatus', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Chọn tình trạng" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="employed">Đang làm việc</SelectItem>
-                    <SelectItem value="self-employed">Tự kinh doanh</SelectItem>
-                    <SelectItem value="unemployed">Thất nghiệp</SelectItem>
-                    <SelectItem value="retired">Đã nghỉ hưu</SelectItem>
-                    <SelectItem value="student">Sinh viên</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="workExperienceYears">Số năm kinh nghiệm</Label>
-                <Input
-                  id="workExperienceYears"
-                  type="number"
-                  {...register('workExperienceYears', { valueAsNumber: true })}
-                  placeholder="5"
-                  min="0"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="employerName">Tên công ty</Label>
-                <Input
-                  id="employerName"
-                  {...register('employerName')}
-                  placeholder="Công ty ABC"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="jobTitle">Chức vụ</Label>
-                <Input
-                  id="jobTitle"
-                  {...register('jobTitle')}
-                  placeholder="Nhân viên kế toán"
-                />
-              </div>
-            </div>
-
             <div>
-              <Label htmlFor="monthlySalary">Lương hàng tháng (VNĐ) *</Label>
-              <Input
-                id="monthlySalary"
-                type="number"
-                {...register('monthlySalary', { 
-                  required: 'Vui lòng nhập lương hàng tháng',
-                  valueAsNumber: true 
-                })}
-                placeholder="15000000"
-              />
-              {errors.monthlySalary && (
-                <p className="text-sm text-destructive mt-1">{errors.monthlySalary.message}</p>
-              )}
+              <Label>Tình trạng nghề nghiệp chính *</Label>
+              <Select onValueChange={(value) => setValue('employmentStatus', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn loại hình" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="salaried">Nhân viên lương</SelectItem>
+                  <SelectItem value="self-employed">Tự kinh doanh</SelectItem>
+                  <SelectItem value="rental">Thu nhập từ cho thuê</SelectItem>
+                  <SelectItem value="other">Khác</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <Label>Nguồn thu nhập khác</Label>
-                <Button type="button" variant="outline" size="sm" onClick={addIncomeSource}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Thêm
-                </Button>
-              </div>
-              
-              {incomeSource.map((source, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <Input
-                    placeholder="Nguồn thu nhập"
-                    value={source.source}
-                    onChange={(e) => {
-                      const updated = [...incomeSource];
-                      updated[index].source = e.target.value;
-                      setIncomeSource(updated);
-                    }}
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Số tiền"
-                    value={source.amount}
-                    onChange={(e) => {
-                      const updated = [...incomeSource];
-                      updated[index].amount = parseFloat(e.target.value) || 0;
-                      setIncomeSource(updated);
-                    }}
-                  />
-                  <Button type="button" variant="outline" size="sm" onClick={() => removeIncomeSource(index)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+            {/* Dynamic sections based on employment type */}
+            {watchedValues.employmentStatus === 'salaried' && (
+              <Card className="p-4 bg-blue-50 border-blue-200">
+                <h4 className="font-medium mb-4">Thông tin nhân viên lương</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="employerName">Tên công ty</Label>
+                    <Input
+                      id="employerName"
+                      {...register('employerName')}
+                      placeholder="Công ty ABC"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="jobTitle">Chức vụ</Label>
+                    <Input
+                      id="jobTitle"
+                      {...register('jobTitle')}
+                      placeholder="Nhân viên kế toán"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="workExperienceYears">Số năm kinh nghiệm</Label>
+                    <Input
+                      id="workExperienceYears"
+                      type="number"
+                      {...register('workExperienceYears', { valueAsNumber: true })}
+                      placeholder="5"
+                      min="0"
+                    />
+                  </div>
                 </div>
-              ))}
-            </div>
+              </Card>
+            )}
 
-            <div className="p-4 bg-muted rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Calculator className="h-5 w-5" />
-                <span className="font-medium">Tổng thu nhập hàng tháng</span>
-              </div>
-              <p className="text-2xl font-bold text-primary">
-                {calculatedTotalIncome.toLocaleString('vi-VN')} VNĐ
-              </p>
-            </div>
+            {watchedValues.employmentStatus === 'self-employed' && (
+              <Card className="p-4 bg-green-50 border-green-200">
+                <h4 className="font-medium mb-4">Thông tin tự kinh doanh</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="businessName">Tên doanh nghiệp</Label>
+                    <Input
+                      id="businessName"
+                      placeholder="Cửa hàng XYZ"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="businessType">Loại hình kinh doanh</Label>
+                    <Input
+                      id="businessType"
+                      placeholder="Bán lẻ, Dịch vụ..."
+                    />
+                  </div>
+                </div>
+              </Card>
+            )}
           </div>
         );
 
@@ -425,8 +416,115 @@ const CreditCardSurveyForm = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-lg font-semibold">Thông tin tài chính hiện tại</h3>
-              <p className="text-muted-foreground">Chi tiết về thẻ tín dụng và khoản vay hiện có</p>
+              <h3 className="text-lg font-semibold">3. Thông Tin Tài Chính</h3>
+              <p className="text-muted-foreground">Chi tiết về thu nhập và tình hình tài chính</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="monthlySalary">Thu nhập từ lương (VNĐ)</Label>
+                <Input
+                  id="monthlySalary"
+                  type="number"
+                  {...register('monthlySalary', { valueAsNumber: true })}
+                  placeholder="15,000,000"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="businessIncome">Thu nhập từ kinh doanh (VNĐ)</Label>
+                <Input
+                  id="businessIncome"
+                  type="number"
+                  {...register('businessIncome', { valueAsNumber: true })}
+                  placeholder="10,000,000"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="rentalIncome">Thu nhập từ cho thuê (VNĐ)</Label>
+                <Input
+                  id="rentalIncome"
+                  type="number"
+                  {...register('rentalIncome', { valueAsNumber: true })}
+                  placeholder="5,000,000"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="otherIncome">Thu nhập khác (VNĐ)</Label>
+                <Input
+                  id="otherIncome"
+                  type="number"
+                  {...register('otherIncome', { valueAsNumber: true })}
+                  placeholder="2,000,000"
+                />
+              </div>
+            </div>
+
+            <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary/20">
+              <div className="flex items-center gap-2 mb-2">
+                <Calculator className="h-5 w-5 text-primary" />
+                <span className="font-medium">Tổng thu nhập góp hàng tháng (VNĐ):</span>
+              </div>
+              <p className="text-3xl font-bold text-primary">
+                {calculatedTotalIncome.toLocaleString('vi-VN')}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="monthlyExpenses">Chi phí hàng tháng (VNĐ)</Label>
+                <Input
+                  id="monthlyExpenses"
+                  type="number"
+                  {...register('monthlyExpenses', { valueAsNumber: true })}
+                  placeholder="8,000,000"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="savingsAmount">Số tiền tiết kiệm (VNĐ)</Label>
+                <Input
+                  id="savingsAmount"
+                  type="number"
+                  {...register('savingsAmount', { valueAsNumber: true })}
+                  placeholder="100,000,000"
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-semibold">4. Thông Tin Tín Dụng</h3>
+              <p className="text-muted-foreground">Thông tin về thẻ tín dụng và khoản vay hiện có</p>
+            </div>
+
+            <div>
+              <Label>Hiện tại bạn đang sử dụng thẻ tín dụng? *</Label>
+              <RadioGroup 
+                onValueChange={(value) => {
+                  if (value === 'no') {
+                    setCreditCards([]);
+                  }
+                }}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="has-credit-card" />
+                  <Label htmlFor="has-credit-card">Có</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="no-credit-card" />
+                  <Label htmlFor="no-credit-card">Không</Label>
+                </div>
+              </RadioGroup>
             </div>
 
             <div>
@@ -438,254 +536,186 @@ const CreditCardSurveyForm = () => {
                 </Button>
               </div>
               
-              {creditCards.map((card, index) => (
-                <Card key={index} className="mb-4">
-                  <CardContent className="pt-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div>
-                        <Label>Ngân hàng</Label>
-                        <Input
-                          placeholder="Vietcombank"
-                          value={card.bank}
-                          onChange={(e) => {
-                            const updated = [...creditCards];
-                            updated[index].bank = e.target.value;
-                            setCreditCards(updated);
-                          }}
-                        />
+              {creditCards.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <CreditCard className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>Chưa có thẻ tín dụng nào</p>
+                </div>
+              ) : (
+                creditCards.map((card, index) => (
+                  <Card key={index} className="mb-4">
+                    <CardContent className="pt-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <Label>Ngân hàng</Label>
+                          <Select
+                            onValueChange={(value) => {
+                              const updated = [...creditCards];
+                              updated[index].bank = value;
+                              setCreditCards(updated);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn ngân hàng" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="vietcombank">Vietcombank</SelectItem>
+                              <SelectItem value="techcombank">Techcombank</SelectItem>
+                              <SelectItem value="bidv">BIDV</SelectItem>
+                              <SelectItem value="vietinbank">VietinBank</SelectItem>
+                              <SelectItem value="acb">ACB</SelectItem>
+                              <SelectItem value="mb">MB Bank</SelectItem>
+                              <SelectItem value="other">Khác</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Hạn mức (VNĐ)</Label>
+                          <Input
+                            type="number"
+                            placeholder="50,000,000"
+                            value={card.limit || ''}
+                            onChange={(e) => {
+                              const updated = [...creditCards];
+                              updated[index].limit = parseFloat(e.target.value) || 0;
+                              setCreditCards(updated);
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <Label>Dư nợ hiện tại (VNĐ)</Label>
+                          <Input
+                            type="number"
+                            placeholder="10,000,000"
+                            value={card.currentBalance || ''}
+                            onChange={(e) => {
+                              const updated = [...creditCards];
+                              updated[index].currentBalance = parseFloat(e.target.value) || 0;
+                              setCreditCards(updated);
+                            }}
+                          />
+                        </div>
+                        <div className="flex items-end">
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => removeCreditCard(index)}
+                            className="w-full"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div>
-                        <Label>Hạn mức</Label>
-                        <Input
-                          type="number"
-                          placeholder="50000000"
-                          value={card.limit}
-                          onChange={(e) => {
-                            const updated = [...creditCards];
-                            updated[index].limit = parseFloat(e.target.value) || 0;
-                            setCreditCards(updated);
-                          }}
-                        />
-                      </div>
-                      <div>
-                        <Label>Dư nợ hiện tại</Label>
-                        <Input
-                          type="number"
-                          placeholder="10000000"
-                          value={card.currentBalance}
-                          onChange={(e) => {
-                            const updated = [...creditCards];
-                            updated[index].currentBalance = parseFloat(e.target.value) || 0;
-                            setCreditCards(updated);
-                          }}
-                        />
-                      </div>
-                      <div className="flex items-end">
-                        <Button type="button" variant="outline" size="sm" onClick={() => removeCreditCard(index)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+
+            <div>
+              <Label>Hiện tại bạn đang có vay cá nhân tại ngân hàng/công ty tài chính? *</Label>
+              <RadioGroup 
+                onValueChange={(value) => {
+                  if (value === 'no') {
+                    setLoans([]);
+                  }
+                }}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="has-loan" />
+                  <Label htmlFor="has-loan">Có</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="no-loan" />
+                  <Label htmlFor="no-loan">Không</Label>
+                </div>
+              </RadioGroup>
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-4">
-                <Label>Các khoản vay hiện có</Label>
+                <Label>Khoản vay hiện có</Label>
                 <Button type="button" variant="outline" size="sm" onClick={addLoan}>
                   <Plus className="h-4 w-4 mr-2" />
                   Thêm khoản vay
                 </Button>
               </div>
               
-              {loans.map((loan, index) => (
-                <Card key={index} className="mb-4">
-                  <CardContent className="pt-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div>
-                        <Label>Loại vay</Label>
-                        <Select onValueChange={(value) => {
-                          const updated = [...loans];
-                          updated[index].type = value;
-                          setLoans(updated);
-                        }}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Chọn loại" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="home">Vay mua nhà</SelectItem>
-                            <SelectItem value="car">Vay mua xe</SelectItem>
-                            <SelectItem value="personal">Vay cá nhân</SelectItem>
-                            <SelectItem value="business">Vay kinh doanh</SelectItem>
-                          </SelectContent>
-                        </Select>
+              {loans.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Calculator className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>Chưa có khoản vay nào</p>
+                </div>
+              ) : (
+                loans.map((loan, index) => (
+                  <Card key={index} className="mb-4">
+                    <CardContent className="pt-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <Label>Loại vay</Label>
+                          <Select
+                            onValueChange={(value) => {
+                              const updated = [...loans];
+                              updated[index].type = value;
+                              setLoans(updated);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn loại vay" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="personal">Vay cá nhân</SelectItem>
+                              <SelectItem value="home">Vay mua nhà</SelectItem>
+                              <SelectItem value="car">Vay mua xe</SelectItem>
+                              <SelectItem value="business">Vay kinh doanh</SelectItem>
+                              <SelectItem value="other">Khác</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Số tiền vay (VNĐ)</Label>
+                          <Input
+                            type="number"
+                            placeholder="500,000,000"
+                            value={loan.amount || ''}
+                            onChange={(e) => {
+                              const updated = [...loans];
+                              updated[index].amount = parseFloat(e.target.value) || 0;
+                              setLoans(updated);
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <Label>Trả hàng tháng (VNĐ)</Label>
+                          <Input
+                            type="number"
+                            placeholder="15,000,000"
+                            value={loan.monthlyPayment || ''}
+                            onChange={(e) => {
+                              const updated = [...loans];
+                              updated[index].monthlyPayment = parseFloat(e.target.value) || 0;
+                              setLoans(updated);
+                            }}
+                          />
+                        </div>
+                        <div className="flex items-end">
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => removeLoan(index)}
+                            className="w-full"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div>
-                        <Label>Số tiền vay</Label>
-                        <Input
-                          type="number"
-                          placeholder="500000000"
-                          value={loan.amount}
-                          onChange={(e) => {
-                            const updated = [...loans];
-                            updated[index].amount = parseFloat(e.target.value) || 0;
-                            setLoans(updated);
-                          }}
-                        />
-                      </div>
-                      <div>
-                        <Label>Trả hàng tháng</Label>
-                        <Input
-                          type="number"
-                          placeholder="5000000"
-                          value={loan.monthlyPayment}
-                          onChange={(e) => {
-                            const updated = [...loans];
-                            updated[index].monthlyPayment = parseFloat(e.target.value) || 0;
-                            setLoans(updated);
-                          }}
-                        />
-                      </div>
-                      <div className="flex items-end">
-                        <Button type="button" variant="outline" size="sm" onClick={() => removeLoan(index)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="monthlyExpenses">Chi tiêu hàng tháng (VNĐ)</Label>
-                <Input
-                  id="monthlyExpenses"
-                  type="number"
-                  {...register('monthlyExpenses', { valueAsNumber: true })}
-                  placeholder="10000000"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="savingsAmount">Số tiền tiết kiệm (VNĐ)</Label>
-                <Input
-                  id="savingsAmount"
-                  type="number"
-                  {...register('savingsAmount', { valueAsNumber: true })}
-                  placeholder="100000000"
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <h3 className="text-lg font-semibold">Nhu cầu thẻ tín dụng</h3>
-              <p className="text-muted-foreground">Cho chúng tôi biết về nhu cầu thẻ tín dụng của bạn</p>
-            </div>
-
-            <div>
-              <Label>Hạn mức tín dụng mong muốn: {watchedValues.desiredCreditLimit?.toLocaleString('vi-VN') || '0'} VNĐ</Label>
-              <div className="mt-2">
-                <Slider
-                  value={[watchedValues.desiredCreditLimit || 5000000]}
-                  onValueChange={(value) => setValue('desiredCreditLimit', value[0])}
-                  max={200000000}
-                  min={5000000}
-                  step={1000000}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                  <span>5 triệu</span>
-                  <span>200 triệu</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <Label>Mục đích sử dụng chính</Label>
-              <RadioGroup onValueChange={(value) => setValue('primaryCardUsage', value)}>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="shopping" id="shopping" />
-                  <Label htmlFor="shopping">Mua sắm hàng ngày</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="travel" id="travel" />
-                  <Label htmlFor="travel">Du lịch</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="business" id="business" />
-                  <Label htmlFor="business">Kinh doanh</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="emergency" id="emergency" />
-                  <Label htmlFor="emergency">Khẩn cấp</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="cashback" id="cashback" />
-                  <Label htmlFor="cashback">Tích điểm/Hoàn tiền</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div>
-              <Label>Ưu đãi mong muốn (có thể chọn nhiều)</Label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {[
-                  'Hoàn tiền mua sắm',
-                  'Tích điểm bay',
-                  'Miễn phí phòng chờ sân bay', 
-                  'Ưu đãi nhà hàng',
-                  'Bảo hiểm du lịch',
-                  'Miễn phí rút tiền ATM',
-                  'Lãi suất 0% trả góp',
-                  'Quà tặng chào mừng'
-                ].map((benefit) => (
-                  <div key={benefit} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={benefit}
-                      onCheckedChange={(checked) => {
-                        const current = watchedValues.preferredBenefits || [];
-                        if (checked) {
-                          setValue('preferredBenefits', [...current, benefit]);
-                        } else {
-                          setValue('preferredBenefits', current.filter(b => b !== benefit));
-                        }
-                      }}
-                    />
-                    <Label htmlFor={benefit} className="text-sm">{benefit}</Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <Label>Phí thường niên</Label>
-              <RadioGroup onValueChange={(value) => setValue('annualFeePreference', value)}>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="no-fee" id="no-fee" />
-                  <Label htmlFor="no-fee">Miễn phí</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="low-fee" id="low-fee" />
-                  <Label htmlFor="low-fee">Phí thấp (dưới 1 triệu/năm)</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="medium-fee" id="medium-fee" />
-                  <Label htmlFor="medium-fee">Phí trung bình (1-3 triệu/năm)</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="high-fee" id="high-fee" />
-                  <Label htmlFor="high-fee">Không quan tâm phí nếu ưu đãi tốt</Label>
-                </div>
-              </RadioGroup>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </div>
         );
@@ -694,84 +724,166 @@ const CreditCardSurveyForm = () => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-lg font-semibold">Thông tin bổ sung và xem lại</h3>
-              <p className="text-muted-foreground">Kiểm tra lại thông tin và hoàn thành khảo sát</p>
+              <h3 className="text-lg font-semibold">5. Yêu Cầu Về Thẻ Tín Dụng</h3>
+              <p className="text-muted-foreground">Thông tin về nhu cầu thẻ tín dụng của bạn</p>
             </div>
 
             <div>
-              <Label htmlFor="previousBankRelationships">Mối quan hệ với ngân hàng</Label>
+              <Label className="text-base font-medium">Hạn mức thẻ tín dụng mong muốn (VNĐ) *</Label>
+              <div className="mt-4 space-y-4">
+                <div className="px-4 py-2 bg-muted rounded-lg text-center">
+                  <span className="text-2xl font-bold text-primary">
+                    {desiredCreditLimit[0].toLocaleString('vi-VN')} VNĐ
+                  </span>
+                </div>
+                <Slider
+                  value={desiredCreditLimit}
+                  onValueChange={(value) => {
+                    setDesiredCreditLimit(value);
+                    setValue('desiredCreditLimit', value[0]);
+                  }}
+                  min={5000000}
+                  max={500000000}
+                  step={5000000}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>5 triệu</span>
+                  <span>500 triệu</span>
+                </div>
+                {desiredCreditLimit[0] > 500000000 && (
+                  <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                    <AlertTriangle className="h-4 w-4 text-destructive" />
+                    <span className="text-sm text-destructive">
+                      Hạn mức vượt quá 500 triệu VNĐ có thể khó được phê duyệt
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label>Mục đích sử dụng thẻ chính</Label>
+              <Select onValueChange={(value) => setValue('primaryCardUsage', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn mục đích" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily">Chi tiêu hàng ngày</SelectItem>
+                  <SelectItem value="shopping">Mua sắm</SelectItem>
+                  <SelectItem value="travel">Du lịch</SelectItem>
+                  <SelectItem value="business">Kinh doanh</SelectItem>
+                  <SelectItem value="emergency">Khẩn cấp</SelectItem>
+                  <SelectItem value="online">Thanh toán online</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label>Ưu đãi mong muốn (chọn nhiều)</Label>
+              <div className="mt-2 space-y-2">
+                {[
+                  { id: 'cashback', label: 'Hoàn tiền' },
+                  { id: 'points', label: 'Tích điểm' },
+                  { id: 'discount', label: 'Giảm giá mua sắm' },
+                  { id: 'travel', label: 'Ưu đãi du lịch' },
+                  { id: 'dining', label: 'Ưu đãi ăn uống' },
+                  { id: 'fuel', label: 'Ưu đãi xăng dầu' },
+                  { id: 'airport', label: 'Phòng chờ sân bay' },
+                  { id: 'insurance', label: 'Bảo hiểm' },
+                ].map((benefit) => (
+                  <div key={benefit.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={benefit.id}
+                      onCheckedChange={(checked) => {
+                        const currentBenefits = watchedValues.preferredBenefits || [];
+                        if (checked) {
+                          setValue('preferredBenefits', [...currentBenefits, benefit.id]);
+                        } else {
+                          setValue('preferredBenefits', currentBenefits.filter(b => b !== benefit.id));
+                        }
+                      }}
+                    />
+                    <Label htmlFor={benefit.id}>{benefit.label}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <Label>Phí thường niên</Label>
+              <Select onValueChange={(value) => setValue('annualFeePreference', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn mức phí" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="free">Miễn phí</SelectItem>
+                  <SelectItem value="low">Dưới 500,000 VNĐ</SelectItem>
+                  <SelectItem value="medium">500,000 - 1,000,000 VNĐ</SelectItem>
+                  <SelectItem value="high">Trên 1,000,000 VNĐ</SelectItem>
+                  <SelectItem value="flexible">Linh hoạt</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="creditHistoryIssues">Bạn có từng gặp vấn đề về tín dụng không?</Label>
+              <RadioGroup 
+                onValueChange={(value) => setValue('creditHistoryIssues', value === 'yes')}
+                className="mt-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="credit-issues-yes" />
+                  <Label htmlFor="credit-issues-yes">Có</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="credit-issues-no" />
+                  <Label htmlFor="credit-issues-no">Không</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {watchedValues.creditHistoryIssues && (
+              <div>
+                <Label htmlFor="creditHistoryDetails">Chi tiết vấn đề tín dụng</Label>
+                <Textarea
+                  id="creditHistoryDetails"
+                  {...register('creditHistoryDetails')}
+                  placeholder="Mô tả chi tiết về vấn đề tín dụng đã gặp..."
+                  rows={3}
+                />
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="previousBankRelationships">Ghi chú thêm</Label>
               <Textarea
                 id="previousBankRelationships"
                 {...register('previousBankRelationships')}
-                placeholder="Bạn đã từng sử dụng dịch vụ của ngân hàng nào? Trải nghiệm như thế nào?"
-                rows={3}
+                placeholder="Thông tin bổ sung khác (tùy chọn)..."
+                rows={4}
               />
             </div>
 
-            <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <Checkbox
-                  id="creditHistoryIssues"
-                  onCheckedChange={(checked) => setValue('creditHistoryIssues', !!checked)}
-                />
-                <Label htmlFor="creditHistoryIssues">Tôi đã từng có vấn đề về tín dụng</Label>
-              </div>
-              
-              {watchedValues.creditHistoryIssues && (
-                <Textarea
-                  {...register('creditHistoryDetails')}
-                  placeholder="Vui lòng mô tả chi tiết về vấn đề tín dụng (trễ hạn thanh toán, nợ xấu, v.v.)"
-                  rows={3}
-                />
-              )}
-            </div>
-
             {/* Credit Score Estimation */}
-            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50">
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <CreditCard className="h-5 w-5" />
-                    <span className="font-semibold">Điểm tín dụng ước tính</span>
-                  </div>
-                  <div className="text-3xl font-bold text-primary mb-2">
-                    {estimatedCreditScore}
-                  </div>
-                  <Badge variant={estimatedCreditScore >= 700 ? "default" : estimatedCreditScore >= 600 ? "secondary" : "destructive"}>
-                    {estimatedCreditScore >= 700 ? "Tốt" : estimatedCreditScore >= 600 ? "Khá" : "Cần cải thiện"}
-                  </Badge>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Dựa trên thông tin bạn cung cấp
-                  </p>
+            <Card className="p-4 bg-gradient-to-r from-primary/10 to-secondary/10">
+              <div className="text-center">
+                <h4 className="font-medium mb-2">Điểm tín dụng ước tính</h4>
+                <div className="text-3xl font-bold text-primary mb-2">
+                  {estimatedCreditScore}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Tóm tắt thông tin</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium">Họ tên:</span>
-                    <p>{watchedValues.fullName}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">Thu nhập tháng:</span>
-                    <p>{calculatedTotalIncome.toLocaleString('vi-VN')} VNĐ</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">Hạn mức mong muốn:</span>
-                    <p>{(watchedValues.desiredCreditLimit || 0).toLocaleString('vi-VN')} VNĐ</p>
-                  </div>
-                  <div>
-                    <span className="font-medium">Số thẻ hiện có:</span>
-                    <p>{creditCards.length} thẻ</p>
-                  </div>
+                <div className="text-sm text-muted-foreground">
+                  Dựa trên thông tin bạn cung cấp
                 </div>
-              </CardContent>
+                <Progress 
+                  value={(estimatedCreditScore - 300) / 5.5} 
+                  className="mt-3"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>300</span>
+                  <span>850</span>
+                </div>
+              </div>
             </Card>
           </div>
         );
@@ -782,60 +894,49 @@ const CreditCardSurveyForm = () => {
   };
 
   return (
-    <div className="py-8 bg-background min-h-screen">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-center">
-                Khảo sát thẻ tín dụng
-              </CardTitle>
-              <div className="space-y-4">
-                <Progress value={progressPercent} className="w-full" />
-                <div className="text-center text-sm text-muted-foreground">
-                  Bước {currentStep} / {totalSteps}
-                </div>
-              </div>
-            </CardHeader>
-            
-            <CardContent>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                {renderStep()}
-                
-                <div className="flex justify-between mt-8">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={prevStep}
-                    disabled={currentStep === 1}
-                  >
-                    <ChevronLeft className="mr-2 h-4 w-4" />
-                    Quay lại
-                  </Button>
-                  
-                  {currentStep === totalSteps ? (
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="bg-primary hover:bg-primary/90"
-                    >
-                      {isSubmitting ? 'Đang gửi...' : 'Hoàn thành khảo sát'}
-                    </Button>
-                  ) : (
-                    <Button
-                      type="button"
-                      onClick={nextStep}
-                    >
-                      Tiếp theo
-                      <ChevronRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
+    <div className="max-w-4xl mx-auto p-6 space-y-8">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold mb-2">Bảng Khảo Sát Thông Tin Khách Hàng</h1>
+        <p className="text-muted-foreground">Thông Tin Thẻ Tín Dụng</p>
       </div>
+
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <span className="text-sm font-medium">Bước {currentStep} / {totalSteps}</span>
+          <span className="text-sm text-muted-foreground">{Math.round(progressPercent)}% hoàn thành</span>
+        </div>
+        <Progress value={progressPercent} className="w-full" />
+      </div>
+
+      <Card>
+        <CardContent className="p-8">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {renderStep()}
+
+            <div className="flex justify-between mt-8">
+              {currentStep > 1 && (
+                <Button type="button" variant="outline" onClick={prevStep}>
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  Quay lại
+                </Button>
+              )}
+              
+              <div className="ml-auto">
+                {currentStep < totalSteps ? (
+                  <Button type="button" onClick={nextStep}>
+                    Tiếp tục
+                    <ChevronRight className="h-4 w-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button type="submit" disabled={isSubmitting} className="bg-primary hover:bg-primary/90">
+                    {isSubmitting ? 'Đang gửi...' : 'Gửi Khảo Sát'}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
