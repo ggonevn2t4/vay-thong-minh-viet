@@ -5,6 +5,62 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile-first optimizations */
+@media (max-width: 768px) {
+  .mobile-optimized {
+    /* Improve touch targets */
+    button, a, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    
+    /* Better spacing for mobile */
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    
+    /* Optimized card layouts */
+    .grid {
+      gap: 0.75rem;
+    }
+    
+    /* Better text sizing */
+    .text-sm {
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    
+    /* Improved form elements */
+    input, textarea, select {
+      font-size: 16px; /* Prevents zoom on iOS */
+      min-height: 44px;
+    }
+  }
+  
+  /* Hide desktop-only elements */
+  .desktop-only {
+    display: none;
+  }
+  
+  /* Show mobile-only elements */
+  .mobile-only {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Hide mobile-only elements on desktop */
+  .mobile-only {
+    display: none;
+  }
+  
+  /* Show desktop-only elements */
+  .desktop-only {
+    display: block;
+  }
+}
+
 @layer base {
   :root {
     --brand: 27 96% 61%;

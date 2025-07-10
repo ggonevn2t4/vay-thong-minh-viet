@@ -4,7 +4,7 @@ import Layout from '@/components/layout/Layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import LoanApplicationsTab from '@/components/dashboard/bank-employee/LoanApplicationsTab';
-import CustomerManagementTab from '@/components/dashboard/bank-employee/CustomerManagementTab';
+import EnhancedCustomerManagement from '@/components/dashboard/enhanced/EnhancedCustomerManagement';
 import ReportsTab from '@/components/dashboard/bank-employee/ReportsTab';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { FileText, Users, BarChart3, Settings } from 'lucide-react';
@@ -46,7 +46,7 @@ const BankEmployeeDashboard = () => {
             </TabsContent>
 
             <TabsContent value="customers">
-              <CustomerManagementTab />
+              <EnhancedCustomerManagement />
             </TabsContent>
 
             <TabsContent value="reports">
