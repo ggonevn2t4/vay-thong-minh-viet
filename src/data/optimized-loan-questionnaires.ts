@@ -3,7 +3,7 @@ import { LoanProductType, CustomQuestionForm } from '@/types/loan-application-fl
 // Optimized questionnaire structure with conditional logic and smart categorization
 export interface OptimizedQuestion {
   id: string;
-  type: 'text' | 'number' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date';
+  type: 'text' | 'number' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'date' | 'slider' | 'currency' | 'phone' | 'email' | 'id_number';
   label: string;
   placeholder?: string;
   required: boolean;
@@ -12,14 +12,26 @@ export interface OptimizedQuestion {
     max?: number;
     pattern?: string;
     message?: string;
+    maxLength?: number;
+    minLength?: number;
   };
   options?: string[];
-  category: 'basic' | 'financial' | 'employment' | 'credit' | 'product_specific' | 'additional';
+  category: 'basic' | 'financial' | 'employment' | 'credit' | 'product_specific' | 'additional' | 'collateral' | 'family';
   priority: 'high' | 'medium' | 'low'; // For progressive disclosure
   dependsOn?: string; // Field ID that this question depends on
   showWhen?: (value: any) => boolean; // Conditional logic
   helpText?: string; // Additional guidance for users
   icon?: string; // Icon for visual enhancement
+  sliderConfig?: {
+    min: number;
+    max: number;
+    step: number;
+    marks?: { value: number; label: string }[];
+  };
+  conditionalSections?: {
+    condition: (value: any) => boolean;
+    questions: OptimizedQuestion[];
+  }[];
 }
 
 export interface OptimizedQuestionForm {
@@ -805,8 +817,722 @@ const educationLoanQuestionnaire: OptimizedQuestionForm = {
   }
 };
 
+// Credit Consumer Loan Questionnaire (TÍN CHẤP – VAY TIÊU DÙNG)
+const creditConsumerLoanQuestionnaire: OptimizedQuestionForm = {
+  productType: 'credit_loan',
+  title: 'Vay Tín Chấp - Tiêu Dùng',
+  description: 'Hoàn thành thông tin để nhận đề xuất vay tín chấp phù hợp với nhu cầu của bạn',
+  estimatedTime: '8-12 phút',
+  categories: [
+    {
+      id: 'basic',
+      name: 'Thông tin cơ bản',
+      description: 'Thông tin cá nhân và liên hệ',
+      icon: '👤',
+      questions: [
+        {
+          id: 'full_name',
+          type: 'text',
+          label: 'Họ và tên',
+          placeholder: 'Nguyễn Văn A',
+          required: true,
+          category: 'basic',
+          priority: 'high',
+          validation: {
+            pattern: '^[a-zA-ZÀ-ỹ\\s]{2,50}$',
+            message: 'Họ tên phải từ 2-50 ký tự, chỉ chứa chữ cái'
+          },
+          icon: '👤'
+        },
+        {
+          id: 'phone_number',
+          type: 'phone',
+          label: 'Số điện thoại',
+          placeholder: '0901234567',
+          required: true,
+          category: 'basic',
+          priority: 'high',
+          validation: {
+            pattern: '^(0|\\+84)[3-9][0-9]{8}$',
+            message: 'Số điện thoại không hợp lệ'
+          },
+          icon: '📱'
+        },
+        {
+          id: 'email',
+          type: 'email',
+          label: 'Email',
+          placeholder: 'example@email.com',
+          required: true,
+          category: 'basic',
+          priority: 'high',
+          validation: {
+            pattern: '^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$',
+            message: 'Email không hợp lệ'
+          },
+          icon: '📧'
+        },
+        {
+          id: 'id_number',
+          type: 'id_number',
+          label: 'Số CMND/CCCD',
+          placeholder: '123456789012',
+          required: true,
+          category: 'basic',
+          priority: 'high',
+          validation: {
+            pattern: '^[0-9]{9,12}$',
+            message: 'CMND/CCCD phải có 9-12 chữ số'
+          },
+          icon: '🆔'
+        },
+        {
+          id: 'date_of_birth',
+          type: 'date',
+          label: 'Ngày sinh',
+          required: true,
+          category: 'basic',
+          priority: 'high',
+          validation: {
+            min: 18,
+            max: 65,
+            message: 'Tuổi phải từ 18-65'
+          },
+          icon: '📅'
+        },
+        {
+          id: 'gender',
+          type: 'radio',
+          label: 'Giới tính',
+          required: true,
+          options: ['Nam', 'Nữ', 'Khác'],
+          category: 'basic',
+          priority: 'high',
+          icon: '👥'
+        },
+        {
+          id: 'marital_status',
+          type: 'select',
+          label: 'Tình trạng hôn nhân',
+          required: true,
+          options: [
+            'Độc thân',
+            'Đã kết hôn',
+            'Ly hôn',
+            'Góa',
+            'Sống chung không đăng ký'
+          ],
+          category: 'basic',
+          priority: 'high',
+          icon: '💑'
+        },
+        {
+          id: 'education_level',
+          type: 'select',
+          label: 'Trình độ học vấn',
+          required: true,
+          options: [
+            'Trung học phổ thông',
+            'Trung cấp/Cao đẳng',
+            'Đại học',
+            'Thạc sĩ',
+            'Tiến sĩ'
+          ],
+          category: 'basic',
+          priority: 'medium',
+          icon: '🎓'
+        }
+      ]
+    },
+    {
+      id: 'financial',
+      name: 'Thông tin tài chính',
+      description: 'Thu nhập, chi phí và tình hình tài chính',
+      icon: '💰',
+      questions: [
+        {
+          id: 'loan_amount',
+          type: 'slider',
+          label: 'Số tiền vay mong muốn',
+          required: true,
+          category: 'financial',
+          priority: 'high',
+          sliderConfig: {
+            min: 10000000,
+            max: 2000000000,
+            step: 5000000,
+            marks: [
+              { value: 10000000, label: '10 triệu' },
+              { value: 100000000, label: '100 triệu' },
+              { value: 500000000, label: '500 triệu' },
+              { value: 1000000000, label: '1 tỷ' },
+              { value: 2000000000, label: '2 tỷ' }
+            ]
+          },
+          helpText: 'Kéo thanh trượt để chọn số tiền vay phù hợp',
+          icon: '💵'
+        },
+        {
+          id: 'loan_term',
+          type: 'select',
+          label: 'Thời hạn vay',
+          required: true,
+          options: [
+            '3 tháng',
+            '6 tháng',
+            '12 tháng',
+            '18 tháng',
+            '24 tháng',
+            '36 tháng',
+            '48 tháng',
+            '60 tháng'
+          ],
+          category: 'financial',
+          priority: 'high',
+          icon: '📅'
+        },
+        {
+          id: 'monthly_income',
+          type: 'currency',
+          label: 'Thu nhập hàng tháng',
+          placeholder: '20,000,000',
+          required: true,
+          category: 'financial',
+          priority: 'high',
+          validation: {
+            min: 5000000,
+            message: 'Thu nhập tối thiểu 5 triệu VNĐ'
+          },
+          helpText: 'Bao gồm tất cả nguồn thu nhập ổn định',
+          icon: '💰'
+        },
+        {
+          id: 'income_stability',
+          type: 'select',
+          label: 'Tính ổn định thu nhập',
+          required: true,
+          options: [
+            'Rất ổn định (lương cố định từ 12 tháng trở lên)',
+            'Ổn định (lương cố định từ 6-12 tháng)',
+            'Tương đối ổn định (có biến động nhẹ)',
+            'Không ổn định (thu nhập theo dự án/mùa vụ)',
+            'Mới bắt đầu có thu nhập'
+          ],
+          category: 'financial',
+          priority: 'high',
+          icon: '📊'
+        },
+        {
+          id: 'monthly_expenses',
+          type: 'currency',
+          label: 'Chi phí sinh hoạt hàng tháng',
+          placeholder: '10,000,000',
+          required: true,
+          category: 'financial',
+          priority: 'medium',
+          validation: {
+            max: 50000000,
+            message: 'Chi phí quá cao so với thu nhập'
+          },
+          helpText: 'Bao gồm ăn uống, nhà ở, di chuyển, học phí, y tế',
+          icon: '🏠'
+        },
+        {
+          id: 'savings_amount',
+          type: 'currency',
+          label: 'Số tiền tiết kiệm hiện có',
+          placeholder: '50,000,000',
+          required: false,
+          category: 'financial',
+          priority: 'medium',
+          helpText: 'Tiền gửi ngân hàng, tiền mặt, chứng khoán',
+          icon: '🏦'
+        }
+      ]
+    },
+    {
+      id: 'employment',
+      name: 'Thông tin nghề nghiệp',
+      description: 'Chi tiết về công việc và thu nhập',
+      icon: '💼',
+      questions: [
+        {
+          id: 'employment_type',
+          type: 'select',
+          label: 'Loại hình việc làm',
+          required: true,
+          options: [
+            'Nhân viên chính thức (có hợp đồng lao động)',
+            'Nhân viên hợp đồng (có thời hạn)',
+            'Công chức/Viên chức',
+            'Chủ doanh nghiệp/Giám đốc',
+            'Kinh doanh tự do/Freelancer',
+            'Nghỉ hưu có lương hưu',
+            'Sinh viên có thu nhập',
+            'Thất nghiệp/Không có việc làm'
+          ],
+          category: 'employment',
+          priority: 'high',
+          icon: '👔'
+        },
+        {
+          id: 'company_name',
+          type: 'text',
+          label: 'Tên công ty/Cơ quan',
+          placeholder: 'Công ty TNHH ABC',
+          required: true,
+          category: 'employment',
+          priority: 'high',
+          dependsOn: 'employment_type',
+          showWhen: (value) => !['Kinh doanh tự do/Freelancer', 'Thất nghiệp/Không có việc làm'].includes(value),
+          validation: {
+            minLength: 2,
+            maxLength: 100,
+            message: 'Tên công ty phải từ 2-100 ký tự'
+          },
+          icon: '🏢'
+        },
+        {
+          id: 'job_position',
+          type: 'text',
+          label: 'Chức vụ/Vị trí công việc',
+          placeholder: 'Nhân viên kế toán',
+          required: true,
+          category: 'employment',
+          priority: 'high',
+          dependsOn: 'employment_type',
+          showWhen: (value) => !['Kinh doanh tự do/Freelancer', 'Thất nghiệp/Không có việc làm'].includes(value),
+          validation: {
+            minLength: 2,
+            maxLength: 50
+          },
+          icon: '👨‍💼'
+        },
+        {
+          id: 'work_experience_current_job',
+          type: 'select',
+          label: 'Thời gian làm việc tại công ty hiện tại',
+          required: true,
+          options: [
+            'Dưới 3 tháng',
+            '3-6 tháng',
+            '6-12 tháng',
+            '1-2 năm',
+            '2-5 năm',
+            '5-10 năm',
+            'Trên 10 năm'
+          ],
+          category: 'employment',
+          priority: 'high',
+          dependsOn: 'employment_type',
+          showWhen: (value) => !['Kinh doanh tự do/Freelancer', 'Thất nghiệp/Không có việc làm'].includes(value),
+          icon: '⏳'
+        },
+        {
+          id: 'total_work_experience',
+          type: 'select',
+          label: 'Tổng số năm kinh nghiệm làm việc',
+          required: true,
+          options: [
+            'Dưới 1 năm',
+            '1-3 năm',
+            '3-5 năm',
+            '5-10 năm',
+            '10-15 năm',
+            'Trên 15 năm'
+          ],
+          category: 'employment',
+          priority: 'medium',
+          icon: '📈'
+        },
+        {
+          id: 'industry',
+          type: 'select',
+          label: 'Lĩnh vực hoạt động',
+          required: false,
+          options: [
+            'Ngân hàng/Tài chính/Bảo hiểm',
+            'Công nghệ thông tin',
+            'Viễn thông',
+            'Y tế/Dược phẩm',
+            'Giáo dục/Đào tạo',
+            'Bất động sản',
+            'Xây dựng',
+            'Sản xuất/Chế tạo',
+            'Thương mại/Bán lẻ',
+            'Du lịch/Nhà hàng/Khách sạn',
+            'Vận tải/Logistics',
+            'Nông nghiệp/Thủy sản',
+            'Dầu khí/Năng lượng',
+            'Chính phủ/Cơ quan nhà nước',
+            'Tổ chức phi lợi nhuận',
+            'Khác'
+          ],
+          category: 'employment',
+          priority: 'low',
+          icon: '🏭'
+        }
+      ]
+    },
+    {
+      id: 'family',
+      name: 'Thông tin gia đình',
+      description: 'Thông tin về gia đình và người phụ thuộc',
+      icon: '👨‍👩‍👧‍👦',
+      questions: [
+        {
+          id: 'spouse_info',
+          type: 'radio',
+          label: 'Tình trạng vợ/chồng',
+          required: true,
+          options: [
+            'Không có vợ/chồng',
+            'Có vợ/chồng nhưng không có thu nhập',
+            'Có vợ/chồng có thu nhập ổn định',
+            'Có vợ/chồng có thu nhập không ổn định'
+          ],
+          category: 'family',
+          priority: 'high',
+          dependsOn: 'marital_status',
+          showWhen: (value) => ['Đã kết hôn', 'Sống chung không đăng ký'].includes(value),
+          icon: '💑'
+        },
+        {
+          id: 'spouse_monthly_income',
+          type: 'currency',
+          label: 'Thu nhập hàng tháng của vợ/chồng',
+          placeholder: '15,000,000',
+          required: false,
+          category: 'family',
+          priority: 'medium',
+          dependsOn: 'spouse_info',
+          showWhen: (value) => ['Có vợ/chồng có thu nhập ổn định', 'Có vợ/chồng có thu nhập không ổn định'].includes(value),
+          helpText: 'Thu nhập ròng sau thuế',
+          icon: '💰'
+        },
+        {
+          id: 'number_of_dependents',
+          type: 'select',
+          label: 'Số người phụ thuộc',
+          required: true,
+          options: [
+            '0 người',
+            '1 người',
+            '2 người',
+            '3 người',
+            '4 người',
+            'Trên 4 người'
+          ],
+          category: 'family',
+          priority: 'medium',
+          helpText: 'Bao gồm con nhỏ, cha mẹ già, người thân cần hỗ trợ tài chính',
+          icon: '👶'
+        },
+        {
+          id: 'housing_situation',
+          type: 'select',
+          label: 'Tình trạng nhà ở',
+          required: true,
+          options: [
+            'Sở hữu nhà riêng (không có nợ)',
+            'Sở hữu nhà riêng (đang trả nợ ngân hàng)',
+            'Thuê nhà/căn hộ',
+            'Ở cùng gia đình/bố mẹ',
+            'Ở nhà công ty',
+            'Khác'
+          ],
+          category: 'family',
+          priority: 'medium',
+          icon: '🏠'
+        },
+        {
+          id: 'monthly_housing_cost',
+          type: 'currency',
+          label: 'Chi phí nhà ở hàng tháng',
+          placeholder: '5,000,000',
+          required: false,
+          category: 'family',
+          priority: 'low',
+          dependsOn: 'housing_situation',
+          showWhen: (value) => ['Sở hữu nhà riêng (đang trả nợ ngân hàng)', 'Thuê nhà/căn hộ'].includes(value),
+          helpText: 'Tiền thuê nhà hoặc khoản vay mua nhà hàng tháng',
+          icon: '💳'
+        }
+      ]
+    },
+    {
+      id: 'product_specific',
+      name: 'Mục đích vay',
+      description: 'Chi tiết về mục đích sử dụng khoản vay',
+      icon: '🎯',
+      questions: [
+        {
+          id: 'loan_purpose',
+          type: 'select',
+          label: 'Mục đích vay chính',
+          required: true,
+          options: [
+            'Tiêu dùng cá nhân/gia đình',
+            'Mua sắm hàng hóa cao cấp',
+            'Du lịch/Nghỉ dưỡng',
+            'Chữa bệnh/Y tế',
+            'Học tập/Đào tạo',
+            'Đám cưới/Sự kiện gia đình',
+            'Sửa chữa/Cải tạo nhà cửa',
+            'Trả nợ/Tái cấu trúc nợ',
+            'Kinh doanh nhỏ lẻ',
+            'Đầu tư/Sinh lời',
+            'Khẩn cấp/Bất khả kháng',
+            'Khác'
+          ],
+          category: 'product_specific',
+          priority: 'high',
+          icon: '🎯'
+        },
+        {
+          id: 'loan_purpose_detail',
+          type: 'textarea',
+          label: 'Mô tả chi tiết mục đích vay',
+          placeholder: 'Vui lòng mô tả cụ thể mục đích sử dụng số tiền vay...',
+          required: true,
+          category: 'product_specific',
+          priority: 'high',
+          validation: {
+            minLength: 10,
+            maxLength: 500,
+            message: 'Mô tả phải từ 10-500 ký tự'
+          },
+          helpText: 'Mô tả càng chi tiết sẽ giúp ngân hàng đánh giá và xử lý nhanh hơn',
+          icon: '📝'
+        },
+        {
+          id: 'preferred_payment_method',
+          type: 'select',
+          label: 'Phương thức trả nợ ưu tiên',
+          required: true,
+          options: [
+            'Trả gốc và lãi đều hàng tháng',
+            'Trả lãi hàng tháng, gốc cuối kỳ',
+            'Trả nợ theo quý',
+            'Trả nợ linh hoạt theo thu nhập',
+            'Khác'
+          ],
+          category: 'product_specific',
+          priority: 'medium',
+          icon: '💳'
+        },
+        {
+          id: 'urgency_level',
+          type: 'select',
+          label: 'Mức độ cần tiền',
+          required: true,
+          options: [
+            'Rất gấp (trong 1-2 ngày)',
+            'Gấp (trong 1 tuần)',
+            'Bình thường (trong 2-3 tuần)',
+            'Không gấp (trong 1 tháng)',
+            'Lên kế hoạch trước'
+          ],
+          category: 'product_specific',
+          priority: 'medium',
+          helpText: 'Giúp ngân hàng ưu tiên xử lý hồ sơ phù hợp',
+          icon: '⚡'
+        }
+      ]
+    },
+    {
+      id: 'credit',
+      name: 'Lịch sử tín dụng',
+      description: 'Thông tin về các khoản vay và thẻ tín dụng hiện có',
+      icon: '📈',
+      questions: [
+        {
+          id: 'existing_loans',
+          type: 'select',
+          label: 'Khoản vay hiện có',
+          required: true,
+          options: [
+            'Không có khoản vay nào',
+            'Có 1 khoản vay',
+            'Có 2-3 khoản vay',
+            'Có trên 3 khoản vay'
+          ],
+          category: 'credit',
+          priority: 'high',
+          icon: '💳'
+        },
+        {
+          id: 'total_monthly_debt_payment',
+          type: 'currency',
+          label: 'Tổng số tiền trả nợ hàng tháng',
+          placeholder: '5,000,000',
+          required: false,
+          category: 'credit',
+          priority: 'high',
+          dependsOn: 'existing_loans',
+          showWhen: (value) => value !== 'Không có khoản vay nào',
+          helpText: 'Bao gồm tất cả các khoản vay: nhà, xe, thẻ tín dụng, vay cá nhân',
+          icon: '💰'
+        },
+        {
+          id: 'credit_cards_count',
+          type: 'select',
+          label: 'Số thẻ tín dụng hiện có',
+          required: true,
+          options: [
+            'Không có thẻ tín dụng',
+            '1 thẻ',
+            '2-3 thẻ',
+            '4-5 thẻ',
+            'Trên 5 thẻ'
+          ],
+          category: 'credit',
+          priority: 'high',
+          icon: '💳'
+        },
+        {
+          id: 'credit_card_usage',
+          type: 'select',
+          label: 'Mức độ sử dụng thẻ tín dụng',
+          required: false,
+          options: [
+            'Sử dụng ít (dưới 30% hạn mức)',
+            'Sử dụng vừa phải (30-70% hạn mức)',
+            'Sử dụng nhiều (trên 70% hạn mức)',
+            'Luôn sử dụng hết hạn mức',
+            'Thường xuyên thanh toán thiếu'
+          ],
+          category: 'credit',
+          priority: 'medium',
+          dependsOn: 'credit_cards_count',
+          showWhen: (value) => value !== 'Không có thẻ tín dụng',
+          icon: '📊'
+        },
+        {
+          id: 'payment_history',
+          type: 'select',
+          label: 'Lịch sử thanh toán',
+          required: true,
+          options: [
+            'Luôn thanh toán đúng hạn',
+            'Thỉnh thoảng trễ hạn (1-2 lần/năm)',
+            'Thường xuyên trễ hạn (3-5 lần/năm)',
+            'Rất thường xuyên trễ hạn (trên 5 lần/năm)',
+            'Chưa có lịch sử tín dụng'
+          ],
+          category: 'credit',
+          priority: 'high',
+          helpText: 'Bao gồm tất cả các khoản vay và thẻ tín dụng',
+          icon: '✅'
+        },
+        {
+          id: 'blacklist_status',
+          type: 'radio',
+          label: 'Bạn có bị CIC ghi nợ xấu không?',
+          required: true,
+          options: [
+            'Không, tôi chưa bao giờ bị ghi nợ xấu',
+            'Có, nhưng đã thanh toán xong và được xóa',
+            'Có, đang trong danh sách nợ xấu',
+            'Không biết rõ tình trạng của mình'
+          ],
+          category: 'credit',
+          priority: 'high',
+          helpText: 'Thông tin này giúp ngân hàng đánh giá chính xác hồ sơ',
+          icon: '⚠️'
+        }
+      ]
+    },
+    {
+      id: 'additional',
+      name: 'Thông tin bổ sung',
+      description: 'Các thông tin khác giúp đánh giá hồ sơ tốt hơn',
+      icon: '📋',
+      questions: [
+        {
+          id: 'preferred_bank',
+          type: 'select',
+          label: 'Ngân hàng ưu tiên',
+          required: false,
+          options: [
+            'Không có ưu tiên đặc biệt',
+            'Vietcombank',
+            'Techcombank',
+            'BIDV',
+            'VietinBank',
+            'Agribank',
+            'ACB',
+            'Sacombank',
+            'VPBank',
+            'TPBank',
+            'HDBank',
+            'Khác'
+          ],
+          category: 'additional',
+          priority: 'low',
+          icon: '🏦'
+        },
+        {
+          id: 'relationship_with_bank',
+          type: 'select',
+          label: 'Mối quan hệ với ngân hàng ưu tiên',
+          required: false,
+          options: [
+            'Khách hàng mới',
+            'Đã có tài khoản tiết kiệm',
+            'Đã có tài khoản lương',
+            'Đã từng vay vốn',
+            'Khách hàng VIP/Ưu tiên'
+          ],
+          category: 'additional',
+          priority: 'low',
+          dependsOn: 'preferred_bank',
+          showWhen: (value) => value !== 'Không có ưu tiên đặc biệt',
+          icon: '🤝'
+        },
+        {
+          id: 'contact_preference',
+          type: 'checkbox',
+          label: 'Thời gian thuận tiện để liên hệ',
+          required: false,
+          options: [
+            'Sáng (8:00-12:00)',
+            'Chiều (12:00-17:00)',
+            'Tối (17:00-20:00)',
+            'Cuối tuần',
+            'Chỉ nhắn tin SMS/Email'
+          ],
+          category: 'additional',
+          priority: 'low',
+          helpText: 'Giúp tư vấn viên liên hệ đúng thời điểm bạn rảnh',
+          icon: '📞'
+        },
+        {
+          id: 'additional_notes',
+          type: 'textarea',
+          label: 'Ghi chú thêm',
+          placeholder: 'Các thông tin bổ sung khác mà bạn muốn chia sẻ...',
+          required: false,
+          category: 'additional',
+          priority: 'low',
+          validation: {
+            maxLength: 1000,
+            message: 'Ghi chú không được quá 1000 ký tự'
+          },
+          icon: '📝'
+        }
+      ]
+    }
+  ],
+  smartValidation: {
+    creditScoreEstimation: true,
+    incomeVerification: true,
+    riskAssessment: true
+  }
+};
+
 export const optimizedQuestionnaires: Record<LoanProductType, OptimizedQuestionForm> = {
-  credit_loan: creditCardQuestionnaire,
+  credit_loan: creditConsumerLoanQuestionnaire, // Updated to use the new comprehensive questionnaire
   mortgage_loan: mortgageQuestionnaire,
   car_loan: carLoanQuestionnaire,
   business_loan: businessLoanQuestionnaire,
