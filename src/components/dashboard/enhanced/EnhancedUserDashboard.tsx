@@ -255,7 +255,11 @@ const EnhancedUserDashboard = () => {
               <p className="text-sm text-muted-foreground mb-4">
                 Hoàn thiện hồ sơ để tăng cơ hội được duyệt vay
               </p>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setActiveTab('profile')}
+              >
                 Cập nhật hồ sơ
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
