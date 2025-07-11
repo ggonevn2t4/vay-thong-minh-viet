@@ -267,15 +267,32 @@ const EnhancedUserDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button className="h-20 flex-col gap-2">
+                <Button 
+                  className="h-20 flex-col gap-2"
+                  onClick={() => {
+                    window.location.href = '/loan-application';
+                  }}
+                >
                   <Plus className="h-6 w-6" />
                   Đăng ký vay mới
                 </Button>
-                <Button variant="outline" className="h-20 flex-col gap-2">
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col gap-2"
+                  onClick={() => {
+                    window.location.href = '/messages';
+                  }}
+                >
                   <MessageCircle className="h-6 w-6" />
                   Nhắn tin tư vấn viên
                 </Button>
-                <Button variant="outline" className="h-20 flex-col gap-2">
+                <Button 
+                  variant="outline" 
+                  className="h-20 flex-col gap-2"
+                  onClick={() => {
+                    window.location.href = '/loan-comparison';
+                  }}
+                >
                   <Target className="h-6 w-6" />
                   So sánh lãi suất
                 </Button>
