@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,6 +41,7 @@ interface ProfileData {
 
 const EnhancedUserDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [applications, setApplications] = useState<LoanApplication[]>([]);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -269,9 +271,7 @@ const EnhancedUserDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Button 
                   className="h-20 flex-col gap-2"
-                  onClick={() => {
-                    window.location.href = '/loan-application';
-                  }}
+                  onClick={() => navigate('/loan-application')}
                 >
                   <Plus className="h-6 w-6" />
                   Đăng ký vay mới
@@ -279,9 +279,7 @@ const EnhancedUserDashboard = () => {
                 <Button 
                   variant="outline" 
                   className="h-20 flex-col gap-2"
-                  onClick={() => {
-                    window.location.href = '/messages';
-                  }}
+                  onClick={() => navigate('/messages')}
                 >
                   <MessageCircle className="h-6 w-6" />
                   Nhắn tin tư vấn viên
@@ -289,9 +287,7 @@ const EnhancedUserDashboard = () => {
                 <Button 
                   variant="outline" 
                   className="h-20 flex-col gap-2"
-                  onClick={() => {
-                    window.location.href = '/loan-comparison';
-                  }}
+                  onClick={() => navigate('/loan-comparison')}
                 >
                   <Target className="h-6 w-6" />
                   So sánh lãi suất
