@@ -533,19 +533,17 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
                 {question.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
             </div>
-            <RadioGroup
-              value={value}
-              onValueChange={(val) => handleInputChange(question.id, val)}
-              className="grid grid-cols-1 md:grid-cols-2 gap-3"
-            >
-              {question.options?.map((option: string) => (
-                <div key={option} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50">
-                  <RadioGroupItem value={option} id={`${question.id}_${option}`} />
-                  <Label htmlFor={`${question.id}_${option}`} className="text-sm font-medium cursor-pointer">
-                    {option}
-                  </Label>
-                </div>
-              ))}
+            <RadioGroup value={value} onValueChange={(val) => handleInputChange(question.id, val)}>
+              <div className="grid grid-cols-1 gap-3">
+                {question.options?.map((option: string) => (
+                  <div key={option} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50">
+                    <RadioGroupItem value={option} id={`${question.id}_${option}`} />
+                    <Label htmlFor={`${question.id}_${option}`} className="text-sm font-medium cursor-pointer">
+                      {option}
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </RadioGroup>
             {question.helpText && (
               <p className="text-xs text-gray-500 flex items-center gap-1">
