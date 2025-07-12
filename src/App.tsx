@@ -44,6 +44,7 @@ import EnhancedCommunication from "./pages/EnhancedCommunication";
 import CreditCardSurvey from "./pages/CreditCardSurvey";
 import HomeLoanSurvey from "./pages/HomeLoanSurvey";
 import CarLoanSurvey from "./pages/CarLoanSurvey";
+import ConsumerCreditLoanSurvey from "./pages/ConsumerCreditLoanSurvey";
 import CompanySettings from "./pages/CompanySettings";
 
 const queryClient = new QueryClient();
@@ -95,6 +96,7 @@ function App() {
               <Route path="/credit-card-survey" element={<CreditCardSurvey />} />
               <Route path="/home-loan-survey" element={<HomeLoanSurvey />} />
               <Route path="/car-loan-survey" element={<CarLoanSurvey />} />
+              <Route path="/consumer-credit-loan-survey" element={<ConsumerCreditLoanSurvey />} />
               <Route path="/company-settings" element={<CompanySettings />} />
               <Route path="/support-tools" element={<SupportTools />} />
               <Route path="/testing" element={<TestingDashboard />} />

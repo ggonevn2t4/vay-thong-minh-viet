@@ -640,6 +640,117 @@ export type Database = {
         }
         Relationships: []
       }
+      consumer_credit_loan_survey_responses: {
+        Row: {
+          assets: Json | null
+          created_at: string
+          credit_history_details: string | null
+          credit_history_issues: boolean | null
+          current_credit_cards: Json | null
+          date_of_birth: string | null
+          desired_credit_limit: number | null
+          email: string | null
+          employer_name: string | null
+          employment_status: string
+          estimated_credit_score: number | null
+          existing_loans: Json | null
+          full_name: string
+          id: string
+          interest_rate_preference: string | null
+          job_title: string | null
+          marital_status: string | null
+          monthly_expenses: number | null
+          monthly_salary: number | null
+          number_of_dependents: number | null
+          other_income_sources: Json | null
+          phone_number: string
+          preferred_banks: Json | null
+          preferred_repayment_method: string | null
+          previous_bank_relationships: string | null
+          primary_credit_purpose: string | null
+          recommended_products: Json | null
+          risk_assessment: Json | null
+          savings_amount: number | null
+          survey_completed_at: string | null
+          total_monthly_income: number | null
+          updated_at: string
+          user_id: string
+          work_experience_years: number | null
+        }
+        Insert: {
+          assets?: Json | null
+          created_at?: string
+          credit_history_details?: string | null
+          credit_history_issues?: boolean | null
+          current_credit_cards?: Json | null
+          date_of_birth?: string | null
+          desired_credit_limit?: number | null
+          email?: string | null
+          employer_name?: string | null
+          employment_status: string
+          estimated_credit_score?: number | null
+          existing_loans?: Json | null
+          full_name: string
+          id?: string
+          interest_rate_preference?: string | null
+          job_title?: string | null
+          marital_status?: string | null
+          monthly_expenses?: number | null
+          monthly_salary?: number | null
+          number_of_dependents?: number | null
+          other_income_sources?: Json | null
+          phone_number: string
+          preferred_banks?: Json | null
+          preferred_repayment_method?: string | null
+          previous_bank_relationships?: string | null
+          primary_credit_purpose?: string | null
+          recommended_products?: Json | null
+          risk_assessment?: Json | null
+          savings_amount?: number | null
+          survey_completed_at?: string | null
+          total_monthly_income?: number | null
+          updated_at?: string
+          user_id: string
+          work_experience_years?: number | null
+        }
+        Update: {
+          assets?: Json | null
+          created_at?: string
+          credit_history_details?: string | null
+          credit_history_issues?: boolean | null
+          current_credit_cards?: Json | null
+          date_of_birth?: string | null
+          desired_credit_limit?: number | null
+          email?: string | null
+          employer_name?: string | null
+          employment_status?: string
+          estimated_credit_score?: number | null
+          existing_loans?: Json | null
+          full_name?: string
+          id?: string
+          interest_rate_preference?: string | null
+          job_title?: string | null
+          marital_status?: string | null
+          monthly_expenses?: number | null
+          monthly_salary?: number | null
+          number_of_dependents?: number | null
+          other_income_sources?: Json | null
+          phone_number?: string
+          preferred_banks?: Json | null
+          preferred_repayment_method?: string | null
+          previous_bank_relationships?: string | null
+          primary_credit_purpose?: string | null
+          recommended_products?: Json | null
+          risk_assessment?: Json | null
+          savings_amount?: number | null
+          survey_completed_at?: string | null
+          total_monthly_income?: number | null
+          updated_at?: string
+          user_id?: string
+          work_experience_years?: number | null
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           advisor_id: string | null
