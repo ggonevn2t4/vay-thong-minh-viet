@@ -93,19 +93,19 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
     }
   };
 
-  const renderQuestionField = (question: OptimizedQuestion) => {
+  const renderCompactQuestionField = (question: OptimizedQuestion) => {
     const value = currentFormData.customer_questions?.[question.id] || '';
     const hasError = errors[question.id];
 
-    const baseClasses = `transition-all duration-200 ${hasError ? 'border-red-500 ring-red-200' : 'focus:ring-blue-200'}`;
+    const baseClasses = `transition-all duration-200 text-sm ${hasError ? 'border-red-500 ring-red-200' : 'focus:ring-blue-200'}`;
 
     switch (question.type) {
       case 'text':
         return (
-          <div key={question.id} className="space-y-3 animate-fade-in">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{question.icon}</span>
-              <Label htmlFor={question.id} className="text-sm font-semibold text-gray-700">
+          <div key={question.id} className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">{question.icon}</span>
+              <Label htmlFor={question.id} className="text-xs font-medium text-gray-700 leading-tight">
                 {question.label}
                 {question.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
@@ -116,17 +116,11 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
               placeholder={question.placeholder}
               value={value}
               onChange={(e) => handleInputChange(question.id, e.target.value)}
-              className={baseClasses}
+              className={`${baseClasses} h-8 px-2`}
             />
-            {question.helpText && (
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                <HelpCircle className="h-3 w-3" />
-                {question.helpText}
-              </p>
-            )}
             {hasError && (
-              <p className="text-red-500 text-sm flex items-center gap-1">
-                <AlertCircle className="h-4 w-4" />
+              <p className="text-red-500 text-xs flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
                 {hasError}
               </p>
             )}
@@ -135,10 +129,10 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
 
       case 'number':
         return (
-          <div key={question.id} className="space-y-3 animate-fade-in">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{question.icon}</span>
-              <Label htmlFor={question.id} className="text-sm font-semibold text-gray-700">
+          <div key={question.id} className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">{question.icon}</span>
+              <Label htmlFor={question.id} className="text-xs font-medium text-gray-700 leading-tight">
                 {question.label}
                 {question.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
@@ -149,17 +143,11 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
               placeholder={question.placeholder}
               value={value}
               onChange={(e) => handleInputChange(question.id, e.target.value)}
-              className={baseClasses}
+              className={`${baseClasses} h-8 px-2`}
             />
-            {question.helpText && (
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                <HelpCircle className="h-3 w-3" />
-                {question.helpText}
-              </p>
-            )}
             {hasError && (
-              <p className="text-red-500 text-sm flex items-center gap-1">
-                <AlertCircle className="h-4 w-4" />
+              <p className="text-red-500 text-xs flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
                 {hasError}
               </p>
             )}
@@ -168,35 +156,29 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
 
       case 'select':
         return (
-          <div key={question.id} className="space-y-3 animate-fade-in">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{question.icon}</span>
-              <Label htmlFor={question.id} className="text-sm font-semibold text-gray-700">
+          <div key={question.id} className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">{question.icon}</span>
+              <Label htmlFor={question.id} className="text-xs font-medium text-gray-700 leading-tight">
                 {question.label}
                 {question.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
             </div>
             <Select value={value} onValueChange={(val) => handleInputChange(question.id, val)}>
-              <SelectTrigger className={baseClasses}>
-                <SelectValue placeholder="Chọn một tùy chọn" />
+              <SelectTrigger className={`${baseClasses} h-8`}>
+                <SelectValue placeholder="Chọn..." />
               </SelectTrigger>
-              <SelectContent className="bg-white border shadow-lg z-50">
+              <SelectContent className="bg-white border shadow-lg z-50 max-h-60">
                 {question.options?.map((option: string) => (
-                  <SelectItem key={option} value={option} className="hover:bg-gray-100">
+                  <SelectItem key={option} value={option} className="hover:bg-gray-100 text-sm">
                     {option}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {question.helpText && (
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                <HelpCircle className="h-3 w-3" />
-                {question.helpText}
-              </p>
-            )}
             {hasError && (
-              <p className="text-red-500 text-sm flex items-center gap-1">
-                <AlertCircle className="h-4 w-4" />
+              <p className="text-red-500 text-xs flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
                 {hasError}
               </p>
             )}
@@ -205,19 +187,19 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
 
       case 'checkbox':
         return (
-          <div key={question.id} className="space-y-3 animate-fade-in">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{question.icon}</span>
-              <Label className="text-sm font-semibold text-gray-700">
+          <div key={question.id} className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">{question.icon}</span>
+              <Label className="text-xs font-medium text-gray-700 leading-tight">
                 {question.label}
                 {question.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {question.options?.map((option: string) => {
+            <div className="space-y-1">
+              {question.options?.slice(0, 4).map((option: string) => {
                 const isChecked = Array.isArray(value) ? value.includes(option) : false;
                 return (
-                  <div key={option} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50">
+                  <div key={option} className="flex items-center space-x-2 p-1 rounded hover:bg-gray-50">
                     <Checkbox
                       id={`${question.id}_${option}`}
                       checked={isChecked}
@@ -229,23 +211,18 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
                           handleInputChange(question.id, currentArray.filter((item: string) => item !== option));
                         }
                       }}
+                      className="h-3 w-3"
                     />
-                    <Label htmlFor={`${question.id}_${option}`} className="text-sm font-medium cursor-pointer">
+                    <Label htmlFor={`${question.id}_${option}`} className="text-xs cursor-pointer">
                       {option}
                     </Label>
                   </div>
                 );
               })}
             </div>
-            {question.helpText && (
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                <HelpCircle className="h-3 w-3" />
-                {question.helpText}
-              </p>
-            )}
             {hasError && (
-              <p className="text-red-500 text-sm flex items-center gap-1">
-                <AlertCircle className="h-4 w-4" />
+              <p className="text-red-500 text-xs flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
                 {hasError}
               </p>
             )}
@@ -287,10 +264,10 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
 
       case 'date':
         return (
-          <div key={question.id} className="space-y-3 animate-fade-in">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{question.icon}</span>
-              <Label htmlFor={question.id} className="text-sm font-semibold text-gray-700">
+          <div key={question.id} className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">{question.icon}</span>
+              <Label htmlFor={question.id} className="text-xs font-medium text-gray-700 leading-tight">
                 {question.label}
                 {question.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
@@ -300,17 +277,11 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
               type="date"
               value={value}
               onChange={(e) => handleInputChange(question.id, e.target.value)}
-              className={baseClasses}
+              className={`${baseClasses} h-8 px-2`}
             />
-            {question.helpText && (
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                <HelpCircle className="h-3 w-3" />
-                {question.helpText}
-              </p>
-            )}
             {hasError && (
-              <p className="text-red-500 text-sm flex items-center gap-1">
-                <AlertCircle className="h-4 w-4" />
+              <p className="text-red-500 text-xs flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
                 {hasError}
               </p>
             )}
@@ -410,10 +381,10 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
 
       case 'phone':
         return (
-          <div key={question.id} className="space-y-3 animate-fade-in">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{question.icon}</span>
-              <Label htmlFor={question.id} className="text-sm font-semibold text-gray-700">
+          <div key={question.id} className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">{question.icon}</span>
+              <Label htmlFor={question.id} className="text-xs font-medium text-gray-700 leading-tight">
                 {question.label}
                 {question.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
@@ -424,17 +395,11 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
               placeholder={question.placeholder}
               value={value}
               onChange={(e) => handleInputChange(question.id, e.target.value)}
-              className={baseClasses}
+              className={`${baseClasses} h-8 px-2`}
             />
-            {question.helpText && (
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                <HelpCircle className="h-3 w-3" />
-                {question.helpText}
-              </p>
-            )}
             {hasError && (
-              <p className="text-red-500 text-sm flex items-center gap-1">
-                <AlertCircle className="h-4 w-4" />
+              <p className="text-red-500 text-xs flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
                 {hasError}
               </p>
             )}
@@ -443,10 +408,10 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
 
       case 'email':
         return (
-          <div key={question.id} className="space-y-3 animate-fade-in">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{question.icon}</span>
-              <Label htmlFor={question.id} className="text-sm font-semibold text-gray-700">
+          <div key={question.id} className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">{question.icon}</span>
+              <Label htmlFor={question.id} className="text-xs font-medium text-gray-700 leading-tight">
                 {question.label}
                 {question.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
@@ -457,17 +422,11 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
               placeholder={question.placeholder}
               value={value}
               onChange={(e) => handleInputChange(question.id, e.target.value)}
-              className={baseClasses}
+              className={`${baseClasses} h-8 px-2`}
             />
-            {question.helpText && (
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                <HelpCircle className="h-3 w-3" />
-                {question.helpText}
-              </p>
-            )}
             {hasError && (
-              <p className="text-red-500 text-sm flex items-center gap-1">
-                <AlertCircle className="h-4 w-4" />
+              <p className="text-red-500 text-xs flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
                 {hasError}
               </p>
             )}
@@ -476,10 +435,10 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
 
       case 'id_number':
         return (
-          <div key={question.id} className="space-y-3 animate-fade-in">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{question.icon}</span>
-              <Label htmlFor={question.id} className="text-sm font-semibold text-gray-700">
+          <div key={question.id} className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm">{question.icon}</span>
+              <Label htmlFor={question.id} className="text-xs font-medium text-gray-700 leading-tight">
                 {question.label}
                 {question.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
@@ -490,18 +449,12 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
               placeholder={question.placeholder}
               value={value}
               onChange={(e) => handleInputChange(question.id, e.target.value)}
-              className={baseClasses}
+              className={`${baseClasses} h-8 px-2`}
               maxLength={12}
             />
-            {question.helpText && (
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                <HelpCircle className="h-3 w-3" />
-                {question.helpText}
-              </p>
-            )}
             {hasError && (
-              <p className="text-red-500 text-sm flex items-center gap-1">
-                <AlertCircle className="h-4 w-4" />
+              <p className="text-red-500 text-xs flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
                 {hasError}
               </p>
             )}
@@ -551,88 +504,102 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
   };
 
   return (
-    <div className="max-w-5xl mx-auto">
-      {/* Header with progress */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
+    <div className="max-w-7xl mx-auto">
+      {/* Compact Header */}
+      <div className="mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{questionnaire.title}</h1>
-            <p className="text-gray-600 mt-1">{questionnaire.description}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{questionnaire.title}</h1>
+            <p className="text-gray-600 text-sm">{questionnaire.description}</p>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Clock className="h-4 w-4" />
-            <span>{questionnaire.estimatedTime}</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Clock className="h-4 w-4" />
+              <span>{questionnaire.estimatedTime}</span>
+            </div>
+            <div className="text-sm font-medium text-blue-600">
+              {totalProgress}% hoàn thành
+            </div>
           </div>
         </div>
         
-        {/* Progress bar */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="font-medium">Tiến độ hoàn thành</span>
-            <span>{totalProgress}% ({completedRequiredQuestions}/{totalRequiredQuestions} câu hỏi bắt buộc)</span>
-          </div>
-          <Progress value={totalProgress} className="w-full h-2" />
-        </div>
+        {/* Compact Progress bar */}
+        <Progress value={totalProgress} className="w-full h-1.5" />
       </div>
 
-      {/* All categories displayed at once */}
-      <div className="space-y-8">
-        {questionnaire.categories.map((category, categoryIndex) => {
-          const categoryQuestions = category.questions.filter(q => 
-            visibleQuestions.some(vq => vq.id === q.id)
-          );
-
-          if (categoryQuestions.length === 0) return null;
-
-          return (
-            <Card key={category.id} className="shadow-lg border-0 bg-white">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white text-xl">
-                    {category.icon}
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl text-gray-900">{category.name}</CardTitle>
-                    <p className="text-gray-600 text-sm">{category.description}</p>
-                  </div>
-                </div>
-              </CardHeader>
+      {/* Compact single form layout */}
+      <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+        <div className="p-6">
+          {/* Category tabs as headers */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-8">
+            {questionnaire.categories.map((category) => {
+              const categoryQuestions = category.questions.filter(q => 
+                visibleQuestions.some(vq => vq.id === q.id)
+              );
+              if (categoryQuestions.length === 0) return null;
               
-              <CardContent className="p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {categoryQuestions.map(renderQuestionField)}
+              const completedInCategory = categoryQuestions.filter(q => 
+                currentFormData.customer_questions?.[q.id] !== undefined && 
+                currentFormData.customer_questions?.[q.id] !== '' && 
+                currentFormData.customer_questions?.[q.id] !== null
+              ).length;
+              
+              return (
+                <div key={category.id} className="text-center p-3 bg-gray-50 rounded-lg border">
+                  <div className="text-lg mb-1">{category.icon}</div>
+                  <div className="text-xs font-medium text-gray-700">{category.name}</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {completedInCategory}/{categoryQuestions.length}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+              );
+            })}
+          </div>
 
-      {/* Submit section */}
-      <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-        <div className="flex justify-between items-center">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onBack}
-            className="flex items-center gap-2 hover:bg-gray-100"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Quay lại
-          </Button>
-          
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-600">
-              Đã hoàn thành {completedRequiredQuestions}/{totalRequiredQuestions} câu hỏi bắt buộc
-            </div>
+          {/* All questions in a compact grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {questionnaire.categories.map((category) => {
+              const categoryQuestions = category.questions.filter(q => 
+                visibleQuestions.some(vq => vq.id === q.id)
+              );
+
+              if (categoryQuestions.length === 0) return null;
+
+              return categoryQuestions.map((question) => (
+                <div key={question.id} className="space-y-2">
+                  {renderCompactQuestionField(question)}
+                </div>
+              ));
+            })}
+          </div>
+        </div>
+
+        {/* Compact Submit section */}
+        <div className="border-t border-gray-200 p-4 bg-gray-50 rounded-b-lg">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <Button
-              onClick={handleSubmit}
-              className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 px-8"
-              disabled={totalProgress < 100}
+              type="button"
+              variant="outline"
+              onClick={onBack}
+              className="flex items-center gap-2 hover:bg-gray-100"
             >
-              Hoàn thành khảo sát
-              <ArrowRight className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4" />
+              Quay lại
             </Button>
+            
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="text-sm text-gray-600 text-center sm:text-right">
+                Đã hoàn thành {completedRequiredQuestions}/{totalRequiredQuestions} câu hỏi bắt buộc
+              </div>
+              <Button
+                onClick={handleSubmit}
+                className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 px-8"
+                disabled={totalProgress < 100}
+              >
+                Hoàn thành khảo sát
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
