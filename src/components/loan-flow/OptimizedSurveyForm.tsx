@@ -31,21 +31,20 @@ interface OptimizedSurveyFormProps {
 const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: OptimizedSurveyFormProps) => {
   const [currentFormData, setCurrentFormData] = useState(formData);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [currentCategoryIndex, setCategoryIndex] = useState(0);
-  const [completedCategories, setCompletedCategories] = useState<Set<string>>(new Set());
   const [startTime] = useState(Date.now());
 
   const productType = formData.product_type || 'credit_loan';
   const questionnaire = getQuestionnaireForProduct(productType);
-  const currentCategory = questionnaire.categories[currentCategoryIndex];
   const visibleQuestions = getConditionalQuestions(questionnaire, currentFormData.customer_questions || {});
-  const categoryQuestions = currentCategory.questions.filter(q => 
-    visibleQuestions.some(vq => vq.id === q.id)
-  );
 
-  const totalProgress = Math.round(
-    ((currentCategoryIndex + (completedCategories.has(currentCategory.id) ? 1 : 0)) / questionnaire.categories.length) * 100
-  );
+  // Calculate progress based on completed questions
+  const totalRequiredQuestions = visibleQuestions.filter(q => q.required).length;
+  const completedRequiredQuestions = visibleQuestions.filter(q => 
+    q.required && currentFormData.customer_questions?.[q.id] !== undefined && 
+    currentFormData.customer_questions?.[q.id] !== '' && 
+    currentFormData.customer_questions?.[q.id] !== null
+  ).length;
+  const totalProgress = totalRequiredQuestions > 0 ? Math.round((completedRequiredQuestions / totalRequiredQuestions) * 100) : 0;
 
   const handleInputChange = (questionId: string, value: any) => {
     const updatedData = {
@@ -67,10 +66,10 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
     }
   };
 
-  const validateCurrentCategory = () => {
+  const validateAllQuestions = () => {
     const newErrors: Record<string, string> = {};
     
-    categoryQuestions.forEach(question => {
+    visibleQuestions.forEach(question => {
       const value = currentFormData.customer_questions?.[question.id];
       const validation = validateQuestionResponse(question, value);
       
@@ -83,28 +82,14 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNextCategory = () => {
-    if (validateCurrentCategory()) {
-      setCompletedCategories(prev => new Set([...prev, currentCategory.id]));
-      
-      if (currentCategoryIndex < questionnaire.categories.length - 1) {
-        setCategoryIndex(currentCategoryIndex + 1);
-        toast.success(`Hoàn thành ${currentCategory.name}`);
-      } else {
-        // All categories completed
-        onUpdateFormData(currentFormData);
-        const timeSpent = Math.round((Date.now() - startTime) / 1000 / 60);
-        toast.success(`Hoàn thành khảo sát trong ${timeSpent} phút!`);
-        onNext();
-      }
-    }
-  };
-
-  const handlePreviousCategory = () => {
-    if (currentCategoryIndex > 0) {
-      setCategoryIndex(currentCategoryIndex - 1);
+  const handleSubmit = () => {
+    if (validateAllQuestions()) {
+      onUpdateFormData(currentFormData);
+      const timeSpent = Math.round((Date.now() - startTime) / 1000 / 60);
+      toast.success(`Hoàn thành khảo sát trong ${timeSpent} phút!`);
+      onNext();
     } else {
-      onBack();
+      toast.error("Vui lòng điền đầy đủ thông tin bắt buộc và kiểm tra lại các lỗi");
     }
   };
 
@@ -566,7 +551,7 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       {/* Header with progress */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
@@ -583,78 +568,74 @@ const OptimizedSurveyForm = ({ formData, onUpdateFormData, onNext, onBack }: Opt
         {/* Progress bar */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="font-medium">Tiến độ</span>
-            <span>{totalProgress}%</span>
+            <span className="font-medium">Tiến độ hoàn thành</span>
+            <span>{totalProgress}% ({completedRequiredQuestions}/{totalRequiredQuestions} câu hỏi bắt buộc)</span>
           </div>
           <Progress value={totalProgress} className="w-full h-2" />
         </div>
-
-        {/* Category navigation */}
-        <div className="flex flex-wrap gap-2 mt-4">
-          {questionnaire.categories.map((category, index) => (
-            <Badge
-              key={category.id}
-              variant={
-                index === currentCategoryIndex 
-                  ? "default" 
-                  : completedCategories.has(category.id) 
-                    ? "secondary" 
-                    : "outline"
-              }
-              className={`flex items-center gap-1 ${
-                index === currentCategoryIndex ? 'bg-blue-600' : ''
-              }`}
-            >
-              <span>{category.icon}</span>
-              <span>{category.name}</span>
-              {completedCategories.has(category.id) && (
-                <CheckCircle className="h-3 w-3 ml-1" />
-              )}
-            </Badge>
-          ))}
-        </div>
       </div>
 
-      {/* Current category form */}
-      <Card className="shadow-lg border-0 bg-white">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-lg">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white text-xl">
-              {currentCategory.icon}
-            </div>
-            <div>
-              <CardTitle className="text-xl text-gray-900">{currentCategory.name}</CardTitle>
-              <p className="text-gray-600 text-sm">{currentCategory.description}</p>
-            </div>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="p-8">
-          <div className="space-y-8">
-            {categoryQuestions.map(renderQuestionField)}
-          </div>
+      {/* All categories displayed at once */}
+      <div className="space-y-8">
+        {questionnaire.categories.map((category, categoryIndex) => {
+          const categoryQuestions = category.questions.filter(q => 
+            visibleQuestions.some(vq => vq.id === q.id)
+          );
+
+          if (categoryQuestions.length === 0) return null;
+
+          return (
+            <Card key={category.id} className="shadow-lg border-0 bg-white">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white text-xl">
+                    {category.icon}
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl text-gray-900">{category.name}</CardTitle>
+                    <p className="text-gray-600 text-sm">{category.description}</p>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {categoryQuestions.map(renderQuestionField)}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Submit section */}
+      <div className="mt-8 p-6 bg-gray-50 rounded-lg">
+        <div className="flex justify-between items-center">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onBack}
+            className="flex items-center gap-2 hover:bg-gray-100"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Quay lại
+          </Button>
           
-          <div className="flex justify-between pt-8 mt-8 border-t">
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-600">
+              Đã hoàn thành {completedRequiredQuestions}/{totalRequiredQuestions} câu hỏi bắt buộc
+            </div>
             <Button
-              type="button"
-              variant="outline"
-              onClick={handlePreviousCategory}
-              className="flex items-center gap-2 hover:bg-gray-50"
+              onClick={handleSubmit}
+              className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 px-8"
+              disabled={totalProgress < 100}
             >
-              <ArrowLeft className="h-4 w-4" />
-              {currentCategoryIndex === 0 ? 'Quay lại' : 'Mục trước'}
-            </Button>
-            
-            <Button
-              onClick={handleNextCategory}
-              className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 px-6"
-            >
-              {currentCategoryIndex === questionnaire.categories.length - 1 ? 'Hoàn thành' : 'Tiếp tục'}
+              Hoàn thành khảo sát
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };
