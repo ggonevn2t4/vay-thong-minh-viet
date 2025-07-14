@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import OptimizedSurveyForm from '@/components/loan-flow/OptimizedSurveyForm';
+import ConsumerCreditLoanSurveyForm from '@/components/consumer-credit-survey/ConsumerCreditLoanSurveyForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, CreditCard, FileText, Users, Target } from 'lucide-react';
@@ -170,12 +170,15 @@ const ConsumerCreditLoanSurvey = () => {
       <Layout>
         <div className="py-8 bg-gray-50 min-h-screen">
           <div className="container mx-auto px-4">
-            <OptimizedSurveyForm
-              formData={formData}
-              onUpdateFormData={handleUpdateFormData}
-              onNext={handleNext}
-              onBack={handleBack}
-            />
+            <Button
+              variant="ghost"
+              onClick={handleBack}
+              className="mb-6 flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Quay lại
+            </Button>
+            <ConsumerCreditLoanSurveyForm />
           </div>
         </div>
       </Layout>
