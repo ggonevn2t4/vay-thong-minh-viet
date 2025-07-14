@@ -56,6 +56,9 @@ export const SignInForm = () => {
     return <ResetPasswordRequestForm onBackToSignIn={() => setIsResetRequest(false)} />;
   }
 
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isDisabled = isLoading || !isValidEmail(formData.email) || !formData.password || formData.password.length < 6;
+
   return (
     <form onSubmit={handleSignIn} className="space-y-4">
       <div className="space-y-2">
@@ -106,8 +109,8 @@ export const SignInForm = () => {
       </div>
       <Button
         type="submit"
-        className="w-full bg-brand-600 hover:bg-brand-700"
-        disabled={isLoading}
+        className="w-full rounded-lg shadow-md transition-all duration-200 font-semibold text-white bg-brand-600 hover:bg-brand-700 focus:ring-2 focus:ring-brand-400 focus:outline-none disabled:bg-brand-100 disabled:text-gray-400"
+        disabled={isDisabled}
       >
         {isLoading ? (
           <>

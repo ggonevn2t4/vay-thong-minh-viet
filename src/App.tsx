@@ -46,6 +46,7 @@ import HomeLoanSurvey from "./pages/HomeLoanSurvey";
 import CarLoanSurvey from "./pages/CarLoanSurvey";
 import ConsumerCreditLoanSurvey from "./pages/ConsumerCreditLoanSurvey";
 import CompanySettings from "./pages/CompanySettings";
+import OnePageLoanApplicationForm from './components/loan-flow/OnePageLoanApplicationForm';
 
 const queryClient = new QueryClient();
 
@@ -89,7 +90,7 @@ function App() {
               <Route path="/khao-sat" element={<KhaoSat />} />
               <Route path="/ket-qua" element={<KetQua />} />
               <Route path="/so-sanh" element={<SoSanh />} />
-              <Route path="/loan-application" element={<LoanApplication />} />
+              <Route path="/loan-application" element={<OnePageLoanApplicationForm />} />
               <Route path="/offer-management" element={<OfferManagement />} />
               <Route path="/legal-document-flow" element={<LegalDocumentFlow />} />
               <Route path="/enhanced-communication" element={<EnhancedCommunication />} />

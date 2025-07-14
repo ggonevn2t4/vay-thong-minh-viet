@@ -1,15 +1,14 @@
 
 import React from 'react';
 import Layout from '@/components/layout/Layout';
-import LoanApplicationFlow from '@/components/loan-flow/LoanApplicationFlow';
+import OnePageLoanApplicationForm from '@/components/loan-flow/OnePageLoanApplicationForm';
 
 const LoanApplication = () => {
-  console.log('LoanApplication page loaded successfully');
-  
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-        <LoanApplicationFlow />
+        <h1 className="text-2xl font-bold mb-4">Đăng ký khoản vay</h1>
+        <OnePageLoanApplicationForm />
       </div>
     </Layout>
   );
